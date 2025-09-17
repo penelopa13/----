@@ -137,12 +137,35 @@ body {
   border-radius:8px; 
   font-weight:600;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .btn.small:hover {
   background:#e09e0c;
   color:#fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   transform: scale(1.05);
+}
+
+/* ---------- Lang Switcher ---------- */
+.lang-switcher {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.lang-switcher a {
+  color: #fff;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+.lang-switcher a:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--accent-color);
 }
 
 /* mobile menu */
