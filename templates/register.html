@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+{% block content %}
+<section class="section container">
+  <h1>Регистрация</h1>
+  <form method="POST" class="auth-form">
+    <input name="name" placeholder="Ваше имя" required>
+    <input name="email" type="email" placeholder="Email" required>
+    <input name="password" type="password" placeholder="Пароль" required>
+    <button class="btn" type="submit">Зарегистрироваться</button>
+  </form>
+</section>
+{% endblock %}
