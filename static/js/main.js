@@ -1,20 +1,26 @@
-// nav toggle
+// Ждём загрузки документа
 document.addEventListener('DOMContentLoaded', () => {
+  // Навигация (бургер-меню)
   const toggle = document.getElementById('nav-toggle');
   const nav = document.getElementById('nav');
-  toggle.addEventListener('click', () => nav.classList.toggle('open'));
+  if (toggle && nav) {
+    toggle.addEventListener('click', () => nav.classList.toggle('open'));
+  }
 
-  // FAQ accordion
+  // FAQ (аккордеон)
   document.querySelectorAll('.faq-question').forEach(btn => {
     btn.addEventListener('click', () => {
       const ans = btn.nextElementSibling;
       btn.classList.toggle('active');
-      if (ans.style.maxHeight) ans.style.maxHeight = null;
-      else ans.style.maxHeight = ans.scrollHeight + "px";
+      if (ans.style.maxHeight) {
+        ans.style.maxHeight = null;
+      } else {
+        ans.style.maxHeight = ans.scrollHeight + "px";
+      }
     });
   });
 
-  // Calculator (if exists)
+  // Калькулятор баллов
   const calcForm = document.querySelector('.calculator-form');
   if (calcForm) {
     calcForm.addEventListener('submit', (e) => {
@@ -23,18 +29,18 @@ document.addEventListener('DOMContentLoaded', () => {
       let sum = 0;
       inputs.forEach(i => sum += Number(i.value) || 0);
       const res = calcForm.querySelector('.calc-result') || document.querySelector('.calc-result');
-      res.textContent = `Итоговые баллы: ${sum}`;
-      // Можно отправить на сервер через fetch если нужно
+      if (res) res.textContent = `Итоговые баллы: ${sum}`;
     });
   }
 
-  // Status check (AJAX)
+  // Проверка статуса заявки (AJAX)
   const statusForm = document.querySelector('.status-form');
   if (statusForm) {
     statusForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const q = statusForm.querySelector('input').value.trim();
       const out = document.querySelector('.status-result');
+      if (!out) return;
       out.textContent = 'Проверка...';
       try {
         const resp = await fetch('/api/status?q=' + encodeURIComponent(q));
@@ -46,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Contact form (AJAX)
+  // Контактная форма (AJAX)
   const contactForm = document.querySelector('.contact-form');
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
@@ -60,13 +66,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const resp = await fetch('/api/contact', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({name, email, message})
+          body: JSON.stringify({ name, email, message })
         });
         const d = await resp.json();
         alert(d.status || 'Отправлено');
       } catch (err) {
         alert('Ошибка отправки');
-      } finally { btn.disabled = false; }
+      } finally {
+        btn.disabled = false;
+      }
     });
+  }
+});
+
+// Прозрачность шапки при скролле
+window.addEventListener('scroll', () => {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+  if (window.scrollY > 50) {
+    header.classList.add('scrolled');
+  } else {
+    header.classList.remove('scrolled');
   }
 });
