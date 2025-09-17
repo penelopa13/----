@@ -1,35 +1,16 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Статус заявки - Талапкер</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <header>
-        <div class="logo">Талапкер</div>
-        <nav>
-            <a href="/">Главная</a>
-            <a href="/faq">FAQ</a>
-            <a href="/status">Статус заявки</a>
-            <a href="/programs">Программы</a>
-            <a href="/calculator">Калькулятор</a>
-            <a href="/contact">Контакты</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <section class="section">
+{% block title %}Статус заявки - Талапкер{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
         <h1>Проверка статуса заявки</h1>
         <form class="status-form">
             <input type="text" placeholder="Введите номер заявки или email" required>
             <button type="submit" class="btn">Проверить</button>
         </form>
         <p class="status-result"></p>
-    </section>
-
-    <footer>
-        <p>© 2025 Университет. Все права защищены.</p>
-    </footer>
-</body>
-</html>
+    </div>
+</section>
+{% endblock %}
