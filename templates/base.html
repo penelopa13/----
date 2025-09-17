@@ -8,25 +8,36 @@
 </head>
 <body>
   <header class="site-header sticky-header">
-    <div class="container header-row">
-       <a href="{{ url_for('home') }}" class="logo">
-      <img src="{{ url_for('static', filename='images/logo_zhubanov.png') }}" alt="Талапкер" />
-    </a>
-      
+    <div class="header-row">
+
+      <!-- Логотип -->
+      <a href="{{ url_for('home') }}" class="logo">
+        <img src="{{ url_for('static', filename='images/logo_zhubanov.png') }}" alt="Талапкер" />
+        <span>Талапкер</span>
+      </a>
+
+      <!-- Кнопка для мобильного меню -->
       <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu">☰</button>
+
+      <!-- Навигация -->
       <nav class="nav" id="nav">
-        <a href="{{ url_for('home') }}">Главная</a>
-        <a href="{{ url_for('faq') }}">FAQ</a>
-        <a href="{{ url_for('status') }}">Статус заявки</a>
-        <a href="{{ url_for('programs') }}">Программы</a>
-        <a href="{{ url_for('calculator') }}">Калькулятор</a>
-        <a href="{{ url_for('contact') }}">Контакты</a>
-        {% if current_user.is_authenticated %}
-          <a href="{{ url_for('logout') }}">Выйти</a>
-        {% else %}
-          <a href="{{ url_for('login') }}">Войти</a>
-          <a class="btn small" href="{{ url_for('register') }}">Регистрация</a>
-        {% endif %}
+        <div class="nav-center">
+          <a href="{{ url_for('home') }}">Главная</a>
+          <a href="{{ url_for('faq') }}">FAQ</a>
+          <a href="{{ url_for('status') }}">Статус заявки</a>
+          <a href="{{ url_for('programs') }}">Программы</a>
+          <a href="{{ url_for('calculator') }}">Калькулятор</a>
+          <a href="{{ url_for('contact') }}">Контакты</a>
+        </div>
+
+        <div class="nav-right">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('logout') }}">Выйти</a>
+          {% else %}
+            <a href="{{ url_for('login') }}">Войти</a>
+            <a class="btn small" href="{{ url_for('register') }}">Регистрация</a>
+          {% endif %}
+        </div>
       </nav>
     </div>
   </header>
