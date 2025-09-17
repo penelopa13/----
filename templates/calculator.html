@@ -1,37 +1,38 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор баллов - Талапкер</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <header>
-        <div class="logo">Талапкер</div>
-        <nav>
-            <a href="/">Главная</a>
-            <a href="/faq">FAQ</a>
-            <a href="/status">Статус заявки</a>
-            <a href="/programs">Программы</a>
-            <a href="/calculator">Калькулятор</a>
-            <a href="/contact">Контакты</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <section class="section">
-        <h1>Калькулятор баллов</h1>
-        <form class="calculator-form">
-            <input type="number" placeholder="Баллы по предмету 1" required>
-            <input type="number" placeholder="Баллы по предмету 2" required>
-            <input type="number" placeholder="Баллы по предмету 3" required>
-            <button type="submit" class="btn">Рассчитать</button>
-        </form>
-        <p class="calc-result"></p>
-    </section>
+{% block title %}Калькулятор баллов - Талапкер{% endblock %}
 
-    <footer>
-        <p>© 2025 Университет. Все права защищены.</p>
-    </footer>
-</body>
-</html>
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1>Калькулятор баллов</h1>
+    <form class="calculator-form" id="calcForm">
+      <input type="number" name="val1" placeholder="Баллы по предмету 1" required>
+      <input type="number" name="val2" placeholder="Баллы по предмету 2" required>
+      <input type="number" name="val3" placeholder="Баллы по предмету 3" required>
+      <button type="submit" class="btn">Рассчитать</button>
+    </form>
+    <p id="calcResult"></p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('calcForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const vals = [
+    parseFloat(e.target.val1.value) || 0,
+    parseFloat(e.target.val2.value) || 0,
+    parseFloat(e.target.val3.value) || 0
+  ];
+  const res = await fetch('/api/calc', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vals })
+  });
+  const data = await res.json();
+  document.getElementById('calcResult').textContent = "Общий балл: " + data.total;
+});
+</script>
+{% endblock %}
