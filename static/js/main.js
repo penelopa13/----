@@ -83,9 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('scroll', () => {
   const header = document.querySelector('.site-header');
   if (!header) return;
+
   if (window.scrollY > 50) {
+    // При скролле делаем более прозрачным
     header.classList.add('scrolled');
   } else {
+    // Вверху страницы — тёмный фон
     header.classList.remove('scrolled');
   }
 });
