@@ -1,38 +1,42 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Контакты - Талапкер</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <header>
-        <div class="logo">Талапкер</div>
-        <nav>
-            <a href="/">Главная</a>
-            <a href="/faq">FAQ</a>
-            <a href="/status">Статус заявки</a>
-            <a href="/programs">Программы</a>
-            <a href="/calculator">Калькулятор</a>
-            <a href="/contact">Контакты</a>
-        </nav>
-    </header>
+{% extends "base.html" %}
 
-    <section class="section">
-        <h1>Контакты</h1>
-        <p>Приёмная комиссия: +7 (700) 123-45-67</p>
-        <p>Email: info@university.kz</p>
-        <form class="contact-form">
-            <input type="text" placeholder="Ваше имя" required>
-            <input type="email" placeholder="Ваш Email" required>
-            <textarea placeholder="Сообщение" required></textarea>
-            <button type="submit" class="btn">Отправить</button>
-        </form>
-    </section>
+{% block title %}Контакты - Талапкер{% endblock %}
 
-    <footer>
-        <p>© 2025 Университет. Все права защищены.</p>
-    </footer>
-</body>
-</html>
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1>Контакты</h1>
+    <p>Приёмная комиссия: +7 (700) 123-45-67</p>
+    <p>Email: info@university.kz</p>
+    <form class="contact-form" id="contactForm">
+      <input type="text" name="name" placeholder="Ваше имя" required>
+      <input type="email" name="email" placeholder="Ваш Email" required>
+      <textarea name="message" placeholder="Сообщение" required></textarea>
+      <button type="submit" class="btn">Отправить</button>
+    </form>
+    <p id="formResult"></p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    name: form.name.value,
+    email: form.email.value,
+    message: form.message.value
+  };
+  const res = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  document.getElementById('formResult').textContent = result.message;
+  if(result.status === 'ok') form.reset();
+});
+</script>
+{% endblock %}
