@@ -48,7 +48,7 @@ body {
   align-items:center; 
   justify-content:space-between; 
   height:var(--header-h); 
-  padding: 0 30px; /* добавил отступы слева и справа */
+  padding: 0 30px;
 }
 
 /* Логотип */
@@ -99,11 +99,34 @@ body {
 }
 .nav a:hover { background:rgba(255,255,255,0.05); }
 
+/* Кнопки */
+.btn { 
+  background:#fff; 
+  color:var(--primary-color); 
+  padding:12px 20px; 
+  border-radius:8px; 
+  text-decoration:none; 
+  font-weight:600;
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  background: var(--accent-color);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .btn.small { 
   background:var(--accent-color); 
   color:#1b1b1b; 
   padding:8px 12px; 
   border-radius:8px; 
+  font-weight:600;
+  transition: all 0.3s ease;
+}
+.btn.small:hover {
+  background:#e09e0c; /* темнее оранжевый */
+  color:#fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* mobile menu */
@@ -144,13 +167,6 @@ body {
 }
 .hero h1 { font-size:40px; margin-bottom:12px; }
 .hero p { font-size:18px; margin-bottom:18px; }
-.btn { 
-  background:#fff; 
-  color:var(--primary-color); 
-  padding:12px 20px; 
-  border-radius:8px; 
-  text-decoration:none; 
-}
 
 /* ---------- Features ---------- */
 .features { 
