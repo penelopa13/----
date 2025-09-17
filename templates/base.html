@@ -9,7 +9,10 @@
 <body>
   <header class="site-header sticky-header">
     <div class="container header-row">
-      <div class="logo">Талапкер</div>
+       <a href="{{ url_for('home') }}" class="logo">
+      <img src="{{ url_for('static', filename='images/logo_zhubanov.png') }}" alt="Талапкер" />
+    </a>
+      
       <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu">☰</button>
       <nav class="nav" id="nav">
         <a href="{{ url_for('home') }}">Главная</a>
@@ -28,7 +31,7 @@
     </div>
   </header>
 
-  <main>
+  <main class="site-main">
     {% block content %}{% endblock %}
   </main>
 
