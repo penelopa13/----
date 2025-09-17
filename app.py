@@ -44,9 +44,9 @@ def load_user(user_id):
 @app.route('/')
 def home(): return render_template('index.html')
 
-@app.route('/faq')
-def faq():
-    return render_template('faq.html')
+@app.route('/university')
+def university():
+    return render_template('university.html')
 
 @app.route('/status')
 def status():
