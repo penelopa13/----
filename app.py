@@ -1,4 +1,4 @@
-# app.py
+# app.py (исправленная версия)
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
@@ -14,11 +14,11 @@ from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 from flask_babel import Babel, _
-
+from flask_babel import get_locale
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:ndd@localhost/talapker')  # Используем SQLite как fallback, но для продакшна замени на PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:ndd@localhost/talapker')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 app.config['BABEL_LANGUAGES'] = ['ru', 'kk', 'en']
@@ -27,16 +27,24 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
-babel = Babel(app)
 
-@babel.localeselector
+# Инициализация Babel без привязки к app сразу
+babel = Babel()
+
 def get_locale():
-    return request.args.get('lang', session.get('lang', request.accept_languages.best_match(app.config['BABEL_LANGUAGES'])))
+    # Сохраняем выбранный язык в сессии при клике на ссылку языка
+    if 'lang' in request.args:
+        session['lang'] = request.args['lang']
+    # Возвращаем из сессии или по предпочтениям браузера
+    return session.get('lang', request.accept_languages.best_match(app.config['BABEL_LANGUAGES']))
+
+# Привязываем locale_selector через init_app (это решает проблему с версией)
+babel.init_app(app, locale_selector=get_locale)
 
 # --- Models ---
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120))
+    name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200))
     is_admin = db.Column(db.Boolean, default=False)
@@ -50,15 +58,15 @@ class User(db.Model, UserMixin):
 
 class ContactMessage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    message = db.Column(db.Text)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    message = db.Column(db.Text, nullable=False)
 
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     status = db.Column(db.String(50), default='pending')  # pending, accepted, rejected
-    documents = db.Column(db.Text)  # JSON или строка с путями к файлам
+    documents = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # --- Forms ---
@@ -66,7 +74,12 @@ class RegisterForm(FlaskForm):
     name = StringField(_('Имя'), validators=[DataRequired(), Length(min=2, max=120)])
     email = StringField(_('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_('Пароль'), validators=[DataRequired(), Length(min=6)])
-    role = SelectField(_('Роль'), choices=[('abiturient', _('Абитуриент')), ('parent', _('Родитель')), ('student', _('Студент')), ('employee', _('Сотрудник'))])
+    role = SelectField(_('Роль'), choices=[
+        ('abiturient', _('Абитуриент')),
+        ('parent', _('Родитель')),
+        ('student', _('Студент')),
+        ('employee', _('Сотрудник'))
+    ])
     submit = SubmitField(_('Зарегистрироваться'))
 
 class LoginForm(FlaskForm):
@@ -79,7 +92,7 @@ class LoginForm(FlaskForm):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- Основные страницы ---
+# --- Роуты страниц (остаются без изменений) ---
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -104,13 +117,12 @@ def calculator():
 def contact():
     return render_template('contact.html')
 
-# --- Profile ---
 @app.route('/profile')
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
 
-# --- Auth routes ---
+# --- Auth роуты ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -127,7 +139,7 @@ def register():
         return redirect(url_for('profile'))
     return render_template('register.html', form=form)
 
-@app.route('/login', methods=['GET','POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -145,7 +157,7 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-# --- API endpoints ---
+# --- API эндпоинты ---
 @app.route('/api/status')
 @login_required
 def api_status():
@@ -161,7 +173,7 @@ def api_contact():
     name = data.get('name')
     email = data.get('email')
     message = data.get('message')
-    if not (name and email and message):
+    if not all([name, email, message]):
         return jsonify({'status': 'error', 'message': _('Заполните все поля')}), 400
     cm = ContactMessage(name=name, email=email, message=message)
     db.session.add(cm)
@@ -172,21 +184,23 @@ def api_contact():
 def api_calc():
     data = request.get_json() or {}
     vals = data.get('vals', [])
-    if not vals or not all(isinstance(v, (int, float)) for v in vals):
+    try:
+        total = sum(float(v) for v in vals)
+        passing_score = 50  # Реальный порог для ЕНТ/баллов
+        message = _('Достаточно баллов для поступления') if total >= passing_score else _('Недостаточно баллов')
+        return jsonify({'total': total, 'can_apply': total >= passing_score, 'message': message})
+    except (ValueError, TypeError):
         return jsonify({'status': 'error', 'message': _('Некорректные данные')}), 400
-    total = sum(float(v) for v in vals)
-    passing_score = 50  # Замени на реальный порог для поступления
-    return jsonify({
-        'total': total,
-        'can_apply': total >= passing_score,
-        'message': _('Достаточно баллов для поступления') if total >= passing_score else _('Недостаточно баллов')
-    })
 
 @app.route('/api/ai_chat', methods=['POST'])
 def ai_chat():
-    return jsonify({'reply': _('Это заглушка AI. Интеграция OpenAI здесь.')})
+    # Заглушка, позже интегрируй OpenAI или xAI
+    data = request.get_json() or {}
+    message = data.get('message', '')
+    reply = _('Это заглушка AI. Интеграция OpenAI здесь. Ваш вопрос: {}').format(message)
+    return jsonify({'reply': reply})
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Создаст таблицы в PostgreSQL
     app.run(debug=True)
