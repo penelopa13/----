@@ -130,24 +130,6 @@ body {
   transform: scale(1.05);
 }
 
-.btn.small { 
-  background:var(--accent-color); 
-  color:#1b1b1b; 
-  padding:8px 12px; 
-  border-radius:8px; 
-  font-weight:600;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn.small:hover {
-  background:#e09e0c;
-  color:#fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transform: scale(1.05);
-}
-
 /* ---------- Lang Switcher ---------- */
 .lang-switcher {
   display: flex;
@@ -360,10 +342,12 @@ textarea {
   position: absolute;
   z-index: 1000 !important;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   padding: 0.4rem;
   border: none;
-  background-color: #fff !important;;
+  background: rgba(255, 255, 255, 0.15) !important; /* прозрачный белый */
+  backdrop-filter: blur(12px); /* мягкое размытие фона */
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .dropdown-item {
@@ -371,10 +355,51 @@ textarea {
   font-weight: 500;
   border-radius: 6px;
   transition: all 0.3s ease;
-  color: #1a1a1a !important;
+  color: #fff !important; /* белый текст на прозрачном фоне */
 }
 
 .dropdown-item:hover {
   background-color: var(--accent-color) !important;
   color: #fff;
 }
+
+.site-header {
+  background: linear-gradient(90deg, #0f1724, #1a2335);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Навигация */
+.nav a {
+  color: #e5e8ff;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: color 0.3s ease;
+}
+.nav a:hover {
+  color: var(--accent-color);
+}
+
+/* Кнопки */
+.btn.small {
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  padding: 8px 14px;
+}
+.btn.small:hover {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+/* Кнопка регистрации — выделена */
+.btn.orange {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+}
+.btn.orange:hover {
+  background: #e09e0c;
+  color: #fff;
+}
+
