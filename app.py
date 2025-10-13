@@ -1,4 +1,4 @@
-# app.py (исправленная версия)
+# app.py
 import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
@@ -13,33 +13,17 @@ from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
-from flask_babel import Babel, _
-from flask_babel import get_locale
+
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:ndd@localhost/talapker')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
-app.config['BABEL_LANGUAGES'] = ['ru', 'kk', 'en']
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
-
-# Инициализация Babel без привязки к app сразу
-babel = Babel()
-
-def get_locale():
-    # Сохраняем выбранный язык в сессии при клике на ссылку языка
-    if 'lang' in request.args:
-        session['lang'] = request.args['lang']
-    # Возвращаем из сессии или по предпочтениям браузера
-    return session.get('lang', request.accept_languages.best_match(app.config['BABEL_LANGUAGES']))
-
-# Привязываем locale_selector через init_app (это решает проблему с версией)
-babel.init_app(app, locale_selector=get_locale)
 
 # --- Models ---
 class User(db.Model, UserMixin):
@@ -48,7 +32,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200))
     is_admin = db.Column(db.Boolean, default=False)
-    role = db.Column(db.String(20), default='abiturient')  # abiturient, parent, student, employee
+    role = db.Column(db.String(20), default='abiturient')
 
     def set_password(self, pw):
         self.password_hash = generate_password_hash(pw)
@@ -65,34 +49,34 @@ class ContactMessage(db.Model):
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    status = db.Column(db.String(50), default='pending')  # pending, accepted, rejected
+    status = db.Column(db.String(50), default='pending')
     documents = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # --- Forms ---
 class RegisterForm(FlaskForm):
-    name = StringField(_('Имя'), validators=[DataRequired(), Length(min=2, max=120)])
-    email = StringField(_('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_('Пароль'), validators=[DataRequired(), Length(min=6)])
-    role = SelectField(_('Роль'), choices=[
-        ('abiturient', _('Абитуриент')),
-        ('parent', _('Родитель')),
-        ('student', _('Студент')),
-        ('employee', _('Сотрудник'))
+    name = StringField('Имя', validators=[DataRequired(), Length(min=2, max=120)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Пароль', validators=[DataRequired(), Length(min=6)])
+    role = SelectField('Роль', choices=[
+        ('abiturient', 'Абитуриент'),
+        ('parent', 'Родитель'),
+        ('student', 'Студент'),
+        ('employee', 'Сотрудник')
     ])
-    submit = SubmitField(_('Зарегистрироваться'))
+    submit = SubmitField('Зарегистрироваться')
 
 class LoginForm(FlaskForm):
-    email = StringField(_('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_('Пароль'), validators=[DataRequired()])
-    submit = SubmitField(_('Войти'))
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    submit = SubmitField('Войти')
 
 # --- User loader ---
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- Роуты страниц (остаются без изменений) ---
+# --- Основные страницы ---
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -117,25 +101,26 @@ def calculator():
 def contact():
     return render_template('contact.html')
 
+# --- Profile ---
 @app.route('/profile')
 @login_required
 def profile():
     return render_template('profile.html', user=current_user)
 
-# --- Auth роуты ---
+# --- Auth routes ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter_by(email=form.email.data).first():
-            flash(_('Пользователь с таким Email уже существует'), 'error')
+            flash('Пользователь с таким Email уже существует', 'error')
             return redirect(url_for('register'))
         u = User(name=form.name.data, email=form.email.data, role=form.role.data)
         u.set_password(form.password.data)
         db.session.add(u)
         db.session.commit()
         login_user(u)
-        flash(_('Регистрация прошла успешно'), 'success')
+        flash('Регистрация прошла успешно', 'success')
         return redirect(url_for('profile'))
     return render_template('register.html', form=form)
 
@@ -147,7 +132,7 @@ def login():
         if u and u.check_password(form.password.data):
             login_user(u)
             return redirect(url_for('profile'))
-        flash(_('Неверный логин или пароль'), 'error')
+        flash('Неверный логин или пароль', 'error')
         return redirect(url_for('login'))
     return render_template('login.html', form=form)
 
@@ -157,14 +142,14 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-# --- API эндпоинты ---
+# --- API endpoints ---
 @app.route('/api/status')
 @login_required
 def api_status():
     user = current_user
     application = Application.query.filter_by(user_id=user.id).first()
     if not application:
-        return jsonify({'message': _('Заявка не найдена')}), 404
+        return jsonify({'message': 'Заявка не найдена'}), 404
     return jsonify({'status': application.status, 'created_at': application.created_at.isoformat()})
 
 @app.route('/api/contact', methods=['POST'])
@@ -174,11 +159,11 @@ def api_contact():
     email = data.get('email')
     message = data.get('message')
     if not all([name, email, message]):
-        return jsonify({'status': 'error', 'message': _('Заполните все поля')}), 400
+        return jsonify({'status': 'error', 'message': 'Заполните все поля'}), 400
     cm = ContactMessage(name=name, email=email, message=message)
     db.session.add(cm)
     db.session.commit()
-    return jsonify({'status': 'ok', 'message': _('Спасибо, мы свяжемся с вами.')})
+    return jsonify({'status': 'ok', 'message': 'Спасибо, мы свяжемся с вами.'})
 
 @app.route('/api/calc', methods=['POST'])
 def api_calc():
@@ -186,21 +171,20 @@ def api_calc():
     vals = data.get('vals', [])
     try:
         total = sum(float(v) for v in vals)
-        passing_score = 50  # Реальный порог для ЕНТ/баллов
-        message = _('Достаточно баллов для поступления') if total >= passing_score else _('Недостаточно баллов')
+        passing_score = 50
+        message = 'Достаточно баллов для поступления' if total >= passing_score else 'Недостаточно баллов'
         return jsonify({'total': total, 'can_apply': total >= passing_score, 'message': message})
     except (ValueError, TypeError):
-        return jsonify({'status': 'error', 'message': _('Некорректные данные')}), 400
+        return jsonify({'status': 'error', 'message': 'Некорректные данные'}), 400
 
 @app.route('/api/ai_chat', methods=['POST'])
 def ai_chat():
-    # Заглушка, позже интегрируй OpenAI или xAI
     data = request.get_json() or {}
     message = data.get('message', '')
-    reply = _('Это заглушка AI. Интеграция OpenAI здесь. Ваш вопрос: {}').format(message)
+    reply = f'Это заглушка AI. Интеграция OpenAI здесь. Ваш вопрос: {message}'
     return jsonify({'reply': reply})
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Создаст таблицы в PostgreSQL
+        db.create_all()
     app.run(debug=True)
