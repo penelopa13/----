@@ -1,4 +1,4 @@
-// main.js
+// static/js/main.js
 document.addEventListener('DOMContentLoaded', () => {
   // Навигация (бургер-меню)
   const toggle = document.getElementById('nav-toggle');
@@ -14,10 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.toggle('active');
       if (ans.style.maxHeight) {
         ans.style.maxHeight = null;
-        ans.style.padding = '0 14px';
       } else {
-        ans.style.maxHeight = ans.scrollHeight + 'px';
-        ans.style.padding = '14px';
+        ans.style.maxHeight = ans.scrollHeight + "px";
       }
     });
   });

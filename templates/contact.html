@@ -1,4 +1,4 @@
-<!-- contact.html -->
+<!-- templates/contact.html -->
 {% extends "base.html" %}
 
 {% block title %}Контакты - Талапкер{% endblock %}
@@ -18,26 +18,4 @@
     <p id="formResult"></p>
   </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.getElementById('contactForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const data = {
-    name: form.name.value,
-    email: form.email.value,
-    message: form.message.value
-  };
-  const res = await fetch('/api/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  const result = await res.json();
-  document.getElementById('formResult').textContent = result.message;
-  if(result.status === 'ok') form.reset();
-});
-</script>
 {% endblock %}

@@ -1,4 +1,4 @@
-<!-- base.html -->
+<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="{{ get_locale() }}">
 <head>
@@ -44,9 +44,9 @@
           <!-- Переключатели языков как список -->
           <div class="lang-switcher">
             <ul class="lang-list">
-              <li><a href="?lang=ru" {% if request.args.get('lang') == 'ru' %}class="active"{% endif %}>Рус</a></li>
-              <li><a href="?lang=kk" {% if request.args.get('lang') == 'kk' %}class="active"{% endif %}>Қаз</a></li>
-              <li><a href="?lang=en" {% if request.args.get('lang') == 'en' %}class="active"{% endif %}>Eng</a></li>
+              <li><a href="?lang=ru" {% if get_locale() == 'ru' %}class="active"{% endif %}>Рус</a></li>
+              <li><a href="?lang=kk" {% if get_locale() == 'kk' %}class="active"{% endif %}>Қаз</a></li>
+              <li><a href="?lang=en" {% if get_locale() == 'en' %}class="active"{% endif %}>Eng</a></li>
             </ul>
           </div>
         </div>

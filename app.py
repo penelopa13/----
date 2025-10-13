@@ -1,7 +1,7 @@
 # app.py
 import os
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager, login_user, logout_user,
@@ -14,15 +14,14 @@ from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 from flask_babel import Babel, _
-from flask import session
 
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://user:pass@localhost/talapker')  # Замени на свои данные PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:ndd@localhost/talapker')  # Используем SQLite как fallback, но для продакшна замени на PostgreSQL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
-app.config['BABEL_LANGUAGES'] = ['ru', 'kk', 'en']  # Поддерживаемые языки
+app.config['BABEL_LANGUAGES'] = ['ru', 'kk', 'en']
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -30,10 +29,8 @@ login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
 babel = Babel(app)
 
-# Исправлено: Правильный декоратор для выбора языка
 @babel.localeselector
 def get_locale():
-    # Проверяем параметр lang в URL, затем сессию, затем заголовок Accept-Language
     return request.args.get('lang', session.get('lang', request.accept_languages.best_match(app.config['BABEL_LANGUAGES'])))
 
 # --- Models ---
