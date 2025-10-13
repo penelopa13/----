@@ -7,6 +7,7 @@ from flask_login import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
+from flask import session
 
 load_dotenv()
 app = Flask(__name__)
@@ -147,6 +148,12 @@ def api_calc():
 @app.route('/api/ai_chat', methods=['POST'])
 def ai_chat():
     return jsonify({'reply': 'Это заглушка AI. Интеграция OpenAI здесь.'})
+
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang in ['ru', 'kk', 'en']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('home'))
 
 if __name__ == '__main__':
     with app.app_context():

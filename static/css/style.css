@@ -344,3 +344,37 @@ textarea {
   padding:18px 0;
   text-align:center;
 }
+/* --- Dropdown (языки) --- */
+/* --- Dropdown (языки) --- */
+.dropdown-toggle {
+  color: #fff !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 1000 !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  padding: 0.4rem;
+  border: none;
+  background-color: #fff !important;;
+}
+
+.dropdown-item {
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  color: #1a1a1a !important;
+}
+
+.dropdown-item:hover {
+  background-color: var(--accent-color) !important;
+  color: #fff;
+}
