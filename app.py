@@ -18,7 +18,7 @@ from flask_babel import Babel, _
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://user:pass@localhost/talapker')  # Замени на твои данные PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:ndd@localhost/talapker')  # Замени на свои данные PostgreSQL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 
@@ -28,7 +28,7 @@ login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
 babel = Babel(app)
 
-@babel.localeselector
+@babel.localeselector_function  # Исправлено: правильный декоратор
 def get_locale():
     return request.args.get('lang', 'ru')
 
@@ -152,7 +152,7 @@ def api_status():
     application = Application.query.filter_by(user_id=user.id).first()
     if not application:
         return jsonify({'message': _('Заявка не найдена')}), 404
-    return jsonify({'status': application.status, 'created_at': application.created_at})
+    return jsonify({'status': application.status, 'created_at': application.created_at.isoformat()})
 
 @app.route('/api/contact', methods=['POST'])
 def api_contact():
