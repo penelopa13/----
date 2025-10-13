@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 {% block title %}Талапкер — Главная{% endblock %}
 {% block content %}
@@ -6,6 +5,7 @@
   <div class="container hero-inner">
     <h1>ИИ-консультант для абитуриентов</h1>
     <p>С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов</p>
+    <!-- ссылка на id="chat-section" -->
     <a class="btn orange" href="#chat-section">Узнать больше</a>
   </div>
 </section>
@@ -19,7 +19,6 @@
     </div>
     <form id="chat-form" class="chat-form">
       <input type="text" id="user-input" placeholder="Введите ваш вопрос..." required>
-      <button type="button" id="voice-btn"><i class="fa-solid fa-microphone"></i></button>
       <button type="submit">Отправить</button>
     </form>
   </div>
