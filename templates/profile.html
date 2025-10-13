@@ -1,0 +1,12 @@
+<!-- profile.html (добавь этот файл, если его нет) -->
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<section class="section container">
+  <h1>Профиль</h1>
+  <p>Имя: {{ user.name }}</p>
+  <p>Email: {{ user.email }}</p>
+  <p>Роль: {{ user.role }}</p>
+  <a href="{{ url_for('logout') }}" class="btn">Выйти</a>
+</section>
+{% endblock %}

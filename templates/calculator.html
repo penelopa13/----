@@ -1,3 +1,4 @@
+<!-- calculator.html -->
 {% extends "base.html" %}
 
 {% block title %}Калькулятор баллов - Талапкер{% endblock %}
@@ -32,7 +33,7 @@ document.getElementById('calcForm').addEventListener('submit', async (e) => {
     body: JSON.stringify({ vals })
   });
   const data = await res.json();
-  document.getElementById('calcResult').textContent = "Общий балл: " + data.total;
+  document.getElementById('calcResult').textContent = `Общий балл: ${data.total}. ${data.message}`;
 });
 </script>
 {% endblock %}

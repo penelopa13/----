@@ -1,12 +1,14 @@
+<!-- login.html -->
 {% extends "base.html" %}
 {% block title %}Вход{% endblock %}
 {% block content %}
 <section class="section container">
   <h1>Вход</h1>
   <form method="POST" class="auth-form">
-    <input name="email" type="email" placeholder="Email" required>
-    <input name="password" type="password" placeholder="Пароль" required>
-    <button class="btn" type="submit">Войти</button>
+    {{ form.hidden_tag() }}
+    {{ form.email(placeholder="Email") }}
+    {{ form.password(placeholder="Пароль") }}
+    {{ form.submit(class="btn") }}
   </form>
 </section>
 {% endblock %}

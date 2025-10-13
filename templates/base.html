@@ -1,5 +1,6 @@
+<!-- base.html -->
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ get_locale() }}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -40,11 +41,13 @@
           <!-- Регистрация -->
           <a href="{{ url_for('register') }}" class="btn small">Регистрация</a>
 
-          <!-- Переключатели языков -->
+          <!-- Переключатели языков как список -->
           <div class="lang-switcher">
-            <a href="?lang=ru">Рус</a> | 
-            <a href="?lang=kk">Қаз</a> | 
-            <a href="?lang=en">Eng</a>
+            <ul class="lang-list">
+              <li><a href="?lang=ru" {% if request.args.get('lang') == 'ru' %}class="active"{% endif %}>Рус</a></li>
+              <li><a href="?lang=kk" {% if request.args.get('lang') == 'kk' %}class="active"{% endif %}>Қаз</a></li>
+              <li><a href="?lang=en" {% if request.args.get('lang') == 'en' %}class="active"{% endif %}>Eng</a></li>
+            </ul>
           </div>
         </div>
       </nav>
