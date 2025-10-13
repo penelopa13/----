@@ -1,4 +1,3 @@
-<!-- templates/calculator.html -->
 {% extends "base.html" %}
 
 {% block title %}Калькулятор баллов - Талапкер{% endblock %}
@@ -16,4 +15,24 @@
     <p id="calcResult"></p>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('calcForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const vals = [
+    parseFloat(e.target.val1.value) || 0,
+    parseFloat(e.target.val2.value) || 0,
+    parseFloat(e.target.val3.value) || 0
+  ];
+  const res = await fetch('/api/calc', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vals })
+  });
+  const data = await res.json();
+  document.getElementById('calcResult').textContent = "Общий балл: " + data.total;
+});
+</script>
 {% endblock %}

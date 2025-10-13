@@ -1,16 +1,13 @@
-<!-- templates/register.html -->
 {% extends "base.html" %}
 {% block title %}Регистрация{% endblock %}
 {% block content %}
 <section class="section container">
   <h1>Регистрация</h1>
   <form method="POST" class="auth-form">
-    {{ form.hidden_tag() }}
-    {{ form.name(placeholder="Ваше имя") }}
-    {{ form.email(placeholder="Email") }}
-    {{ form.password(placeholder="Пароль") }}
-    {{ form.role() }}
-    {{ form.submit(class="btn") }}
+    <input name="name" placeholder="Ваше имя" required>
+    <input name="email" type="email" placeholder="Email" required>
+    <input name="password" type="password" placeholder="Пароль" required>
+    <button class="btn" type="submit">Зарегистрироваться</button>
   </form>
 </section>
 {% endblock %}
