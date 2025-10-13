@@ -1,4 +1,3 @@
-<!-- index.html -->
 {% extends "base.html" %}
 {% block title %}Талапкер — Главная{% endblock %}
 {% block content %}
@@ -6,7 +5,6 @@
   <div class="container hero-inner">
     <h1>ИИ-консультант для абитуриентов</h1>
     <p>С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов</p>
-    <!-- ссылка на id="chat-section" -->
     <a class="btn orange" href="#chat-section">Узнать больше</a>
   </div>
 </section>
@@ -25,34 +23,4 @@
     </form>
   </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.getElementById('chat-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const input = document.getElementById('user-input');
-  const messages = document.getElementById('messages');
-  const userMsg = input.value;
-  messages.innerHTML += `<div class="message user">${userMsg}</div>`;
-  input.value = '';
-  const res = await fetch('/api/ai_chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: userMsg })
-  });
-  const data = await res.json();
-  messages.innerHTML += `<div class="message bot">${data.reply}</div>`;
-  messages.scrollTop = messages.scrollHeight; // Прокрутка вниз
-});
-
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = 'ru-RU'; // Для казахского: 'kk-KZ', для английского: 'en-US'
-recognition.onresult = (event) => {
-  document.getElementById('user-input').value = event.results[0][0].transcript;
-};
-document.getElementById('voice-btn').addEventListener('click', () => {
-  recognition.start();
-});
-</script>
 {% endblock %}

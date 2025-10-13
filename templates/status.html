@@ -1,30 +1,14 @@
-<!-- status.html -->
 {% extends "base.html" %}
-
 {% block title %}Статус заявки - Талапкер{% endblock %}
-
 {% block content %}
 <section class="section">
-    <div class="container">
-        <h1>Проверка статуса заявки</h1>
-        <form class="status-form">
-            <input type="text" placeholder="Введите номер заявки или email" required>
-            <button type="submit" class="btn">Проверить</button>
-        </form>
-        <p class="status-result"></p>
-    </div>
+  <div class="container">
+    <h1>Проверка статуса заявки</h1>
+    <form class="status-form">
+      <input type="text" name="query" placeholder="Введите номер заявки или email" required>
+      <button type="submit" class="btn">Проверить</button>
+    </form>
+    <p class="status-result"></p>
+  </div>
 </section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.querySelector('.status-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const input = e.target.querySelector('input').value;
-    const result = document.querySelector('.status-result');
-    const res = await fetch(`/api/status?q=${encodeURIComponent(input)}`);
-    const data = await res.json();
-    result.textContent = data.message;
-});
-</script>
 {% endblock %}

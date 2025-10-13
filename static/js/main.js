@@ -1,4 +1,4 @@
-// Ждём загрузки документа
+// main.js
 document.addEventListener('DOMContentLoaded', () => {
   // Навигация (бургер-меню)
   const toggle = document.getElementById('nav-toggle');
@@ -14,64 +14,128 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.toggle('active');
       if (ans.style.maxHeight) {
         ans.style.maxHeight = null;
+        ans.style.padding = '0 14px';
       } else {
-        ans.style.maxHeight = ans.scrollHeight + "px";
+        ans.style.maxHeight = ans.scrollHeight + 'px';
+        ans.style.padding = '14px';
       }
     });
   });
 
-  // Калькулятор баллов
-  const calcForm = document.querySelector('.calculator-form');
-  if (calcForm) {
-    calcForm.addEventListener('submit', (e) => {
+  // Чат-бот
+  const chatForm = document.getElementById('chat-form');
+  if (chatForm) {
+    chatForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const inputs = calcForm.querySelectorAll('input[type="number"]');
-      let sum = 0;
-      inputs.forEach(i => sum += Number(i.value) || 0);
-      const res = calcForm.querySelector('.calc-result') || document.querySelector('.calc-result');
-      if (res) res.textContent = `Итоговые баллы: ${sum}`;
+      const input = document.getElementById('user-input');
+      const messages = document.getElementById('messages');
+      const userMsg = input.value.trim();
+      if (!userMsg) return;
+      messages.innerHTML += `<div class="message user">${userMsg}</div>`;
+      input.value = '';
+      try {
+        const res = await fetch('/api/ai_chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMsg })
+        });
+        const data = await res.json();
+        messages.innerHTML += `<div class="message bot">${data.reply}</div>`;
+        messages.scrollTop = messages.scrollHeight;
+      } catch (err) {
+        messages.innerHTML += `<div class="message bot">Ошибка связи с ИИ</div>`;
+        messages.scrollTop = messages.scrollHeight;
+      }
     });
+
+    // Голосовой ввод
+    const voiceBtn = document.getElementById('voice-btn');
+    if (voiceBtn) {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = document.documentElement.lang || 'ru-RU';
+      recognition.onresult = (event) => {
+        document.getElementById('user-input').value = event.results[0][0].transcript;
+      };
+      voiceBtn.addEventListener('click', () => recognition.start());
+    }
   }
 
-  // Проверка статуса заявки (AJAX)
-  const statusForm = document.querySelector('.status-form');
-  if (statusForm) {
-    statusForm.addEventListener('submit', async (e) => {
+  // Калькулятор баллов
+  const calcForm = document.getElementById('calcForm');
+  if (calcForm) {
+    calcForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const q = statusForm.querySelector('input').value.trim();
-      const out = document.querySelector('.status-result');
-      if (!out) return;
-      out.textContent = 'Проверка...';
+      const vals = [
+        parseFloat(calcForm.val1.value) || 0,
+        parseFloat(calcForm.val2.value) || 0,
+        parseFloat(calcForm.val3.value) || 0
+      ];
+      const result = document.getElementById('calcResult');
       try {
-        const resp = await fetch('/api/status?q=' + encodeURIComponent(q));
-        const data = await resp.json();
-        out.textContent = data.message || 'Нет данных';
+        const res = await fetch('/api/calc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vals })
+        });
+        const data = await res.json();
+        result.textContent = `Общий балл: ${data.total}. ${data.message}`;
       } catch (err) {
-        out.textContent = 'Ошибка проверки статуса';
+        result.textContent = 'Ошибка расчёта';
       }
     });
   }
 
-  // Контактная форма (AJAX)
-  const contactForm = document.querySelector('.contact-form');
+  // Проверка статуса заявки
+  const statusForm = document.querySelector('.status-form');
+  if (statusForm) {
+    statusForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = statusForm.querySelector('input').value.trim();
+      const result = document.querySelector('.status-result');
+      if (!input) {
+        result.textContent = 'Введите номер заявки или email';
+        return;
+      }
+      result.textContent = 'Проверка...';
+      try {
+        const res = await fetch(`/api/status?q=${encodeURIComponent(input)}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+        });
+        if (res.status === 401) {
+          result.textContent = 'Пожалуйста, войдите в систему';
+          setTimeout(() => window.location.href = '/login', 2000);
+          return;
+        }
+        const data = await res.json();
+        result.textContent = data.message || `Статус: ${data.status} (Создано: ${data.created_at})`;
+      } catch (err) {
+        result.textContent = 'Ошибка проверки статуса';
+      }
+    });
+  }
+
+  // Контактная форма
+  const contactForm = document.getElementById('contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = contactForm.querySelector('input[type="text"]').value;
-      const email = contactForm.querySelector('input[type="email"]').value;
+      const name = contactForm.querySelector('input[name="name"]').value;
+      const email = contactForm.querySelector('input[name="email"]').value;
       const message = contactForm.querySelector('textarea').value;
+      const result = document.getElementById('formResult');
       const btn = contactForm.querySelector('button');
       btn.disabled = true;
       try {
-        const resp = await fetch('/api/contact', {
+        const res = await fetch('/api/contact', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, message })
         });
-        const d = await resp.json();
-        alert(d.status || 'Отправлено');
+        const data = await res.json();
+        result.textContent = data.message;
+        if (data.status === 'ok') contactForm.reset();
       } catch (err) {
-        alert('Ошибка отправки');
+        result.textContent = 'Ошибка отправки';
       } finally {
         btn.disabled = false;
       }
@@ -82,13 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
 // Прозрачность шапки при скролле
 window.addEventListener('scroll', () => {
   const header = document.querySelector('.site-header');
-  if (!header) return;
-
-  if (window.scrollY > 50) {
-    // При скролле делаем более прозрачным
-    header.classList.add('scrolled');
-  } else {
-    // Вверху страницы — тёмный фон
-    header.classList.remove('scrolled');
+  if (header) {
+    if (window.scrollY > 50) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
   }
 });
