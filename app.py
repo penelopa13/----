@@ -14,13 +14,15 @@ from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, PasswordField, SelectField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 from flask_babel import Babel, _
+from flask import session
 
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:ndd@localhost/talapker')  # Замени на свои данные PostgreSQL
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://user:pass@localhost/talapker')  # Замени на свои данные PostgreSQL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
+app.config['BABEL_LANGUAGES'] = ['ru', 'kk', 'en']  # Поддерживаемые языки
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -28,9 +30,11 @@ login_manager.login_view = 'login'
 csrf = CSRFProtect(app)
 babel = Babel(app)
 
-@babel.localeselector_function  # Исправлено: правильный декоратор
+# Исправлено: Правильный декоратор для выбора языка
+@babel.localeselector
 def get_locale():
-    return request.args.get('lang', 'ru')
+    # Проверяем параметр lang в URL, затем сессию, затем заголовок Accept-Language
+    return request.args.get('lang', session.get('lang', request.accept_languages.best_match(app.config['BABEL_LANGUAGES'])))
 
 # --- Models ---
 class User(db.Model, UserMixin):
@@ -161,11 +165,11 @@ def api_contact():
     email = data.get('email')
     message = data.get('message')
     if not (name and email and message):
-        return jsonify({'status':'error','message': _('Заполните все поля')}), 400
+        return jsonify({'status': 'error', 'message': _('Заполните все поля')}), 400
     cm = ContactMessage(name=name, email=email, message=message)
     db.session.add(cm)
     db.session.commit()
-    return jsonify({'status':'ok','message': _('Спасибо, мы свяжемся с вами.')})
+    return jsonify({'status': 'ok', 'message': _('Спасибо, мы свяжемся с вами.')})
 
 @app.route('/api/calc', methods=['POST'])
 def api_calc():
