@@ -28,9 +28,18 @@
       <nav class="nav" id="nav">
         <div class="nav-center">
           <a href="{{ url_for('home') }}">Главная</a>
-          <a href="{{ url_for('university') }}">Университет</a>
+          <div class="dropdown nav-dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="universityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Университет
+            </a>
+            <ul class="dropdown-menu glass-menu" aria-labelledby="universityDropdown">
+              <li><a class="dropdown-item" href="{{ url_for('university') }}">Университет</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('programs') }}">Образовательные программы</a></li>
+            </ul>
+            
+          </div>
           <a href="{{ url_for('status') }}">Статус заявки</a>
-          <a href="{{ url_for('programs') }}">Программы</a>
+          <a href="{{ url_for('test_psy') }}">Тест</a>
           <a href="{{ url_for('calculator') }}">Калькулятор</a>
           <a href="{{ url_for('contact') }}">Контакты</a>
         </div>
