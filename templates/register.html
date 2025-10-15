@@ -1,13 +1,22 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
 {% block title %}Регистрация{% endblock %}
 {% block content %}
-<section class="section container">
-  <h1>Регистрация</h1>
-  <form method="POST" class="auth-form">
-    <input name="name" placeholder="Ваше имя" required>
-    <input name="email" type="email" placeholder="Email" required>
-    <input name="password" type="password" placeholder="Пароль" required>
-    <button class="btn" type="submit">Зарегистрироваться</button>
-  </form>
+<section class="register-section">
+  <div class="register-card">
+    <h2>Создать аккаунт</h2>
+    <form method="POST" class="auth-form">
+      <div class="input-group">
+        <input name="name" type="text" placeholder="Ваше имя" required>
+      </div>
+      <div class="input-group">
+        <input name="email" type="email" placeholder="Введите email" required>
+      </div>
+      <div class="input-group">
+        <input name="password" type="password" placeholder="Придумайте пароль" required>
+      </div>
+      <button class="btn orange" type="submit">Зарегистрироваться</button>
+    </form>
+    <p class="login-link">Уже есть аккаунт? <a href="/login">Войти</a></p>
+  </div>
 </section>
 {% endblock %}
