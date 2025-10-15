@@ -92,3 +92,40 @@ window.addEventListener('scroll', () => {
     header.classList.remove('scrolled');
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const elements = document.querySelectorAll(
+    ".contact-title, .contact-details, .contact-form"
+  );
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("fade-in-up");
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+
+  elements.forEach(el => observer.observe(el));
+});
+
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {
+    name: form.name.value,
+    email: form.email.value,
+    message: form.message.value
+  };
+  const res = await fetch('/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const result = await res.json();
+  document.getElementById('formResult').textContent = result.message;
+  if(result.status === 'ok') form.reset();
+});
