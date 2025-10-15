@@ -69,6 +69,10 @@ def calculator():
 def contact():
     return render_template('contact.html')
 
+@app.route('/test_psy')
+def test_psy():
+    return render_template('test_psy.html')
+
 # --- Profile ---
 @app.route('/profile')
 @login_required

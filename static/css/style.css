@@ -430,13 +430,9 @@ textarea {
   padding: 8px 14px;
   border-radius: 6px;
   transition: all 0.3s ease;
-  background: transparent !important; /* убираем фон */
 }
 
-/* При наведении — только текст становится оранжевым и светится */
 .glass-menu .dropdown-item:hover {
-  color: var(--accent-color) !important; /* оранжевый текст */
-  background: transparent !important; /* без фона */
-  transform: translateX(4px); /* небольшой сдвиг для эффекта */
-  text-shadow: 0 0 6px rgba(255, 140, 0, 0.8); /* 🔥 свечение */
+  background: var(--accent-color);
+  color: #fff;
 }
