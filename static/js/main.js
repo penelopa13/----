@@ -129,3 +129,22 @@ document.getElementById('contactForm').addEventListener('submit', async (e) => {
   document.getElementById('formResult').textContent = result.message;
   if(result.status === 'ok') form.reset();
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const notifBtn = document.getElementById("notifBtn");
+  const notifPanel = document.getElementById("notifPanel");
+
+  if (notifBtn && notifPanel) {
+    notifBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      notifPanel.classList.toggle("open");
+    });
+
+    // Закрытие при клике вне панели
+    document.addEventListener("click", (e) => {
+      if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+        notifPanel.classList.remove("open");
+      }
+    });
+  }
+});
