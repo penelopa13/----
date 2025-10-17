@@ -1,3 +1,4 @@
+import datetime
 import os
 import json
 import random
@@ -14,12 +15,16 @@ import openai
 load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///dev.db') + '?sslmode=require&channel_binding=require'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///dev.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+
+from flask_migrate import Migrate
+migrate = Migrate(app, db)
+
 
 # --- Models ---
 class User(db.Model, UserMixin):
@@ -62,13 +67,11 @@ class TestQuestion(db.Model):
     category = db.Column(db.String(50))
 
 class TestResult(db.Model):
-    __tablename__ = 'test_results'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    answers = db.Column(db.JSON)
-    mbti_type = db.Column(db.String(4))
-    recommended_programs = db.Column(db.JSON)
-    created_at = db.Column(db.DateTime, default=db.func.now())
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    answers = db.Column(db.Text)
+    recommended_programs = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime)
 
 class ChatHistory(db.Model):
     __tablename__ = 'chat_history'

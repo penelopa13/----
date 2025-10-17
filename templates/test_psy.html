@@ -1,56 +1,41 @@
 {% extends "base.html" %}
-{% block title %}{% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}{% endblock %}
+{% block title %}
+    {% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}
+{% endblock %}
+
 {% block content %}
 <section class="section container">
-    <h1>{% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}</h1>
-    <div id="progress">{% if lang == 'kk' %}Сұрақтар: 0/{{ questions|length }}{% elif lang == 'en' %}Questions: 0/{{ questions|length }}{% else %}Вопросы: 0/{{ questions|length }}{% endif %}</div>
-    <form id="testForm">
+    <h1>
+        {% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}
+    </h1>
+
+    <div id="progress">
+        {% if lang == 'kk' %}Сұрақтар: 0/{{ questions|length }}
+        {% elif lang == 'en' %}Questions: 0/{{ questions|length }}
+        {% else %}Вопросы: 0/{{ questions|length }}
+        {% endif %}
+    </div>
+
+    <form id="testForm" data-total="{{ questions|length }}" data-lang="{{ lang }}">
         {% for question in questions %}
         <div class="form-group">
             <label>{{ question.text }}</label>
             <div class="labels">
                 <span>{% if lang == 'kk' %}Толық келіспеймін{% elif lang == 'en' %}Strongly Disagree{% else %}Совершенно не согласен{% endif %}</span>
-                <span>{% if lang == 'kk' %}Толық келіспеймін{% elif lang == 'en' %}Strongly Agree{% else %}Совершенно согласен{% endif %}</span>
+                <span>{% if lang == 'kk' %}Толық келісемін{% elif lang == 'en' %}Strongly Agree{% else %}Полностью согласен{% endif %}</span>
             </div>
             <input type="range" name="answer_{{ question.id }}" min="1" max="7" value="4" class="slider" oninput="updateProgress()">
         </div>
         {% endfor %}
-        <button type="submit" class="btn orange">{% if lang == 'kk' %}Жіберу{% elif lang == 'en' %}Submit{% else %}Отправить{% endif %}</button>
+
+        <button type="submit" class="btn orange">
+            {% if lang == 'kk' %}Жіберу{% elif lang == 'en' %}Submit{% else %}Отправить{% endif %}
+        </button>
+
         <div id="test-result"></div>
     </form>
 </section>
-<script>
-    function updateProgress() {
-        const sliders = document.querySelectorAll('.slider');
-        let answered = 0;
-        sliders.forEach(slider => { if (slider.value != 4) answered++; });
-        document.getElementById('progress').innerText = `{% if lang == 'kk' %}Сұрақтар: ${answered}/{{ questions|length }}{% elif lang == 'en' %}Questions: ${answered}/{{ questions|length }}{% else %}Вопросы: ${answered}/{{ questions|length }}{% endif %}`;
-    }
-    const testForm = document.getElementById('testForm');
-    if (testForm) {
-        testForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(testForm);
-            const answers = [];
-            {% for question in questions %}
-            answers.push({ id: {{ question.id }}, value: parseInt(formData.get('answer_{{ question.id }}')) });
-            {% endfor %}
-            const response = await fetch('/api/test/personality-submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ answers })
-            });
-            const result = await response.json();
-            const testResult = document.getElementById('test-result');
-            if (result.mbti) {
-                testResult.innerHTML = `
-                    <p>{% if lang == 'kk' %}Сіздің типіңіз: ${result.mbti} {% elif lang == 'en' %}Your type: ${result.mbti} {% else %}Ваш тип: ${result.mbti} {% endif %}</p>
-                    <p>{% if lang == 'kk' %}Ұсыныстар: ${result.recommendations} {% elif lang == 'en' %}Recommendations: ${result.recommendations} {% else %}Рекомендации: ${result.recommendations} {% endif %}</p>
-                `;
-            } else {
-                testResult.textContent = '{% if lang == 'kk' %}Қате{% elif lang == 'en' %}Error{% else %}Ошибка{% endif %}';
-            }
-        });
-    }
-</script>
+
+<!-- Подключаем JS -->
+<script src="{{ url_for('static', filename='js/test_psy.js') }}"></script>
 {% endblock %}
