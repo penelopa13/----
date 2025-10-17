@@ -1,4 +1,3 @@
-// Ждём загрузки документа
 document.addEventListener('DOMContentLoaded', () => {
   // Навигация (бургер-меню)
   const toggle = document.getElementById('nav-toggle');
@@ -12,11 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const ans = btn.nextElementSibling;
       btn.classList.toggle('active');
-      if (ans.style.maxHeight) {
-        ans.style.maxHeight = null;
-      } else {
-        ans.style.maxHeight = ans.scrollHeight + "px";
-      }
+      ans.style.maxHeight = ans.style.maxHeight ? null : ans.scrollHeight + 'px';
     });
   });
 
@@ -26,9 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     calcForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const inputs = calcForm.querySelectorAll('input[type="number"]');
-      let sum = 0;
-      inputs.forEach(i => sum += Number(i.value) || 0);
-      const res = calcForm.querySelector('.calc-result') || document.querySelector('.calc-result');
+      const sum = Array.from(inputs).reduce((acc, i) => acc + (Number(i.value) || 0), 0);
+      const res = calcForm.querySelector('.calc-result');
       if (res) res.textContent = `Итоговые баллы: ${sum}`;
     });
   }
@@ -46,105 +40,88 @@ document.addEventListener('DOMContentLoaded', () => {
         const resp = await fetch('/api/status?q=' + encodeURIComponent(q));
         const data = await resp.json();
         out.textContent = data.message || 'Нет данных';
-      } catch (err) {
+      } catch {
         out.textContent = 'Ошибка проверки статуса';
       }
     });
   }
 
   // Контактная форма (AJAX)
-  const contactForm = document.querySelector('.contact-form');
+  const contactForm = document.querySelector('.contact-form, #contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = contactForm.querySelector('input[type="text"]').value;
-      const email = contactForm.querySelector('input[type="email"]').value;
-      const message = contactForm.querySelector('textarea').value;
-      const btn = contactForm.querySelector('button');
-      btn.disabled = true;
+      const form = e.target;
+      const name = form.querySelector('[name="name"]')?.value || '';
+      const email = form.querySelector('[name="email"]')?.value || '';
+      const message = form.querySelector('[name="message"]')?.value || '';
+      const btn = form.querySelector('button');
+      if (btn) btn.disabled = true;
+
       try {
         const resp = await fetch('/api/contact', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, message })
         });
-        const d = await resp.json();
-        alert(d.status || 'Отправлено');
-      } catch (err) {
+        const data = await resp.json();
+        const resultBlock = document.getElementById('formResult');
+        if (resultBlock) resultBlock.textContent = data.message || 'Отправлено';
+        else alert(data.message || 'Отправлено');
+        if (data.status === 'ok') form.reset();
+      } catch {
         alert('Ошибка отправки');
       } finally {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
       }
     });
   }
+
+  // Анимация появления элементов на странице контактов
+  const animatedElements = document.querySelectorAll(
+    '.contact-title, .contact-details, .contact-form'
+  );
+  if (animatedElements.length > 0) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('fade-in-up');
+      });
+    }, { threshold: 0.1 });
+
+    animatedElements.forEach(el => observer.observe(el));
+  }
+
+  // === Панель уведомлений ===
+  const notifBtn = document.getElementById("notifBtn");
+  const notifPanel = document.getElementById("notifPanel");
+  const closeNotif = document.getElementById("closeNotif");
+  const overlay = document.getElementById("overlay");
+
+  if (notifBtn && notifPanel && closeNotif && overlay) {
+    notifBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      notifPanel.classList.add("active");
+      overlay.classList.add("active");
+
+      // 👇 Убираем бейдж при открытии панели
+      const badge = notifBtn.querySelector(".notif-badge");
+      if (badge) badge.style.display = "none";
+    });
+
+    const closePanel = () => {
+      notifPanel.classList.remove("active");
+      overlay.classList.remove("active");
+    };
+
+    closeNotif.addEventListener("click", closePanel);
+    overlay.addEventListener("click", closePanel);
+  }
+
 });
 
 // Прозрачность шапки при скролле
 window.addEventListener('scroll', () => {
   const header = document.querySelector('.site-header');
   if (!header) return;
-
-  if (window.scrollY > 50) {
-    // При скролле делаем более прозрачным
-    header.classList.add('scrolled');
-  } else {
-    // Вверху страницы — тёмный фон
-    header.classList.remove('scrolled');
-  }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const elements = document.querySelectorAll(
-    ".contact-title, .contact-details, .contact-form"
-  );
-
-  const observer = new IntersectionObserver(
-    entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("fade-in-up");
-        }
-      });
-    },
-    { threshold: 0.1 }
-  );
-
-  elements.forEach(el => observer.observe(el));
-});
-
-document.getElementById('contactForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const data = {
-    name: form.name.value,
-    email: form.email.value,
-    message: form.message.value
-  };
-  const res = await fetch('/api/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-  const result = await res.json();
-  document.getElementById('formResult').textContent = result.message;
-  if(result.status === 'ok') form.reset();
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-  const notifBtn = document.getElementById("notifBtn");
-  const notifPanel = document.getElementById("notifPanel");
-
-  if (notifBtn && notifPanel) {
-    notifBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      notifPanel.classList.toggle("open");
-    });
-
-    // Закрытие при клике вне панели
-    document.addEventListener("click", (e) => {
-      if (!notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
-        notifPanel.classList.remove("open");
-      }
-    });
-  }
+  header.classList.toggle('scrolled', window.scrollY > 50);
 });

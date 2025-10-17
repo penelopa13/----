@@ -12,18 +12,23 @@
 
   <style>
     /* === Панель уведомлений === */
-    #notifPanel {
-      position: fixed;
-      top: 0;
-      right: -350px;
-      width: 300px;
-      height: 100vh;
-      background: rgba(255, 255, 255, 0.98);
-      box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
-      padding: 1.5rem 1rem;
-      transition: right 0.4s ease;
-      z-index: 10001;
-    }
+/* === Панель уведомлений === */
+/* === Панель уведомлений === */
+#notifPanel {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 300px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.65); /* ← Ещё прозрачнее */
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px); /* ← немного усилил размытие, чтобы текст лучше читался */
+  padding: 1.5rem 1rem;
+  transition: right 0.4s ease;
+  z-index: 10001;
+}
+
+
 
     #notifPanel.active {
       right: 0;
@@ -71,19 +76,20 @@
     }
 
     /* Кнопка закрытия панели */
-    .notif-close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.3rem;
-      color: #555;
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
+.notif-close {
+  position: absolute;
+  top: 8px;
+  right: 15px;
+  font-size: 2rem; /* ← увеличил размер с 1.3rem до 2rem */
+  color: #444;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
 
-    .notif-close:hover {
-      color: #000;
-    }
+.notif-close:hover {
+  color: #000;
+  transform: scale(1.15); /* ← лёгкое увеличение при наведении */
+}
 
     /* === Затемнение фона === */
     #overlay {
