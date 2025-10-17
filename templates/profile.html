@@ -1,12 +1,18 @@
-<!-- templates/profile.html -->
 {% extends "base.html" %}
-{% block title %}Профиль{% endblock %}
+{% block title %}{% if session.get('lang', current_user.language) == 'kk' %}Менің кабинет{% elif session.get('lang', current_user.language) == 'en' %}My Cabinet{% else %}Мой кабинет{% endif %}{% endblock %}
 {% block content %}
 <section class="section container">
-  <h1>Профиль</h1>
-  <p>Имя: {{ user.name }}</p>
-  <p>Email: {{ user.email }}</p>
-  <p>Роль: {{ user.role }}</p>
-  <a href="{{ url_for('logout') }}" class="btn">Выйти</a>
+    <h1>{% if session.get('lang', current_user.language) == 'kk' %}Менің кабинет{% elif session.get('lang', current_user.language) == 'en' %}My Cabinet{% else %}Мой кабинет{% endif %}</h1>
+    <p>{% if session.get('lang', current_user.language) == 'kk' %}Аты-жөні: {{ user.name }}{% elif session.get('lang', current_user.language) == 'en' %}Name: {{ user.name }}{% else %}Имя: {{ user.name }}{% endif %}</p>
+    <p>{% if session.get('lang', current_user.language) == 'kk' %}Email: {{ user.email }}{% elif session.get('lang', current_user.language) == 'en' %}Email: {{ user.email }}{% else %}Email: {{ user.email }}{% endif %}</p>
+    <p>{% if session.get('lang', current_user.language) == 'kk' %}Рөл: {{ user.is_admin and 'Админ' or 'Қолданушы' }}{% elif session.get('lang', current_user.language) == 'en' %}Role: {{ user.is_admin and 'Admin' or 'User' }}{% else %}Роль: {{ user.is_admin and 'Админ' or 'Пользователь' }}{% endif %}</p>
+    {% if result %}
+        <p>{% if session.get('lang', current_user.language) == 'kk' %}ЕНТ баллы: {{ user.ent_total }}{% elif session.get('lang', current_user.language) == 'en' %}ENT Score: {{ user.ent_total }}{% else %}Баллы ЕНТ: {{ user.ent_total }}{% endif %}</p>
+        <p>{% if session.get('lang', current_user.language) == 'kk' %}MBTI типі: {{ result.mbti_type }}{% elif session.get('lang', current_user.language) == 'en' %}MBTI Type: {{ result.mbti_type }}{% else %}MBTI тип: {{ result.mbti_type }}{% endif %}</p>
+        <p>{% if session.get('lang', current_user.language) == 'kk' %}Ұсыныстар: {{ result.recommended_programs.ai_suggestions }}{% elif session.get('lang', current_user.language) == 'en' %}Recommendations: {{ result.recommended_programs.ai_suggestions }}{% else %}Рекомендации: {{ result.recommended_programs.ai_suggestions }}{% endif %}</p>
+    {% endif %}
+    <a href="{{ url_for('calculator') }}" class="btn orange">{% if session.get('lang', current_user.language) == 'kk' %}ЕНТ есептеу{% elif session.get('lang', current_user.language) == 'en' %}ENT Calculator{% else %}Калькулятор ЕНТ{% endif %}</a>
+    <a href="{{ url_for('test_psy') }}" class="btn orange">{% if session.get('lang', current_user.language) == 'kk' %}Тест{% elif session.get('lang', current_user.language) == 'en' %}Test{% else %}Тест{% endif %}</a>
+    <a href="{{ url_for('logout') }}" class="btn orange">{% if session.get('lang', current_user.language) == 'kk' %}Шығу{% elif session.get('lang', current_user.language) == 'en' %}Logout{% else %}Выйти{% endif %}</a>
 </section>
 {% endblock %}

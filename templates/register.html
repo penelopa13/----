@@ -1,22 +1,29 @@
-{% extends "base.html" %} 
-{% block title %}Регистрация{% endblock %}
+{% extends "base.html" %}
+{% block title %}{% if session.get('lang', 'ru') == 'kk' %}Тіркелу{% elif session.get('lang', 'ru') == 'en' %}Register{% else %}Регистрация{% endif %}{% endblock %}
 {% block content %}
 <section class="register-section">
-  <div class="register-card">
-    <h2>Создать аккаунт</h2>
-    <form method="POST" class="auth-form">
-      <div class="input-group">
-        <input name="name" type="text" placeholder="Ваше имя" required>
-      </div>
-      <div class="input-group">
-        <input name="email" type="email" placeholder="Введите email" required>
-      </div>
-      <div class="input-group">
-        <input name="password" type="password" placeholder="Придумайте пароль" required>
-      </div>
-      <button class="btn orange" type="submit">Зарегистрироваться</button>
-    </form>
-    <p class="login-link">Уже есть аккаунт? <a href="/login">Войти</a></p>
-  </div>
+    <div class="register-card">
+        <h2>{% if session.get('lang', 'ru') == 'kk' %}Тіркелу{% elif session.get('lang', 'ru') == 'en' %}Create Account{% else %}Создать аккаунт{% endif %}</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" class="auth-form">
+            <div class="input-group">
+                <input name="name" type="text" placeholder="{% if session.get('lang', 'ru') == 'kk' %}Аты-жөні{% elif session.get('lang', 'ru') == 'en' %}Full Name{% else %}Ваше имя{% endif %}" required>
+            </div>
+            <div class="input-group">
+                <input name="email" type="email" placeholder="{% if session.get('lang', 'ru') == 'kk' %}Email{% elif session.get('lang', 'ru') == 'en' %}Email{% else %}Введите email{% endif %}" required>
+            </div>
+            <div class="input-group">
+                <input name="password" type="password" placeholder="{% if session.get('lang', 'ru') == 'kk' %}Құпия сөз{% elif session.get('lang', 'ru') == 'en' %}Password{% else %}Придумайте пароль{% endif %}" required>
+            </div>
+            <button class="btn orange" type="submit">{% if session.get('lang', 'ru') == 'kk' %}Тіркелу{% elif session.get('lang', 'ru') == 'en' %}Register{% else %}Зарегистрироваться{% endif %}</button>
+        </form>
+        <p class="login-link">{% if session.get('lang', 'ru') == 'kk' %}Есептік жазбаңыз бар ма? <a href="{{ url_for('login') }}">Кіру</a>{% elif session.get('lang', 'ru') == 'en' %}Already have an account? <a href="{{ url_for('login') }}">Login</a>{% else %}Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a>{% endif %}</p>
+    </div>
 </section>
 {% endblock %}
