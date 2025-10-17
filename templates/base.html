@@ -20,12 +20,15 @@
   right: -350px;
   width: 300px;
   height: 100vh;
-  background: rgba(255, 255, 255, 0.65); /* ← Ещё прозрачнее */
+  background: rgba(255, 255, 255, 0.65);
   box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px); /* ← немного усилил размытие, чтобы текст лучше читался */
+  backdrop-filter: blur(10px);
   padding: 1.5rem 1rem;
   transition: right 0.4s ease;
   z-index: 10001;
+  border-top-left-radius: 18px;   /* ← добавили округление углов */
+  border-bottom-left-radius: 18px;
+  overflow: hidden; /* чтобы контент не выходил за края */
 }
 
 
