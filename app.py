@@ -25,7 +25,6 @@ login_manager.login_view = 'login'
 from flask_migrate import Migrate
 migrate = Migrate(app, db)
 
-
 # --- Models ---
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,12 +32,12 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(200))
     is_admin = db.Column(db.Boolean, default=False)
-    ent_math = db.Column(db.Integer, default=0)  # 0-40
-    ent_reading = db.Column(db.Integer, default=0)  # 0-40
-    ent_history = db.Column(db.Integer, default=0)  # 0-20
-    ent_profile1 = db.Column(db.Integer, default=0)  # 0-30
-    ent_profile2 = db.Column(db.Integer, default=0)  # 0-30
-    ent_subjects = db.Column(db.JSON)  # {"profile1": "Физика", "profile2": "Математика"}
+    ent_math = db.Column(db.Integer, default=0)
+    ent_reading = db.Column(db.Integer, default=0)
+    ent_history = db.Column(db.Integer, default=0)
+    ent_profile1 = db.Column(db.Integer, default=0)
+    ent_profile2 = db.Column(db.Integer, default=0)
+    ent_subjects = db.Column(db.JSON)
     ent_total = db.Column(db.Integer, default=0)
     language = db.Column(db.String(10), default='ru')
 
@@ -71,7 +70,7 @@ class TestResult(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     answers = db.Column(db.Text)
     recommended_programs = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now)
 
 class ChatHistory(db.Model):
     __tablename__ = 'chat_history'
@@ -94,29 +93,18 @@ def load_user(user_id):
 
 # --- Utilities ---
 def load_questions(lang='ru'):
+    """Загрузка вопросов из JSON-файла по языку"""
     file_path = os.path.join('data', f'questions_{lang}.json')
     if not os.path.exists(file_path):
         return []
     with open(file_path, 'r', encoding='utf-8') as f:
         questions = json.load(f)
     random.shuffle(questions)
-    return questions[:50]
+    return questions[:25]  # максимум 25 вопросов
 
 def calculate_ent_total(ent_data):
     total = sum([ent_data.get(key, 0) for key in ['math', 'reading', 'history', 'profile1', 'profile2']])
-    return min(total, 140)  # Ограничение 140 баллов
-
-def calculate_mbti(answers, questions):
-    dichotomies = {'I/E': 0, 'S/N': 0, 'T/F': 0, 'J/P': 0}
-    for ans in answers:
-        question = next((q for q in questions if q['id'] == ans['id']), None)
-        if question:
-            score = ans['value'] - 4
-            if question['dichotomy'][0] in ['I', 'S', 'T', 'J']:
-                score = -score
-            dichotomies[question['dichotomy']] += score * (question.get('scale', 1))
-    mbti = ''.join(['E' if dichotomies[k] > 0 else k[0] for k in dichotomies])
-    return mbti
+    return min(total, 140)
 
 # --- Routes ---
 @app.route('/')
@@ -215,13 +203,6 @@ def api_contact():
     db.session.commit()
     return jsonify({'status': 'ok', 'message': 'Спасибо, мы свяжемся с вами.'})
 
-@app.route('/api/calc', methods=['POST'])
-def api_calc():
-    data = request.get_json() or {}
-    vals = data.get('vals', [])
-    total = sum([float(v or 0) for v in vals])
-    return jsonify({'total': total})
-
 @app.route('/api/test/questions', methods=['GET'])
 @login_required
 def get_questions():
@@ -229,72 +210,43 @@ def get_questions():
     questions = load_questions(lang)
     return jsonify(questions)
 
-@app.route('/api/test/ent-submit', methods=['POST'])
+# --- Психологический тест ---
+@app.route('/api/test/submit', methods=['POST'])
 @login_required
-def submit_ent():
-    data = request.get_json() or {}
-    ent_data = {
-        'math': data.get('math', 0),
-        'reading': data.get('reading', 0),
-        'history': data.get('history', 0),
-        'profile1': data.get('profile1', 0),
-        'profile2': data.get('profile2', 0)
-    }
-    current_user.ent_math = ent_data['math']
-    current_user.ent_reading = ent_data['reading']
-    current_user.ent_history = ent_data['history']
-    current_user.ent_profile1 = ent_data['profile1']
-    current_user.ent_profile2 = ent_data['profile2']
-    current_user.ent_subjects = data.get('subjects', {})
-    current_user.ent_total = calculate_ent_total(ent_data)
-    db.session.commit()
-    return jsonify({'total': current_user.ent_total, 'message': 'Баллы сохранены'})
-
-@app.route('/api/test/personality-submit', methods=['POST'])
-@login_required
-def submit_personality():
+def submit_test():
+    """Получает ответы, считает результат, сохраняет в БД"""
     data = request.get_json() or {}
     answers = data.get('answers', [])
-    lang = session.get('lang', current_user.language)
-    questions = load_questions(lang)
-    mbti = calculate_mbti(answers, questions)
-    openai.api_key = os.getenv('OPENAI_API_KEY')
-    ai_prompt = f"Ты — ИИ-консультант «Талапкер» АРУ им. Жубанова. Рекомендуй 3–5 программ на основе MBTI: {mbti}, ЕНТ: {current_user.ent_total} баллов, предметы: {current_user.ent_subjects}. Отвечай на {lang}."
-    ai_response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "system", "content": "Ты консультант АRU. Рекомендуй программы."}, {"role": "user", "content": ai_prompt}]
-    ).choices[0].message.content
-    new_result = TestResult(user_id=current_user.id, answers=json.dumps(answers), mbti_type=mbti, recommended_programs=json.dumps({'ai_suggestions': ai_response}))
-    db.session.add(new_result)
-    db.session.commit()
-    return jsonify({'mbti': mbti, 'recommendations': ai_response})
+    if not answers:
+        return jsonify({'error': 'Нет ответов'}), 400
 
-@app.route('/api/test/combined-result', methods=['GET'])
-@login_required
-def get_combined_result():
-    result = TestResult.query.filter_by(user_id=current_user.id).order_by(TestResult.created_at.desc()).first()
-    return jsonify({
-        'ent_total': current_user.ent_total,
-        'ent_subjects': current_user.ent_subjects,
-        'mbti': result.mbti_type if result else None,
-        'recommendations': result.recommended_programs if result else None
-    })
+    scores = {}
+    for a in answers:
+        cat = a.get('category', 'other')
+        val = int(a.get('value', 0))
+        scores[cat] = scores.get(cat, 0) + val
 
-@app.route('/api/ai_chat', methods=['POST'])
-def ai_chat():
-    data = request.get_json() or {}
-    user_msg = data.get('message', '')
-    lang = session.get('lang', 'ru')
-    openai.api_key = os.getenv('OPENAI_API_KEY')
-    system_prompt = f"Ты — ИИ-консультант «Талапкер» АРУ им. Жубанова. Отвечай вежливо и понятно на {lang}."
-    response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "system", "content": system_prompt}, {"role": "user", "content": user_msg}]
-    ).choices[0].message.content
-    new_chat = ChatHistory(user_id=current_user.id, message=user_msg, response=response)
-    db.session.add(new_chat)
+    top_category = max(scores, key=scores.get)
+
+    recommendations = {
+        'math': 'Рекомендуемые программы: Математика, Информатика, Анализ данных.',
+        'engineering': 'Рекомендуемые программы: Машиностроение, Электроника, Автоматизация.',
+        'social': 'Рекомендуемые программы: Психология, Педагогика, Социология.',
+        'creative': 'Рекомендуемые программы: Дизайн, Журналистика, Искусство.',
+        'analytic': 'Рекомендуемые программы: Экономика, Финансы, Аналитика.',
+        'other': 'Попробуйте пройти тест снова для уточнения результата.'
+    }
+    rec_text = recommendations.get(top_category, recommendations['other'])
+
+    result = TestResult(
+        user_id=current_user.id,
+        answers=json.dumps(answers, ensure_ascii=False),
+        recommended_programs=rec_text
+    )
+    db.session.add(result)
     db.session.commit()
-    return jsonify({'reply': response})
+
+    return jsonify({'message': 'Результаты сохранены', 'recommendations': rec_text})
 
 @app.route('/set_language/<lang>')
 def set_language(lang):

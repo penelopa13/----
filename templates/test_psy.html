@@ -9,33 +9,39 @@
         {% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}
     </h1>
 
-    <div id="progress">
-        {% if lang == 'kk' %}Сұрақтар: 0/{{ questions|length }}
-        {% elif lang == 'en' %}Questions: 0/{{ questions|length }}
-        {% else %}Вопросы: 0/{{ questions|length }}
-        {% endif %}
-    </div>
+    <p>
+        {% if lang == 'kk' %}Төмендегі сұрақтарға шын жауап беріңіз. Тест нәтижесі сізге сәйкес келетін мамандықты анықтауға көмектеседі.{% elif lang == 'en' %}
+        Answer honestly. The result will help determine which university program suits you best.
+        {% else %}Отвечайте честно. Результаты помогут определить, какие программы вам подходят.{% endif %}
+    </p>
 
-    <form id="testForm" data-total="{{ questions|length }}" data-lang="{{ lang }}">
+    <form id="testForm" data-lang="{{ lang }}">
         {% for question in questions %}
-        <div class="form-group">
-            <label>{{ question.text }}</label>
-            <div class="labels">
-                <span>{% if lang == 'kk' %}Толық келіспеймін{% elif lang == 'en' %}Strongly Disagree{% else %}Совершенно не согласен{% endif %}</span>
-                <span>{% if lang == 'kk' %}Толық келісемін{% elif lang == 'en' %}Strongly Agree{% else %}Полностью согласен{% endif %}</span>
+        <div class="question-block">
+            <p class="question-text">{{ question.text }}</p>
+            <div class="range-container">
+                <span class="left-label">
+                    {% if lang == 'kk' %}Келіспеймін{% elif lang == 'en' %}Disagree{% else %}Не согласен{% endif %}
+                </span>
+                <input type="range" min="1" max="7" value="4" class="answer-slider"
+                       name="q{{ loop.index }}" data-category="{{ question.category }}">
+                <span class="right-label">
+                    {% if lang == 'kk' %}Келісемін{% elif lang == 'en' %}Agree{% else %}Согласен{% endif %}
+                </span>
             </div>
-            <input type="range" name="answer_{{ question.id }}" min="1" max="7" value="4" class="slider" oninput="updateProgress()">
         </div>
         {% endfor %}
 
         <button type="submit" class="btn orange">
             {% if lang == 'kk' %}Жіберу{% elif lang == 'en' %}Submit{% else %}Отправить{% endif %}
         </button>
-
-        <div id="test-result"></div>
     </form>
+
+    <div id="resultBox" style="margin-top:20px; display:none;">
+        <h3>{% if lang == 'kk' %}Нәтиже{% elif lang == 'en' %}Result{% else %}Результат{% endif %}</h3>
+        <p id="resultText"></p>
+    </div>
 </section>
 
-<!-- Подключаем JS -->
 <script src="{{ url_for('static', filename='js/test_psy.js') }}"></script>
 {% endblock %}
