@@ -93,14 +93,19 @@ def load_user(user_id):
 
 # --- Utilities ---
 def load_questions(lang='ru'):
-    """Загрузка вопросов из JSON-файла по языку"""
     file_path = os.path.join('data', f'questions_{lang}.json')
     if not os.path.exists(file_path):
+        print("❌ Файл не найден:", file_path)
         return []
     with open(file_path, 'r', encoding='utf-8') as f:
         questions = json.load(f)
-    random.shuffle(questions)
-    return questions[:25]  # максимум 25 вопросов
+
+    # Для совместимости — добавим общее поле text
+    for q in questions:
+        q['text'] = q.get('question', '')
+    print(f"✅ Загружено {len(questions)} вопросов для языка {lang}")
+    return questions
+
 
 def calculate_ent_total(ent_data):
     total = sum([ent_data.get(key, 0) for key in ['math', 'reading', 'history', 'profile1', 'profile2']])

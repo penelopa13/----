@@ -1,47 +1,58 @@
 {% extends "base.html" %}
-{% block title %}
-    {% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}
-{% endblock %}
-
+{% block title %}Personality Test{% endblock %}
 {% block content %}
 <section class="section container">
-    <h1>
-        {% if lang == 'kk' %}Психологиялық тест{% elif lang == 'en' %}Personality Test{% else %}Психологический тест{% endif %}
-    </h1>
+  <h1 class="title center">🧠 Personality Test</h1>
 
-    <p>
-        {% if lang == 'kk' %}Төмендегі сұрақтарға шын жауап беріңіз. Тест нәтижесі сізге сәйкес келетін мамандықты анықтауға көмектеседі.{% elif lang == 'en' %}
-        Answer honestly. The result will help determine which university program suits you best.
-        {% else %}Отвечайте честно. Результаты помогут определить, какие программы вам подходят.{% endif %}
-    </p>
-
-    <form id="testForm" data-lang="{{ lang }}">
-        {% for question in questions %}
-        <div class="question-block">
-            <p class="question-text">{{ question.text }}</p>
-            <div class="range-container">
-                <span class="left-label">
-                    {% if lang == 'kk' %}Келіспеймін{% elif lang == 'en' %}Disagree{% else %}Не согласен{% endif %}
-                </span>
-                <input type="range" min="1" max="7" value="4" class="answer-slider"
-                       name="q{{ loop.index }}" data-category="{{ question.category }}">
-                <span class="right-label">
-                    {% if lang == 'kk' %}Келісемін{% elif lang == 'en' %}Agree{% else %}Согласен{% endif %}
-                </span>
-            </div>
-        </div>
-        {% endfor %}
-
-        <button type="submit" class="btn orange">
-            {% if lang == 'kk' %}Жіберу{% elif lang == 'en' %}Submit{% else %}Отправить{% endif %}
-        </button>
-    </form>
-
-    <div id="resultBox" style="margin-top:20px; display:none;">
-        <h3>{% if lang == 'kk' %}Нәтиже{% elif lang == 'en' %}Result{% else %}Результат{% endif %}</h3>
-        <p id="resultText"></p>
+  <div id="test-container" class="card shadow p-4">
+    <div id="question-box">
+      <h3 id="question-text"></h3>
+      <div id="options" class="options"></div>
     </div>
+
+    <div id="progress" class="progress mt-3"></div>
+
+    <button id="next-btn" class="btn orange mt-3" disabled>Next</button>
+  </div>
+
+  <div id="result-box" style="display:none;">
+    <h2>✅ Test completed!</h2>
+    <p>Your results are being analyzed...</p>
+  </div>
 </section>
 
 <script src="{{ url_for('static', filename='js/test_psy.js') }}"></script>
+
+<style>
+  .options button {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .options button.selected {
+    background: #ff9800;
+    color: white;
+  }
+  .btn.orange {
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+  }
+  .card {
+    max-width: 600px;
+    margin: auto;
+  }
+  .progress {
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
 {% endblock %}
