@@ -57,12 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function finishTest() {
     container.style.display = "none";
     resultBox.style.display = "block";
-
-    fetch("/api/test/personality-submit", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers }),
-    })
+  fetch("/api/test/submit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ answers }),
+  })
       .then((res) => res.json())
       .then((data) => {
         resultBox.innerHTML = `
