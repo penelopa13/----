@@ -54,24 +54,38 @@ document.addEventListener("DOMContentLoaded", () => {
     showQuestion();
   });
 
+  // === 5️⃣ Завершение теста и отправка ===
   function finishTest() {
     container.style.display = "none";
     resultBox.style.display = "block";
-  fetch("/api/test/submit", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ answers }),
-  })
+    loadingText.style.display = "block";
+    finalResult.style.display = "none";
+
+    fetch("/api/test/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers }),
+    })
       .then((res) => res.json())
       .then((data) => {
-        resultBox.innerHTML = `
-          <h2>🎯 Your MBTI Type: ${data.mbti}</h2>
-          <p>${data.recommendations}</p>
-          <a href="/profile" class="btn orange mt-3">Go to Profile</a>
-        `;
+        loadingText.style.display = "none";
+        finalResult.style.display = "block";
+
+        mbtiType.textContent = `${data.mbti} — ${data.recommendations.title}`;
+        recommendationsList.innerHTML = "";
+
+        if (data.recommendations.programs && data.recommendations.programs.length > 0) {
+          data.recommendations.programs.forEach((p) => {
+            const li = document.createElement("li");
+            li.textContent = p;
+            recommendationsList.appendChild(li);
+          });
+        } else {
+          recommendationsList.innerHTML = "<li>No recommendations found.</li>";
+        }
       })
       .catch(() => {
-        resultBox.innerHTML = "<p>❌ Error saving results.</p>";
+        loadingText.textContent = "❌ Error saving results.";
       });
   }
-});
+})

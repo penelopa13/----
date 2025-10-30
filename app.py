@@ -91,6 +91,13 @@ class ContactMessage(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+def load_mbti_data():
+    file_path = os.path.join('data', 'mbti.json')
+    if not os.path.exists(file_path):
+        return {}
+    with open(file_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
 # --- Utilities ---
 def load_questions(lang='ru'):
     file_path = os.path.join('data', f'questions_{lang}.json')
@@ -214,43 +221,100 @@ def get_questions():
     questions = load_questions(lang)
     return jsonify(questions)
 
+
 # --- Психологический тест ---
+def calculate_mbti(answers, questions):
+    """
+    На основе ответов считает количество баллов по 4 осям MBTI
+    и возвращает тип, например 'INTJ'
+    """
+    # Каждая пара осей MBTI
+    mbti_axes = {
+        'EI': 0,  # Extroversion / Introversion
+        'SN': 0,  # Sensing / Intuition
+        'TF': 0,  # Thinking / Feeling
+        'JP': 0   # Judging / Perceiving
+    }
+
+    # Для простоты: категории вопросов должны быть связаны с одной из осей
+    mapping = {
+        'extroversion': 'EI',
+        'introversion': 'EI',
+        'sensing': 'SN',
+        'intuition': 'SN',
+        'thinking': 'TF',
+        'feeling': 'TF',
+        'judging': 'JP',
+        'perceiving': 'JP'
+    }
+
+    # Пробегаем по ответам
+    for a in answers:
+        qid = a.get('id')
+        value = int(a.get('value', 0))
+        question = next((q for q in questions if q['id'] == qid), None)
+        if not question:
+            continue
+
+        cat = question.get('category', '').lower()
+        axis = mapping.get(cat, None)
+        if not axis:
+            continue
+
+        # Чем выше значение (4-5) — тем сильнее "первое" направление оси
+        if axis == 'EI':
+            mbti_axes['EI'] += (value - 3) if cat == 'extroversion' else -(value - 3)
+        elif axis == 'SN':
+            mbti_axes['SN'] += (value - 3) if cat == 'sensing' else -(value - 3)
+        elif axis == 'TF':
+            mbti_axes['TF'] += (value - 3) if cat == 'thinking' else -(value - 3)
+        elif axis == 'JP':
+            mbti_axes['JP'] += (value - 3) if cat == 'judging' else -(value - 3)
+
+    # Определяем буквы по осям
+    result = ''
+    result += 'E' if mbti_axes['EI'] >= 0 else 'I'
+    result += 'S' if mbti_axes['SN'] >= 0 else 'N'
+    result += 'T' if mbti_axes['TF'] >= 0 else 'F'
+    result += 'J' if mbti_axes['JP'] >= 0 else 'P'
+
+    return result
+
+
 @app.route('/api/test/submit', methods=['POST'])
 @login_required
 def submit_test():
     """Получает ответы, считает результат, сохраняет в БД"""
     data = request.get_json() or {}
     answers = data.get('answers', [])
-    if not answers:
-        return jsonify({'error': 'Нет ответов'}), 400
+    lang = session.get('lang', current_user.language)
 
-    scores = {}
-    for a in answers:
-        cat = a.get('category', 'other')
-        val = int(a.get('value', 0))
-        scores[cat] = scores.get(cat, 0) + val
+    # Загружаем вопросы
+    questions = load_questions(lang)
+    mbti = calculate_mbti(answers, questions)
 
-    top_category = max(scores, key=scores.get)
+    # Загружаем рекомендации
+    mbti_data = load_mbti_data()
+    result_info = mbti_data.get(mbti, None)
+    if result_info:
+        rec = {
+            'title': result_info['title'][lang],
+            'description': result_info['description'][lang],
+            'programs': result_info['recommended_programs'][lang]
+        }
+    else:
+        rec = {'title': 'Не определено', 'description': 'Попробуйте снова', 'programs': []}
 
-    recommendations = {
-        'math': 'Рекомендуемые программы: Математика, Информатика, Анализ данных.',
-        'engineering': 'Рекомендуемые программы: Машиностроение, Электроника, Автоматизация.',
-        'social': 'Рекомендуемые программы: Психология, Педагогика, Социология.',
-        'creative': 'Рекомендуемые программы: Дизайн, Журналистика, Искусство.',
-        'analytic': 'Рекомендуемые программы: Экономика, Финансы, Аналитика.',
-        'other': 'Попробуйте пройти тест снова для уточнения результата.'
-    }
-    rec_text = recommendations.get(top_category, recommendations['other'])
-
+    # Сохраняем
     result = TestResult(
         user_id=current_user.id,
         answers=json.dumps(answers, ensure_ascii=False),
-        recommended_programs=rec_text
+        recommended_programs=json.dumps(rec, ensure_ascii=False)
     )
     db.session.add(result)
     db.session.commit()
 
-    return jsonify({'message': 'Результаты сохранены', 'recommendations': rec_text})
+    return jsonify({'mbti': mbti, 'recommendations': rec})
 
 @app.route('/set_language/<lang>')
 def set_language(lang):

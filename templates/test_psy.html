@@ -4,6 +4,7 @@
 <section class="section container">
   <h1 class="title center">🧠 Personality Test</h1>
 
+  <!-- Контейнер теста -->
   <div id="test-container" class="card shadow p-4">
     <div id="question-box">
       <h3 id="question-text"></h3>
@@ -15,9 +16,22 @@
     <button id="next-btn" class="btn orange mt-3" disabled>Next</button>
   </div>
 
-  <div id="result-box" style="display:none;">
-    <h2>✅ Test completed!</h2>
-    <p>Your results are being analyzed...</p>
+  <!-- Контейнер результата -->
+  <div id="result-box" class="card shadow p-4" style="display:none;">
+    <h2 class="center">✅ Test completed!</h2>
+    <p class="center" id="loading-text">Your results are being analyzed...</p>
+
+    <div id="final-result" class="mt-4" style="display:none;">
+      <h3 class="center">🎯 Your Personality Type:</h3>
+      <p id="mbti-type" class="center" style="font-size:1.2em; font-weight:bold;"></p>
+
+      <h4 class="center mt-3">💡 Recommended Programs:</h4>
+      <ul id="recommendations-list" class="mt-2"></ul>
+
+      <div class="center mt-4">
+        <a href="/profile" class="btn orange">Go to Profile</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -27,13 +41,16 @@
   .options button {
     display: block;
     width: 100%;
-    margin: 5px 0;
+    margin: 6px 0;
     border: 1px solid #ccc;
     background: #f9f9f9;
     padding: 10px;
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
+  }
+  .options button:hover {
+    background: #ffe0b2;
   }
   .options button.selected {
     background: #ff9800;
@@ -45,6 +62,10 @@
     border: none;
     border-radius: 8px;
     padding: 10px 15px;
+    cursor: pointer;
+  }
+  .btn.orange:hover {
+    background: #fb8c00;
   }
   .card {
     max-width: 600px;
@@ -53,6 +74,16 @@
   .progress {
     text-align: center;
     font-weight: bold;
+  }
+  #recommendations-list li {
+    background: #fff3e0;
+    border-radius: 6px;
+    padding: 8px;
+    margin: 5px 0;
+    list-style: none;
+  }
+  .center {
+    text-align: center;
   }
 </style>
 {% endblock %}
