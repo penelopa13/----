@@ -100,7 +100,6 @@ def load_questions(lang='ru'):
     with open(file_path, 'r', encoding='utf-8') as f:
         questions = json.load(f)
 
-    # Для совместимости — добавим общее поле text
     for q in questions:
         q['text'] = q.get('question', '')
     print(f"✅ Загружено {len(questions)} вопросов для языка {lang}")
