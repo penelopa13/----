@@ -703,3 +703,80 @@ textarea {
   color: #fff;
 }
 /* --- Иконка уведомлений --- */
+/* --- Profile Page --- */
+.profile-section {
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1f2d3d, #2b8cff);
+  padding: 40px 20px;
+}
+
+.profile-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 40px 50px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  text-align: left;
+  color: #fff;
+  animation: fadeIn 0.6s ease;
+}
+
+.profile-card h2 {
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 1.9rem;
+  color: var(--accent-color);
+}
+
+.profile-info p {
+  margin-bottom: 14px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.profile-info p strong {
+  color: var(--accent-color);
+  margin-right: 8px;
+}
+
+.recommendations {
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  border-left: 4px solid var(--accent-color);
+}
+
+.suggestions {
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.profile-actions .btn.orange {
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 1rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.profile-actions .btn.orange:hover {
+  background: #e09e0c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
