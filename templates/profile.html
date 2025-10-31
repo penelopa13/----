@@ -1,80 +1,84 @@
 {% extends "base.html" %}
 {% block title %}
     {% if session.get('lang', current_user.language) == 'kk' %}Менің кабинет
-    {% elif session.get('lang', current_user.language) == 'en' %}My Cabinet
-    {% else %}Мой кабинет{% endif %}
+    {% elif session.get('lang', current_user.language) == 'en' %}My Profile
+    {% else %}Личный кабинет{% endif %}
 {% endblock %}
 
 {% block content %}
 <section class="profile-section">
-    <div class="profile-card">
-        <h2>
-            {% if session.get('lang', current_user.language) == 'kk' %}Менің кабинет
-            {% elif session.get('lang', current_user.language) == 'en' %}My Cabinet
-            {% else %}Мой кабинет{% endif %}
-        </h2>
-
-        <div class="profile-info">
-            <p><strong>
-                {% if session.get('lang', current_user.language) == 'kk' %}Аты-жөні:
-                {% elif session.get('lang', current_user.language) == 'en' %}Name:
-                {% else %}Имя:{% endif %}
-            </strong> {{ user.name }}</p>
-
-            <p><strong>Email:</strong> {{ user.email }}</p>
-
-            <p><strong>
-                {% if session.get('lang', current_user.language) == 'kk' %}Рөл:
-                {% elif session.get('lang', current_user.language) == 'en' %}Role:
-                {% else %}Роль:{% endif %}
-            </strong> 
-                {{ user.is_admin and 
-                    (session.get('lang', current_user.language) == 'kk' and 'Админ' or 
-                     session.get('lang', current_user.language) == 'en' and 'Admin' or 'Админ') or 
-                    (session.get('lang', current_user.language) == 'kk' and 'Қолданушы' or 
-                     session.get('lang', current_user.language) == 'en' and 'User' or 'Пользователь') }}
-            </p>
-
-            {% if result %}
-                <p><strong>
-                    {% if session.get('lang', current_user.language) == 'kk' %}ЕНТ баллы:
-                    {% elif session.get('lang', current_user.language) == 'en' %}ENT Score:
-                    {% else %}Баллы ЕНТ:{% endif %}
-                </strong> {{ user.ent_total }}</p>
-
-                <p><strong>
-                    {% if session.get('lang', current_user.language) == 'kk' %}MBTI типі:
-                    {% elif session.get('lang', current_user.language) == 'en' %}MBTI Type:
-                    {% else %}MBTI тип:{% endif %}
-                </strong> {{ result.mbti_type }}</p>
-
-                <div class="recommendations">
-                    <p><strong>
-                        {% if session.get('lang', current_user.language) == 'kk' %}Ұсыныстар:
-                        {% elif session.get('lang', current_user.language) == 'en' %}Recommendations:
-                        {% else %}Рекомендации:{% endif %}
-                    </strong></p>
-                    <p class="suggestions">{{ result.recommended_programs.ai_suggestions }}</p>
-                </div>
-            {% endif %}
+    <div class="profile-card wide">
+        <!-- Заголовок + аватар -->
+        <div class="profile-header">
+            <div class="avatar-circle">
+                <i class="fas fa-user"></i>
+            </div>
+            <div>
+                <h2>{{ user.name }}</h2>
+                <p class="subtitle">{{ user.email }}</p>
+            </div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
         </div>
 
-        <div class="profile-actions">
-            <a href="{{ url_for('calculator') }}" class="btn orange">
-                {% if session.get('lang', current_user.language) == 'kk' %}ЕНТ есептеу
-                {% elif session.get('lang', current_user.language) == 'en' %}ENT Calculator
-                {% else %}Калькулятор ЕНТ{% endif %}
-            </a>
-            <a href="{{ url_for('test_psy') }}" class="btn orange">
-                {% if session.get('lang', current_user.language) == 'kk' %}Тест
-                {% elif session.get('lang', current_user.language) == 'en' %}Test
-                {% else %}Тест{% endif %}
-            </a>
-            <a href="{{ url_for('logout') }}" class="btn orange">
-                {% if session.get('lang', current_user.language) == 'kk' %}Шығу
-                {% elif session.get('lang', current_user.language) == 'en' %}Logout
-                {% else %}Выйти{% endif %}
-            </a>
+        <div class="profile-grid">
+            <!-- Левая колонка: Информация -->
+            <div class="profile-info">
+                <div class="info-item">
+                    <span class="label">Роль:</span>
+                    <span class="value">
+                        {{ user.is_admin and 'Админ' or 'Пользователь' }}
+                    </span>
+                </div>
+
+                {% if result %}
+                <div class="info-item">
+                    <span class="label">ЕНТ баллы:</span>
+                    <span class="value highlight">{{ user.ent_total }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">MBTI:</span>
+                    <span class="value mbti">{{ result.mbti_type }}</span>
+                </div>
+
+                <!-- Прогресс-бар -->
+                <div class="progress-container">
+                    <div class="progress-label">
+                        Порог поступления: <strong>85</strong> / 140
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ (user.ent_total / 140 * 100)|round(0) }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Правая колонка: Рекомендации + Действия -->
+            <div class="profile-actions-column">
+                {% if result %}
+                <div class="recommendations">
+                    <h4>🎯 Рекомендации</h4>
+                    <p class="suggestions">{{ result.recommended_programs.ai_suggestions }}</p>
+                </div>
+                {% endif %}
+
+                <div class="quick-actions">
+                    <a href="{{ url_for('calculator') }}" class="action-card">
+                        <i class="fas fa-calculator"></i>
+                        <span>Калькулятор ЕНТ</span>
+                    </a>
+                    <a href="{{ url_for('test_psy') }}" class="action-card">
+                        <i class="fas fa-brain"></i>
+                        <span>Пройти тест</span>
+                    </a>
+                    <a href="{{ url_for('status') }}" class="action-card">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Статус заявки</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
