@@ -1,54 +1,280 @@
 {% extends "base.html" %}
 {% block title %}О университете — Талапкер{% endblock %}
+
 {% block content %}
 
-<!-- Hero-секция -->
-<section class="hero" style="background: url('/static/images/university.jpg') center/cover no-repeat; height: 300px; display: flex; align-items: center; justify-content: center;">
-  <h1 style="color: white; font-size: 2.5rem; background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 8px;">
-    О нашем университете
-  </h1>
-</section>
-
-<!-- Основная информация -->
-<section class="section container">
-  <div class="university-info">
-    <p>
-      Наш университет — это современное образовательное учреждение, готовящее специалистов в разных областях. 
-      Мы объединяем инновации, опыт преподавателей и современные технологии.
-    </p>
-    
-    <h2>История</h2>
-    <p>
-      Основан в 1957 году. Сегодня университет — это тысячи студентов и выпускников, признанных по всему миру.
-    </p>
-
-    <h2>Факультеты</h2>
-    <div class="faculties" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
-      <div class="card">
-        <h3>Факультет IT</h3>
-        <p>Программирование, кибербезопасность, искусственный интеллект.</p>
+<!-- КАРУСЕЛЬ НА ВСЮ ШИРИНУ ЭКРАНА -->
+<section class="university-hero-section" data-aos="fade-up" data-aos-delay="100">
+  <!-- КАРУСЕЛЬ ВНЕ .container -->
+  <div class="modern-carousel wide" id="universityCarousel">
+    <!-- Слайд 1 -->
+    <div class="carousel-slide active">
+      <img src="{{ url_for('static', filename='images/university/1.jpg') }}" alt="Кампус">
+      <div class="carousel-caption">
+        <h2>Современный кампус</h2>
+        <p>Уютные аудитории и передовые лаборатории</p>
       </div>
-      <div class="card">
-        <h3>Экономика и управление</h3>
-        <p>Бизнес, финансы, управление проектами.</p>
+    </div>
+    <!-- Слайд 2 -->
+    <div class="carousel-slide">
+      <img src="{{ url_for('static', filename='images/university/2.jpg') }}" alt="Студенты">
+      <div class="carousel-caption">
+        <h2>Активная студенческая жизнь</h2>
+        <p>Клубы, спорт, наука и творчество</p>
       </div>
-      <div class="card">
-        <h3>Гуманитарные науки</h3>
-        <p>Филология, история, журналистика.</p>
-      </div>
-      <div class="card">
-        <h3>Естественные науки</h3>
-        <p>Физика, химия, биология, математика.</p>
+    </div>
+    <!-- Слайд 3 -->
+    <div class="carousel-slide">
+      <img src="{{ url_for('static', filename='images/university/3.jpg') }}" alt="Лаборатория">
+      <div class="carousel-caption">
+        <h2>Инновационные технологии</h2>
+        <p>Робототехника, ИИ, биотехнологии</p>
       </div>
     </div>
 
-    <h2 style="margin-top: 30px;">Контакты</h2>
-    <p>
-      📍 Адрес: г. Алматы, ул. Абая 123<br>
-      📞 Телефон: +7 (727) 123-45-67<br>
-      ✉️ Email: info@university.kz
-    </p>
+    <!-- Стрелки -->
+    <button class="carousel-control carousel-prev" id="prevBtn">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="carousel-control carousel-next" id="nextBtn">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+
+    <!-- Точки -->
+    <div class="carousel-dots">
+      <span class="dot active" data-slide="0"></span>
+      <span class="dot" data-slide="1"></span>
+      <span class="dot" data-slide="2"></span>
+    </div>
+  </div>
+
+  <!-- Остальной контент — в .container -->
+  <div class="container">
+    <!-- Основная информация -->
+    <div class="university-info text-center my-5">
+      <h1 class="display-5 fw-bold mb-4" data-aos="fade-up">Университет имени А. Жубанова</h1>
+      <p class="lead text-muted" data-aos="fade-up" data-aos-delay="100">
+        Ведущий вуз Казахстана, сочетающий традиции и инновации. Мы готовим лидеров будущего.
+      </p>
+    </div>
+
+    <!-- Статистика -->
+    <div class="stats-grid" data-aos="fade-up" data-aos-delay="200">
+      <div class="stat-item">
+        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+        <div class="stat-number" data-count="12">0</div>
+        <div class="stat-label">Место в РК</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon"><i class="fas fa-user-graduate"></i></div>
+        <div class="stat-number" data-count="8500">0</div>
+        <div class="stat-label">Студентов</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+        <div class="stat-number" data-count="97">0</div>
+        <div class="stat-label">% Трудоустройства</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon"><i class="fas fa-globe"></i></div>
+        <div class="stat-number" data-count="40">0</div>
+        <div class="stat-label">Стран-партнёров</div>
+      </div>
+    </div>
+
+    <!-- История -->
+    <div class="row align-items-center my-5" data-aos="fade-up">
+      <div class="col-md-6">
+        <h2 class="mb-4">Наша история</h2>
+        <p>
+          Основан в 1957 году как педагогический институт. За 68 лет превратился в многопрофильный университет 
+          с передовыми программами в IT, экономике, медицине и гуманитарных науках.
+        </p>
+        <p class="text-muted">
+          Сегодня мы — флагман образования в Западном Казахстане, входим в ТОП-15 вузов страны.
+        </p>
+      </div>
+      <div class="col-md-6 text-center">
+        <img src="{{ url_for('static', filename='images/university/history.webp') }}" alt="История" class="img-fluid rounded shadow">
+      </div>
+    </div>
+
+    <!-- Факультеты -->
+    <h2 class="text-center mb-5" data-aos="fade-up">Факультеты</h2>
+    <div class="row g-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="col-md-6 col-lg-3">
+        <div class="faculty-card">
+          <div class="faculty-icon"><i class="fas fa-laptop-code"></i></div>
+          <h3>IT и Инженерия</h3>
+          <p>Программирование, ИИ, кибербезопасность, робототехника</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="faculty-card">
+          <div class="faculty-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>Экономика и Бизнес</h3>
+          <p>Финансы, маркетинг, управление проектами</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="faculty-card">
+          <div class="faculty-icon"><i class="fas fa-book"></i></div>
+          <h3>Гуманитарные науки</h3>
+          <p>Филология, журналистика, история, психология</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="faculty-card">
+          <div class="faculty-icon"><i class="fas fa-microscope"></i></div>
+          <h3>Естественные науки</h3>
+          <p>Биология, химия, физика, экология</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Контакты -->
+    <div class="contact-info mt-5 p-4 rounded shadow-sm bg-light" data-aos="fade-up">
+      <h3 class="text-center mb-4">Контакты</h3>
+      <div class="row text-center">
+        <div class="col-md-4">
+          <p><strong><i class="fas fa-map-marker-alt"></i></strong><br>г. Актобе, пр. Абая 42</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong><i class="fas fa-phone"></i></strong><br>+7 (7132) 56-78-90</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong><i class="fas fa-envelope"></i></strong><br>info@zhubanov.edu.kz</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
+<!-- Партнёры и спонсоры -->
+<section class="partners-section py-5 bg-dark text-white">
+  <div class="container">
+    <h2 class="text-center mb-5">Наши партнёры</h2>
+    <div class="partners-grid">
+      <div class="partner-logo">
+        <img src="{{ url_for('static', filename='images/partners/heriot.png') }}" alt="Heriot-Watt">
+      </div>
+      <div class="partner-logo">
+        <img src="{{ url_for('static', filename='images/partners/halyk.png') }}" alt="Halyk Bank">
+      </div>
+      <div class="partner-logo">
+        <img src="{{ url_for('static', filename='images/partners/tencent.png') }}" alt="Tencent">
+      </div>
+      <div class="partner-logo">
+        <img src="{{ url_for('static', filename='images/partners/nazarbayev.png') }}" alt="Nazarbayev University">
+      </div>
+      <div class="partner-logo">
+        <img src="{{ url_for('static', filename='images/partners/bolashak.png') }}" alt="Bolashak">
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+
+  // === АНИМАЦИЯ СЧЁТЧИКОВ ===
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const counters = entry.target.querySelectorAll('.stat-number');
+        counters.forEach(counter => {
+          const target = parseInt(counter.getAttribute('data-count'));
+          const duration = 2000;
+          const start = 0;
+          const increment = target / (duration / 16);
+          let current = start;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              counter.textContent = target;
+              clearInterval(timer);
+            } else {
+              counter.textContent = Math.floor(current);
+            }
+          }, 16);
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  const statsSection = document.querySelector('.stats-grid');
+  if (statsSection) observer.observe(statsSection);
+
+  // === КАРУСЕЛЬ: СТРЕЛКИ + ТОЧКИ + АВТОПРОКРУТКА ===
+  const slides = document.querySelectorAll('.carousel-slide');
+  const dots = document.querySelectorAll('.dot');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  let currentSlide = 0;
+  const totalSlides = slides.length;
+  let autoSlideInterval;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+    });
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+    currentSlide = index;
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    showSlide(currentSlide);
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    showSlide(currentSlide);
+  }
+
+  // Клик по точкам
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const slideIndex = parseInt(dot.getAttribute('data-slide'));
+      showSlide(slideIndex);
+      resetAutoSlide();
+    });
+  });
+
+  // Клик по стрелкам
+  prevBtn.addEventListener('click', () => {
+    prevSlide();
+    resetAutoSlide();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    nextSlide();
+    resetAutoSlide();
+  });
+
+  // Автопрокрутка
+  function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 5000);
+  }
+
+  function resetAutoSlide() {
+    clearInterval(autoSlideInterval);
+    startAutoSlide();
+  }
+
+  // Пауза при наведении
+  const carousel = document.getElementById('universityCarousel');
+  carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
+  carousel.addEventListener('mouseleave', startAutoSlide);
+
+  // Запуск
+  startAutoSlide();
+</script>
 {% endblock %}
