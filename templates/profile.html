@@ -1,85 +1,96 @@
 {% extends "base.html" %}
 {% block title %}
-    {% if session.get('lang', current_user.language) == 'kk' %}Менің кабинет
-    {% elif session.get('lang', current_user.language) == 'en' %}My Profile
-    {% else %}Личный кабинет{% endif %}
+  {% if session.get('lang', current_user.language) == 'kk' %}Менің кабинет
+  {% elif session.get('lang', current_user.language) == 'en' %}My Profile
+  {% else %}Личный кабинет{% endif %}
 {% endblock %}
 
 {% block content %}
 <section class="profile-section">
-    <div class="profile-card wide">
-        <!-- Заголовок + аватар -->
-        <div class="profile-header">
-            <div class="avatar-circle">
-                <i class="fas fa-user"></i>
-            </div>
-            <div>
-                <h2>{{ user.name }}</h2>
-                <p class="subtitle">{{ user.email }}</p>
-            </div>
-            <a href="{{ url_for('logout') }}" class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
-        </div>
-
-        <div class="profile-grid">
-            <!-- Левая колонка: Информация -->
-            <div class="profile-info">
-                <div class="info-item">
-                    <span class="label">Роль:</span>
-                    <span class="value">
-                        {{ user.is_admin and 'Админ' or 'Пользователь' }}
-                    </span>
-                </div>
-
-                {% if result %}
-                <div class="info-item">
-                    <span class="label">ЕНТ баллы:</span>
-                    <span class="value highlight">{{ user.ent_total }}</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="label">MBTI:</span>
-                    <span class="value mbti">{{ result.mbti_type }}</span>
-                </div>
-
-                <!-- Прогресс-бар -->
-                <div class="progress-container">
-                    <div class="progress-label">
-                        Порог поступления: <strong>85</strong> / 140
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ (user.ent_total / 140 * 100)|round(0) }}%"></div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Правая колонка: Рекомендации + Действия -->
-            <div class="profile-actions-column">
-                {% if result %}
-                <div class="recommendations">
-                    <h4>🎯 Рекомендации</h4>
-                    <p class="suggestions">{{ result.recommended_programs.ai_suggestions }}</p>
-                </div>
-                {% endif %}
-
-                <div class="quick-actions">
-                    <a href="{{ url_for('calculator') }}" class="action-card">
-                        <i class="fas fa-calculator"></i>
-                        <span>Калькулятор ЕНТ</span>
-                    </a>
-                    <a href="{{ url_for('test_psy') }}" class="action-card">
-                        <i class="fas fa-brain"></i>
-                        <span>Пройти тест</span>
-                    </a>
-                    <a href="{{ url_for('status') }}" class="action-card">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Статус заявки</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+  <div class="profile-card wide">
+    <!-- Заголовок + аватар -->
+    <div class="profile-header">
+      <div class="avatar-circle">
+        <i class="fas fa-user"></i>
+      </div>
+      <div>
+        <h2>{{ user.name }}</h2>
+        <p class="subtitle">{{ user.email }}</p>
+      </div>
+      <a href="{{ url_for('logout') }}" class="logout-btn" title="Выйти">
+        <i class="fas fa-sign-out-alt"></i>
+      </a>
     </div>
+
+    <div class="profile-grid">
+      <!-- Левая колонка -->
+      <div class="profile-info">
+        <div class="info-item">
+          <span class="label">Роль:</span>
+          <span class="value">{{ user.is_admin and 'Админ' or 'Пользователь' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="label">ЕНТ баллы:</span>
+          <span class="value highlight">{{ user.ent_total }}</span>
+        </div>
+
+        {% if result %}
+        <div class="info-item">
+          <span class="label">Тип личности (MBTI):</span>
+          <span class="value mbti">{{ result.mbti_type }}</span>
+        </div>
+
+        <!-- Прогресс-бар -->
+        <div class="progress-container">
+          <div class="progress-label">
+            Порог поступления: <strong>85</strong> / 140
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ (user.ent_total / 140 * 100)|round(0) }}%"></div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Правая колонка -->
+      <div class="profile-actions-column">
+        {% if result %}
+        <div class="recommendations">
+          <h4>🎯 Рекомендации</h4>
+
+          {% set rec = result.recommended_programs | safe | from_json %}
+          <p class="suggestions">{{ rec.description }}</p>
+
+          {% if rec.programs %}
+          <ul class="recommended-list">
+            {% for prog in rec.programs %}
+            <li>📘 {{ prog }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        {% else %}
+        <div class="no-result">
+          <p>Вы ещё не проходили психологический тест.</p>
+          <a href="{{ url_for('test_psy') }}" class="btn orange">Пройти тест</a>
+        </div>
+        {% endif %}
+
+        <div class="quick-actions">
+          <a href="{{ url_for('calculator') }}" class="action-card">
+            <i class="fas fa-calculator"></i>
+            <span>Калькулятор ЕНТ</span>
+          </a>
+          <a href="{{ url_for('status') }}" class="action-card">
+            <i class="fas fa-file-alt"></i>
+            <span>Статус заявки</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
+
+
 {% endblock %}

@@ -1,35 +1,44 @@
 {% extends "base.html" %}
-{% block title %}Personality Test{% endblock %}
-{% block content %}
-<section class="section container">
-  <h1 class="title center">🧠 Personality Test</h1>
+{% block title %}🧠 Personality Test{% endblock %}
 
-  <!-- Контейнер теста -->
-  <div id="test-container" class="card shadow p-4">
-    <div id="question-box">
-      <h3 id="question-text"></h3>
-      <div id="options" class="options"></div>
+{% block content %}
+<section class="profile-section">
+  <div class="profile-card wide" style="max-width: 720px;">
+    <h2 class="center" style="color: var(--accent-color); margin-bottom: 16px;">
+      🧠 Personality Test
+    </h2>
+
+    <!-- Контейнер теста -->
+    <div id="test-container">
+      <div id="question-box" class="fade-in">
+        <h3 id="question-text" class="question-text"></h3>
+        <div id="options" class="options"></div>
+      </div>
+
+      <div id="progress" class="progress-text mt-3"></div>
+
+      <div class="mt-3 buttons center">
+        <button id="prev-btn" class="btn small" disabled>← Назад</button>
+      </div>
     </div>
 
-    <div id="progress" class="progress mt-3"></div>
+    <!-- Контейнер результата -->
+    <div id="result-box" style="display:none;">
+      <h2 class="center" style="color: var(--accent-color);">✅ Тест завершён!</h2>
+      <p class="center" id="loading-text" style="color:#fff;">Результаты анализируются...</p>
 
-    <button id="next-btn" class="btn orange mt-3" disabled>Next</button>
-  </div>
+      <div id="final-result" class="mt-4" style="display:none;">
+        <h3 class="center" style="color:#fff;">🎯 Твой тип личности:</h3>
+        <p id="mbti-type" class="center mbti-type"></p>
 
-  <!-- Контейнер результата -->
-  <div id="result-box" class="card shadow p-4" style="display:none;">
-    <h2 class="center">✅ Test completed!</h2>
-    <p class="center" id="loading-text">Your results are being analyzed...</p>
+        <p id="description" class="center mt-3 text-safe"></p>
 
-    <div id="final-result" class="mt-4" style="display:none;">
-      <h3 class="center">🎯 Your Personality Type:</h3>
-      <p id="mbti-type" class="center" style="font-size:1.2em; font-weight:bold;"></p>
+        <h4 class="center mt-3" style="color:var(--accent-color);">💡 Рекомендуемые направления:</h4>
+        <ul id="recommendations-list" class="recommendations-list"></ul>
 
-      <h4 class="center mt-3">💡 Recommended Programs:</h4>
-      <ul id="recommendations-list" class="mt-2"></ul>
-
-      <div class="center mt-4">
-        <a href="/profile" class="btn orange">Go to Profile</a>
+        <div class="center mt-4">
+          <a href="/profile" class="btn orange">Перейти в профиль</a>
+        </div>
       </div>
     </div>
   </div>
@@ -38,52 +47,105 @@
 <script src="{{ url_for('static', filename='js/test_psy.js') }}"></script>
 
 <style>
-  .options button {
-    display: block;
-    width: 100%;
-    margin: 6px 0;
-    border: 1px solid #ccc;
-    background: #f9f9f9;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .options button:hover {
-    background: #ffe0b2;
-  }
-  .options button.selected {
-    background: #ff9800;
-    color: white;
-  }
-  .btn.orange {
-    background: #ff9800;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 15px;
-    cursor: pointer;
-  }
-  .btn.orange:hover {
-    background: #fb8c00;
-  }
-  .card {
-    max-width: 600px;
-    margin: auto;
-  }
-  .progress {
+  /* --- Стиль вопроса и опций --- */
+  .question-text {
+    font-size: 1.3rem;
+    color: #fff;
+    margin-bottom: 18px;
     text-align: center;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .options button {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #fff;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .options button:hover {
+    background: rgba(255, 179, 15, 0.25);
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+  }
+
+  .options button.selected {
+    background: var(--accent-color);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(255,179,15,0.3);
+  }
+
+  .progress-text {
+    text-align: center;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.95rem;
+    margin-top: 12px;
+  }
+
+  .mbti-type {
+    font-family: monospace;
+    background: rgba(255,179,15,0.15);
+    border: 1px solid rgba(255,179,15,0.4);
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: inline-block;
+    color: var(--accent-color);
+    font-size: 1.4rem;
     font-weight: bold;
   }
-  #recommendations-list li {
-    background: #fff3e0;
-    border-radius: 6px;
-    padding: 8px;
-    margin: 5px 0;
+
+  .recommendations-list {
+    margin-top: 10px;
     list-style: none;
+    padding: 0;
   }
-  .center {
-    text-align: center;
+
+  .recommendations-list li {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #fff;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+  }
+
+  .recommendations-list li:hover {
+    background: rgba(255,179,15,0.15);
+    transform: translateX(4px);
+  }
+
+  .buttons .btn.small {
+    background: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    font-weight: 600;
+  }
+
+  .buttons .btn.small:hover {
+    background: var(--accent-color);
+    color: #fff;
+    transform: scale(1.05);
+  }
+
+  .fade-in {
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 {% endblock %}

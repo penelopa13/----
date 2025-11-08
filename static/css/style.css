@@ -1410,4 +1410,61 @@ textarea {
     height: 40px;
     font-size: 1rem;
   }
+/* === ШРИФТЫ И ТИПОГРАФИКА ПРОФИЛЯ === */
+.profile-card.wide,
+.profile-section,
+.profile-header,
+.profile-info,
+.recommendations,
+.quick-actions {
+  font-family: "Poppins", "Inter", "Segoe UI", sans-serif;
+  letter-spacing: 0.25px;
+}
+
+.profile-card.wide h2 {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.4px;
+}
+
+.profile-info .label {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+}
+
+.profile-info .value {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #fff;
+}
+
+.recommendations h4 {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.suggestions, .recommended-list li {
+  font-family: "Inter", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.9);
+}
+
+.action-card span {
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.subtitle {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  color: rgba(255,255,255,0.8);
+}
+
 }

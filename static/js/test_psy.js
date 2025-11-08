@@ -3,14 +3,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const questionText = document.getElementById("question-text");
   const optionsDiv = document.getElementById("options");
   const progressDiv = document.getElementById("progress");
-  const nextBtn = document.getElementById("next-btn");
+  const prevBtn = document.getElementById("prev-btn");
   const resultBox = document.getElementById("result-box");
+  const loadingText = document.getElementById("loading-text");
+  const finalResult = document.getElementById("final-result");
+  const mbtiType = document.getElementById("mbti-type");
+  const description = document.getElementById("description");
+  const recommendationsList = document.getElementById("recommendations-list");
 
   let questions = [];
   let currentIndex = 0;
   let answers = [];
 
-  // Загружаем вопросы с сервера
+  // === Загружаем вопросы с сервера ===
   fetch("/api/test/questions")
     .then((res) => res.json())
     .then((data) => {
@@ -34,27 +39,35 @@ document.addEventListener("DOMContentLoaded", () => {
     q.options.forEach((opt, i) => {
       const btn = document.createElement("button");
       btn.textContent = opt;
-      btn.addEventListener("click", () => selectOption(i + 1, btn));
+      if (answers[currentIndex] && answers[currentIndex].value === i + 1) {
+        btn.classList.add("selected");
+      }
+      btn.addEventListener("click", () => {
+        answers[currentIndex] = { id: q.id, value: i + 1 };
+        // Переходим к следующему вопросу автоматически
+        currentIndex++;
+        if (currentIndex < questions.length) {
+          showQuestion();
+        } else {
+          finishTest();
+        }
+      });
       optionsDiv.appendChild(btn);
     });
 
-    progressDiv.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
-    nextBtn.disabled = true;
+    progressDiv.textContent = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+    prevBtn.disabled = currentIndex === 0;
   }
 
-  function selectOption(value, button) {
-    document.querySelectorAll(".options button").forEach((b) => b.classList.remove("selected"));
-    button.classList.add("selected");
-    answers[currentIndex] = { id: questions[currentIndex].id, value };
-    nextBtn.disabled = false;
-  }
-
-  nextBtn.addEventListener("click", () => {
-    currentIndex++;
-    showQuestion();
+  // Кнопка "Назад"
+  prevBtn.addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      showQuestion();
+    }
   });
 
-  // === 5️⃣ Завершение теста и отправка ===
+  // === Завершение теста и показ результата ===
   function finishTest() {
     container.style.display = "none";
     resultBox.style.display = "block";
@@ -72,20 +85,21 @@ document.addEventListener("DOMContentLoaded", () => {
         finalResult.style.display = "block";
 
         mbtiType.textContent = `${data.mbti} — ${data.recommendations.title}`;
-        recommendationsList.innerHTML = "";
+        description.textContent = data.recommendations.description;
 
-        if (data.recommendations.programs && data.recommendations.programs.length > 0) {
+        recommendationsList.innerHTML = "";
+        if (data.recommendations.programs?.length > 0) {
           data.recommendations.programs.forEach((p) => {
             const li = document.createElement("li");
             li.textContent = p;
             recommendationsList.appendChild(li);
           });
         } else {
-          recommendationsList.innerHTML = "<li>No recommendations found.</li>";
+          recommendationsList.innerHTML = "<li>Рекомендации не найдены.</li>";
         }
       })
       .catch(() => {
-        loadingText.textContent = "❌ Error saving results.";
+        loadingText.textContent = "❌ Ошибка при сохранении результатов.";
       });
   }
-})
+});

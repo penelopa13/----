@@ -14,6 +14,15 @@ import openai
 
 load_dotenv()
 app = Flask(__name__)
+# --- Custom Jinja filter ---
+@app.template_filter('from_json')
+def from_json_filter(s):
+    """Преобразует JSON-строку в объект Python (dict/list)"""
+    try:
+        return json.loads(s)
+    except Exception:
+        return {}
+
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///dev.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -70,12 +79,14 @@ class TestResult(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     answers = db.Column(db.Text)
     recommended_programs = db.Column(db.Text)
+    mbti_type = db.Column(db.String(10))  # добавляем тип MBTI
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+
 
 class ChatHistory(db.Model):
     __tablename__ = 'chat_history'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     message = db.Column(db.Text)
     response = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=db.func.now())
@@ -309,8 +320,10 @@ def submit_test():
     result = TestResult(
         user_id=current_user.id,
         answers=json.dumps(answers, ensure_ascii=False),
-        recommended_programs=json.dumps(rec, ensure_ascii=False)
+        recommended_programs=json.dumps(rec, ensure_ascii=False),
+        mbti_type=mbti  # добавляем сам тип
     )
+
     db.session.add(result)
     db.session.commit()
 
