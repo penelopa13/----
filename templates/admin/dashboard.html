@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Админ-панель</h1>
+    <p class="text-muted">Добро пожаловать, <strong>{{ current_user.name or current_user.email }}</strong></p>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5>Пользователей</h5>
+                    <h2>{{ users|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5>Тестов пройдено</h5>
+                    <h2>{{ results|length }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5>Сообщений</h5>
+                    <h2>{{ contact_messages|length }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Последние сообщения</h3>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Email</th>
+                    <th>Сообщение</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for msg in contact_messages[:5] %}
+                <tr>
+                    <td>{{ msg.name }}</td>
+                    <td>{{ msg.email }}</td>
+                    <td>{{ msg.message[:50] }}...</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

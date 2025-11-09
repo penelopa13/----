@@ -1,3 +1,5 @@
+# app.py (обновлённая версия с админкой и перенаправлением)
+
 import datetime
 import os
 import json
@@ -14,6 +16,7 @@ import openai
 
 load_dotenv()
 app = Flask(__name__)
+
 # --- Custom Jinja filter ---
 @app.template_filter('from_json')
 def from_json_filter(s):
@@ -79,9 +82,8 @@ class TestResult(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     answers = db.Column(db.Text)
     recommended_programs = db.Column(db.Text)
-    mbti_type = db.Column(db.String(10))  # добавляем тип MBTI
+    mbti_type = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
-
 
 class ChatHistory(db.Model):
     __tablename__ = 'chat_history'
@@ -113,16 +115,14 @@ def load_mbti_data():
 def load_questions(lang='ru'):
     file_path = os.path.join('data', f'questions_{lang}.json')
     if not os.path.exists(file_path):
-        print("❌ Файл не найден:", file_path)
+        print("Файл не найден:", file_path)
         return []
     with open(file_path, 'r', encoding='utf-8') as f:
         questions = json.load(f)
-
     for q in questions:
         q['text'] = q.get('question', '')
-    print(f"✅ Загружено {len(questions)} вопросов для языка {lang}")
+    print(f"Загружено {len(questions)} вопросов для языка {lang}")
     return questions
-
 
 def calculate_ent_total(ent_data):
     total = sum([ent_data.get(key, 0) for key in ['math', 'reading', 'history', 'profile1', 'profile2']])
@@ -161,12 +161,33 @@ def test_psy():
     questions = load_questions(lang)
     return render_template('test_psy.html', questions=questions, lang=lang)
 
+# === ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ ===
 @app.route('/profile')
 @login_required
 def profile():
+    if current_user.is_admin:
+        return redirect(url_for('admin_dashboard'))
     result = TestResult.query.filter_by(user_id=current_user.id).order_by(TestResult.created_at.desc()).first()
     return render_template('profile.html', user=current_user, result=result)
 
+# === АДМИН-ПАНЕЛЬ ===
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Доступ запрещён. Только для администраторов.', 'error')
+        return redirect(url_for('profile'))
+
+    users = User.query.all()
+    results = TestResult.query.order_by(TestResult.created_at.desc()).limit(10).all()
+    contact_messages = ContactMessage.query.order_by(ContactMessage.id.desc()).all()
+
+    return render_template('admin/dashboard.html',
+                           users=users,
+                           results=results,
+                           contact_messages=contact_messages)
+
+# === РЕГИСТРАЦИЯ ===
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -182,9 +203,10 @@ def register():
         db.session.commit()
         login_user(u)
         flash('Регистрация прошла успешно', 'success')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile'))  # Всегда в профиль
     return render_template('register.html')
 
+# === ВХОД С ПЕРЕНАПРАВЛЕНИЕМ ===
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -193,7 +215,12 @@ def login():
         u = User.query.filter_by(email=email).first()
         if u and u.check_password(pw):
             login_user(u)
-            return redirect(url_for('profile'))
+            flash(f'Добро пожаловать, {u.name or u.email}!', 'success')
+            # ПЕРЕНАПРАВЛЕНИЕ ПО РОЛИ
+            if u.is_admin:
+                return redirect(url_for('admin_dashboard'))
+            else:
+                return redirect(url_for('profile'))
         flash('Неверный логин или пароль', 'error')
         return redirect(url_for('login'))
     return render_template('login.html')
@@ -202,6 +229,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    flash('Вы вышли из системы.', 'info')
     return redirect(url_for('home'))
 
 # --- API Endpoints ---
@@ -232,47 +260,27 @@ def get_questions():
     questions = load_questions(lang)
     return jsonify(questions)
 
-
 # --- Психологический тест ---
 def calculate_mbti(answers, questions):
-    """
-    На основе ответов считает количество баллов по 4 осям MBTI
-    и возвращает тип, например 'INTJ'
-    """
-    # Каждая пара осей MBTI
-    mbti_axes = {
-        'EI': 0,  # Extroversion / Introversion
-        'SN': 0,  # Sensing / Intuition
-        'TF': 0,  # Thinking / Feeling
-        'JP': 0   # Judging / Perceiving
-    }
-
-    # Для простоты: категории вопросов должны быть связаны с одной из осей
+    mbti_axes = {'EI': 0, 'SN': 0, 'TF': 0, 'JP': 0}
     mapping = {
-        'extroversion': 'EI',
-        'introversion': 'EI',
-        'sensing': 'SN',
-        'intuition': 'SN',
-        'thinking': 'TF',
-        'feeling': 'TF',
-        'judging': 'JP',
-        'perceiving': 'JP'
+        'extroversion': 'EI', 'introversion': 'EI',
+        'sensing': 'SN', 'intuition': 'SN',
+        'thinking': 'TF', 'feeling': 'TF',
+        'judging': 'JP', 'perceiving': 'JP'
     }
 
-    # Пробегаем по ответам
     for a in answers:
         qid = a.get('id')
         value = int(a.get('value', 0))
         question = next((q for q in questions if q['id'] == qid), None)
         if not question:
             continue
-
         cat = question.get('category', '').lower()
         axis = mapping.get(cat, None)
         if not axis:
             continue
 
-        # Чем выше значение (4-5) — тем сильнее "первое" направление оси
         if axis == 'EI':
             mbti_axes['EI'] += (value - 3) if cat == 'extroversion' else -(value - 3)
         elif axis == 'SN':
@@ -282,48 +290,36 @@ def calculate_mbti(answers, questions):
         elif axis == 'JP':
             mbti_axes['JP'] += (value - 3) if cat == 'judging' else -(value - 3)
 
-    # Определяем буквы по осям
     result = ''
     result += 'E' if mbti_axes['EI'] >= 0 else 'I'
     result += 'S' if mbti_axes['SN'] >= 0 else 'N'
     result += 'T' if mbti_axes['TF'] >= 0 else 'F'
     result += 'J' if mbti_axes['JP'] >= 0 else 'P'
-
     return result
-
 
 @app.route('/api/test/submit', methods=['POST'])
 @login_required
 def submit_test():
-    """Получает ответы, считает результат, сохраняет в БД"""
     data = request.get_json() or {}
     answers = data.get('answers', [])
     lang = session.get('lang', current_user.language)
-
-    # Загружаем вопросы
     questions = load_questions(lang)
     mbti = calculate_mbti(answers, questions)
 
-    # Загружаем рекомендации
     mbti_data = load_mbti_data()
-    result_info = mbti_data.get(mbti, None)
-    if result_info:
-        rec = {
-            'title': result_info['title'][lang],
-            'description': result_info['description'][lang],
-            'programs': result_info['recommended_programs'][lang]
-        }
-    else:
-        rec = {'title': 'Не определено', 'description': 'Попробуйте снова', 'programs': []}
+    result_info = mbti_data.get(mbti, {})
+    rec = {
+        'title': result_info.get('title', {}).get(lang, 'Не определено'),
+        'description': result_info.get('description', {}).get(lang, 'Попробуйте снова'),
+        'programs': result_info.get('recommended_programs', {}).get(lang, [])
+    }
 
-    # Сохраняем
     result = TestResult(
         user_id=current_user.id,
         answers=json.dumps(answers, ensure_ascii=False),
         recommended_programs=json.dumps(rec, ensure_ascii=False),
-        mbti_type=mbti  # добавляем сам тип
+        mbti_type=mbti
     )
-
     db.session.add(result)
     db.session.commit()
 
@@ -335,7 +331,25 @@ def set_language(lang):
         session['lang'] = lang
     return redirect(request.referrer or url_for('home'))
 
+# === ИНИЦИАЛИЗАЦИЯ АДМИНА ===
+def create_admin():
+    if not User.query.filter_by(email='admin@site.com').first():
+        admin = User(
+            name='Администратор',
+            email='admin@site.com',
+            is_admin=True,
+            language='ru'
+        )
+        admin.set_password('admin123')
+        db.session.add(admin)
+        db.session.commit()
+        print("Админ создан: admin@site.com / admin123")
+
+# === ЗАПУСК ПРИЛОЖЕНИЯ ===
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        create_admin()  # Теперь вызываем вручную
+    print("Сервер запущен: http://127.0.0.1:5000")
+    print("Админ: admin@site.com / admin123")
     app.run(debug=True)
