@@ -1,58 +1,231 @@
 {% extends "base.html" %}
 {% block title %}Админ-панель{% endblock %}
-
 {% block content %}
 <div class="container py-5">
     <h1 class="mb-4">Админ-панель</h1>
     <p class="text-muted">Добро пожаловать, <strong>{{ current_user.name or current_user.email }}</strong></p>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-primary">
-                <div class="card-body">
-                    <h5>Пользователей</h5>
-                    <h2>{{ users|length }}</h2>
+    <!-- Статистика — СТЕКЛЯННЫЕ КАРТОЧКИ -->
+<div class="row g-4 mb-5">
+    <!-- Пользователи -->
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-card glass-card bg-primary-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3">
+                    <i class="fas fa-users fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1 fw-semibold opacity-90">Пользователей</h5>
+                    <h2 class="mb-0 display-5 fw-bold">{{ users|length }}</h2>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-success">
-                <div class="card-body">
-                    <h5>Тестов пройдено</h5>
-                    <h2>{{ results|length }}</h2>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5>Сообщений</h5>
-                    <h2>{{ contact_messages|length }}</h2>
-                </div>
-            </div>
+            <div class="glass-shine"></div>
         </div>
     </div>
 
-    <h3>Последние сообщения</h3>
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Имя</th>
-                    <th>Email</th>
-                    <th>Сообщение</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for msg in contact_messages[:5] %}
-                <tr>
-                    <td>{{ msg.name }}</td>
-                    <td>{{ msg.email }}</td>
-                    <td>{{ msg.message[:50] }}...</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Тесты -->
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-card glass-card bg-success-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3">
+                    <i class="fas fa-check-circle fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1 fw-semibold opacity-90">Тестов пройдено</h5>
+                    <h2 class="mb-0 display-5 fw-bold">{{ results|length }}</h2>
+                </div>
+            </div>
+            <div class="glass-shine"></div>
+        </div>
+    </div>
+
+    <!-- Сообщения -->
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-card glass-card bg-warning-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3">
+                    <i class="fas fa-envelope fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1 fw-semibold opacity-90">Сообщений</h5>
+                    <h2 class="mb-0 display-5 fw-bold">{{ contact_messages|length }}</h2>
+                </div>
+            </div>
+            <div class="glass-shine"></div>
+        </div>
     </div>
 </div>
+    <!-- Форма отправки уведомления -->
+    <div class="card border-0 shadow-lg" data-aos="fade-up" data-aos-delay="400">
+        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1f2d3d, #2b8cff); border-radius: 16px 16px 0 0;">
+            <h3 class="mb-0">
+                <i class="fas fa-bell me-2"></i> Отправить уведомление
+            </h3>
+        </div>
+        <div class="card-body p-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-radius: 0 0 16px 16px;">
+            <form id="notificationForm">
+                <div class="mb-3">
+                    <label for="notifTitle" class="form-label fw-semibold text-dark">
+                        <i class="fas fa-heading text-primary"></i> Заголовок
+                    </label>
+                    <input type="text" class="form-control form-control-lg shadow-sm" id="notifTitle" placeholder="Например: Приём документов завершён" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="notifMessage" class="form-label fw-semibold text-dark">
+                        <i class="fas fa-comment-dots text-success"></i> Сообщение
+                    </label>
+                    <textarea class="form-control shadow-sm" id="notifMessage" rows="4" placeholder="Введите текст уведомления..." required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="notifType" class="form-label fw-semibold text-dark">
+                        <i class="fas fa-tag text-warning"></i> Тип уведомления
+                    </label>
+                    <select class="form-select form-select-lg shadow-sm" id="notifType">
+                        <option value="info">ℹ️ Информация</option>
+                        <option value="success">✅ Успех</option>
+                        <option value="warning">⚠️ Важно</option>
+                        <option value="urgent">🔥 Срочно</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark">
+                        <i class="fas fa-paper-plane text-accent"></i> Кому отправить
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="recipient" id="allUsers" value="all" checked>
+                        <label class="form-check-label" for="allUsers">
+                            Всем пользователям
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="recipient" id="specificUser" value="specific">
+                        <label class="form-check-label" for="specificUser">
+                            Конкретному пользователю
+                        </label>
+                    </div>
+                    <div id="userSelectWrapper" class="mt-2" style="display: none;">
+                        <select class="form-select shadow-sm" id="specificUserSelect">
+                            <option value="">— Выберите пользователя —</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.name or user.email }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-grid d-md-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="clearForm()">
+                        <i class="fas fa-eraser"></i> Очистить
+                    </button>
+                    <button type="submit" class="btn btn-orange btn-lg px-5 shadow-sm">
+                        <i class="fas fa-paper-plane"></i> Отправить уведомление
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Предпросмотр уведомления (всплывающий) -->
+    <div id="previewToast" class="toast align-items-center text-white border-0 position-fixed bottom-0 end-0 p-3" style="z-index: 11000; display: none;" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold">
+                <span id="previewIcon"></span> <span id="previewText"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение AOS для анимаций -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 600, once: true });
+
+    // Показать/скрыть выбор пользователя
+    document.querySelectorAll('input[name="recipient"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('userSelectWrapper').style.display = 
+                this.value === 'specific' ? 'block' : 'none';
+        });
+    });
+
+    // Очистка формы
+    function clearForm() {
+        document.getElementById('notificationForm').reset();
+        document.getElementById('userSelectWrapper').style.display = 'none';
+    }
+
+    // Отправка формы (заглушка)
+    document.getElementById('notificationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const title = document.getElementById('notifTitle').value;
+        const message = document.getElementById('notifMessage').value;
+        const type = document.getElementById('notifType').value;
+
+        const icons = {
+            info: 'ℹ️',
+            success: '✅',
+            warning: '⚠️',
+            urgent: '🔥'
+        };
+
+        // Показать тост-предпросмотр
+        const toast = document.getElementById('previewToast');
+        const iconEl = document.getElementById('previewIcon');
+        const textEl = document.getElementById('previewText');
+
+        iconEl.textContent = icons[type];
+        textEl.textContent = title;
+
+        toast.className = `toast align-items-center text-white border-0 position-fixed bottom-0 end-0 p-3 bg-${type === 'info' ? 'primary' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger'}`;
+        toast.style.display = 'block';
+
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+
+        // Очистить форму
+        setTimeout(() => {
+            clearForm();
+        }, 800);
+    });
+</script>
+
+<style>
+    .bg-gradient {
+        background: linear-gradient(135deg, #1f2d3d, #2b8cff) !important;
+    }
+    .btn-orange {
+        background: var(--accent-color);
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-orange:hover {
+        background: #e09e0c;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 179, 15, 0.3);
+    }
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-size: 1rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 0.2rem rgba(255, 179, 15, 0.25);
+    }
+    .card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .toast {
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+    }
+</style>
 {% endblock %}
