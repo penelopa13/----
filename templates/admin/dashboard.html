@@ -166,39 +166,28 @@
     }
 
     // Отправка формы (заглушка)
-    document.getElementById('notificationForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    document.getElementById('notificationForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-        const title = document.getElementById('notifTitle').value;
-        const message = document.getElementById('notifMessage').value;
-        const type = document.getElementById('notifType').value;
+    const payload = {
+        title: document.getElementById('notifTitle').value,
+        message: document.getElementById('notifMessage').value,
+        type: document.getElementById('notifType').value,
+        recipient: document.querySelector('input[name="recipient"]:checked').value === 'all'
+            ? 'all'
+            : document.getElementById('specificUserSelect').value
+    };
 
-        const icons = {
-            info: 'ℹ️',
-            success: '✅',
-            warning: '⚠️',
-            urgent: '🔥'
-        };
-
-        // Показать тост-предпросмотр
-        const toast = document.getElementById('previewToast');
-        const iconEl = document.getElementById('previewIcon');
-        const textEl = document.getElementById('previewText');
-
-        iconEl.textContent = icons[type];
-        textEl.textContent = title;
-
-        toast.className = `toast align-items-center text-white border-0 position-fixed bottom-0 end-0 p-3 bg-${type === 'info' ? 'primary' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger'}`;
-        toast.style.display = 'block';
-
-        const bsToast = new bootstrap.Toast(toast);
-        bsToast.show();
-
-        // Очистить форму
-        setTimeout(() => {
-            clearForm();
-        }, 800);
+    const res = await fetch('/api/admin/notify', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
     });
+
+    const data = await res.json();
+    alert(data.message);
+});
+
 </script>
 
 <style>

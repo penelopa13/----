@@ -99,6 +99,18 @@ class ContactMessage(db.Model):
     email = db.Column(db.String(120))
     message = db.Column(db.Text)
 
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    notif_type = db.Column(db.String(20), default='info')
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    # null = всем пользователям
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+
 # --- User loader ---
 @login_manager.user_loader
 def load_user(user_id):
@@ -344,6 +356,76 @@ def create_admin():
         db.session.add(admin)
         db.session.commit()
         print("Админ создан: admin@site.com / admin123")
+
+@app.route('/api/admin/notify', methods=['POST'])
+@login_required
+def admin_notify():
+    if not current_user.is_admin:
+        return jsonify({'status': 'error', 'message': 'Доступ запрещен'}), 403
+
+    data = request.get_json() or {}
+    title = data.get('title')
+    message = data.get('message')
+    notif_type = data.get('type')
+    recipient = data.get('recipient')  # "all" или user_id
+
+    if not title or not message:
+        return jsonify({'status': 'error', 'message': 'Заполните все поля'}), 400
+
+    if recipient == 'all':
+        users = User.query.all()
+        for u in users:
+            notif = Notification(
+                title=title,
+                message=message,
+                notif_type=notif_type,
+                recipient_id=u.id
+            )
+            db.session.add(notif)
+    else:
+        user = User.query.get(int(recipient))
+        if not user:
+            return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
+
+        notif = Notification(
+            title=title,
+            message=message,
+            notif_type=notif_type,
+            recipient_id=user.id
+        )
+        db.session.add(notif)
+
+    db.session.commit()
+    return jsonify({'status': 'ok', 'message': 'Уведомление отправлено'})
+
+
+@app.route('/api/notifications')
+@login_required
+def get_notifications():
+    notifs = Notification.query.filter_by(recipient_id=current_user.id).order_by(Notification.created_at.desc()).all()
+    
+    return jsonify([
+        {
+            'id': n.id,
+            'title': n.title,
+            'message': n.message,
+            'type': n.notif_type,
+            'is_read': n.is_read,
+            'created_at': n.created_at.strftime('%d.%m.%Y %H:%M')
+        }
+        for n in notifs
+    ])
+
+@app.route('/api/notifications/read/<int:notif_id>', methods=['POST'])
+@login_required
+def mark_read(notif_id):
+    notif = Notification.query.get_or_404(notif_id)
+    if notif.recipient_id != current_user.id:
+        return jsonify({'status': 'error'}), 403
+    notif.is_read = True
+    db.session.commit()
+    return jsonify({'status': 'ok'})
+
 
 # === ЗАПУСК ПРИЛОЖЕНИЯ ===
 if __name__ == '__main__':
