@@ -12,7 +12,9 @@ from flask_login import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-import openai
+import google.generativeai as genai
+
+genai.configure(api_key="AIzaSyAuM3vW7xKeZg8idyhOLcY_YX9bSI5IY18")
 
 load_dotenv()
 app = Flask(__name__)
@@ -172,6 +174,72 @@ def test_psy():
     lang = session.get('lang', current_user.language)
     questions = load_questions(lang)
     return render_template('test_psy.html', questions=questions, lang=lang)
+
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def api_chat():
+    data = request.get_json() or {}
+    user_message = data.get("message", "").strip()
+
+    if not user_message:
+        return jsonify({"reply": "Сообщение пустое."})
+
+    try:
+        model = genai.GenerativeModel("gemini-flash-latest")  # или gemini-1.5-pro
+
+        # --- ОТКЛЮЧАЕМ БЕЗОПАСНОСТЬ (для тестов) ---
+        model = genai.GenerativeModel("gemini-flash-latest")
+
+        safety_settings = [
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        ]
+
+        response = model.generate_content(
+            user_message,
+            generation_config={"temperature": 0.7, "max_output_tokens": 1000},
+            safety_settings=safety_settings,
+            stream=False
+        )
+
+ # ОТЛАДКА: ВЫВОДИМ ВСЁ
+        print("\n" + "="*50)
+        print("GEMINI DEBUG OUTPUT")
+        print("="*50)
+        print(f"User message: {user_message}")
+        print(f"Response object: {response}")
+        print(f"Candidates: {len(response.candidates) if hasattr(response, 'candidates') else 'None'}")
+        
+        if not response.candidates:
+            return jsonify({"reply": "ИИ не смог ответить."})
+
+        candidate = response.candidates[0]
+
+        # ПРАВИЛЬНАЯ ПРОВЕРКА
+        if candidate.finish_reason == 3:  # SAFETY
+            return jsonify({"reply": "Сообщение заблокировано по безопасности."})
+        elif candidate.finish_reason == 2:  # MAX_TOKENS
+            ai_text = response.text.strip() + "\n\n[Ответ обрезан. Продолжение в следующем сообщении.]"
+        else:
+            ai_text = response.text.strip()
+
+        # Сохраняем
+        record = ChatHistory(
+            user_id=current_user.id,
+            message=user_message,
+            response=ai_text
+        )
+        db.session.add(record)
+        db.session.commit()
+
+        return jsonify({"reply": ai_text})
+
+    except Exception as e:
+        print("Gemini error:", e)
+        return jsonify({"reply": "Ошибка ИИ."})
+    
 
 # === ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ ===
 @app.route('/profile')

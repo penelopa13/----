@@ -116,7 +116,26 @@
     setTimeout(() => {
       const botMsg = document.createElement('div');
       botMsg.className = 'message bot';
-      botMsg.textContent = `Вы сказали: "${text}". Я обрабатываю ваш запрос...`;
+  // === Отправка на сервер ===
+  fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  })
+    .then(res => res.json())
+    .then(data => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'message bot';
+        botMsg.textContent = data.reply;
+        messages.appendChild(botMsg);
+        messages.scrollTop = messages.scrollHeight;
+    })
+    .catch(err => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'message bot';
+        botMsg.textContent = "Ошибка соединения с ИИ.";
+        messages.appendChild(botMsg);
+    });
       messages.appendChild(botMsg);
       messages.scrollTop = messages.scrollHeight;
     }, 800);
