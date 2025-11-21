@@ -18,6 +18,17 @@ genai.configure(api_key="AIzaSyAuM3vW7xKeZg8idyhOLcY_YX9bSI5IY18")
 
 load_dotenv()
 app = Flask(__name__)
+# Добавь в начало app.py (после импортов)
+FAQ_DATA = None
+
+def load_faq_exact():
+    global FAQ_DATA
+    path = os.path.join('data', 'faq_exact.json')
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            FAQ_DATA = json.load(f)
+    else:
+        FAQ_DATA = []
 
 # --- Custom Jinja filter ---
 @app.template_filter('from_json')
@@ -179,56 +190,58 @@ def test_psy():
 @login_required
 def api_chat():
     data = request.get_json() or {}
-    user_message = data.get("message", "").strip()
+    user_message = data.get("message", "").strip().lower()
+    lang = session.get('lang', current_user.language)
 
     if not user_message:
-        return jsonify({"reply": "Сообщение пустое."})
+        return jsonify({"reply": "Пустое сообщение."})
 
+    # --- 1. Ищем точное совпадение в FAQ ---
+    if FAQ_DATA:
+        for item in FAQ_DATA:
+            if any(keyword in user_message for keyword in [k.lower() for k in item.get('keywords', [])]):
+                answer_key = f"answer_{lang}" if lang in ['ru', 'kk', 'en'] else "answer_ru"
+                reply = item.get(answer_key) or item.get("answer_ru")
+                
+                # Сохраняем в историю
+                record = ChatHistory(user_id=current_user.id, message=user_message, response=reply)
+                db.session.add(record)
+                db.session.commit()
+                
+                return jsonify({"reply": reply})
+
+    # --- 2. Если не нашли — идём в Gemini с жёсткой инструкцией ---
     try:
-        model = genai.GenerativeModel("gemini-flash-latest")  # или gemini-1.5-pro
+        prompt = f"""Ты — официальный ИИ-консультант приёмной комиссии университета «Талапкер».
+Отвечай ТОЛЬКО на казахском, русском или английском (в зависимости от языка вопроса).
+Используй официальный, доброжелательный тон.
+Если не знаешь точного ответа — скажи: «Уточните, пожалуйста, ваш вопрос, я помогу!»
 
-        # --- ОТКЛЮЧАЕМ БЕЗОПАСНОСТЬ (для тестов) ---
-        model = genai.GenerativeModel("gemini-flash-latest")
+Вопрос пользователя: {data.get("message")}
 
-        safety_settings = [
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        ]
+Ответ:"""
 
+        model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content(
-            user_message,
-            generation_config={"temperature": 0.7, "max_output_tokens": 1000},
-            safety_settings=safety_settings,
-            stream=False
+            prompt,
+            generation_config=genai.GenerationConfig(
+                temperature=0.3,  # низкая температура = более предсказуемый ответ
+                max_output_tokens=800
+            ),
+            safety_settings=[
+                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            ]
         )
 
- # ОТЛАДКА: ВЫВОДИМ ВСЁ
-        print("\n" + "="*50)
-        print("GEMINI DEBUG OUTPUT")
-        print("="*50)
-        print(f"User message: {user_message}")
-        print(f"Response object: {response}")
-        print(f"Candidates: {len(response.candidates) if hasattr(response, 'candidates') else 'None'}")
-        
-        if not response.candidates:
-            return jsonify({"reply": "ИИ не смог ответить."})
-
-        candidate = response.candidates[0]
-
-        # ПРАВИЛЬНАЯ ПРОВЕРКА
-        if candidate.finish_reason == 3:  # SAFETY
-            return jsonify({"reply": "Сообщение заблокировано по безопасности."})
-        elif candidate.finish_reason == 2:  # MAX_TOKENS
-            ai_text = response.text.strip() + "\n\n[Ответ обрезан. Продолжение в следующем сообщении.]"
-        else:
-            ai_text = response.text.strip()
+        ai_text = response.text.strip()
 
         # Сохраняем
         record = ChatHistory(
             user_id=current_user.id,
-            message=user_message,
+            message=data.get("message"),
             response=ai_text
         )
         db.session.add(record)
@@ -238,7 +251,7 @@ def api_chat():
 
     except Exception as e:
         print("Gemini error:", e)
-        return jsonify({"reply": "Ошибка ИИ."})
+        return jsonify({"reply": "Извините, сейчас я не могу ответить. Попробуйте позже."})
     
 
 # === ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ ===
@@ -494,7 +507,10 @@ def mark_read(notif_id):
     db.session.commit()
     return jsonify({'status': 'ok'})
 
-
+with app.app_context():
+    db.create_all()
+    create_admin()
+    load_faq_exact()  # ← добавь эту строку
 # === ЗАПУСК ПРИЛОЖЕНИЯ ===
 if __name__ == '__main__':
     with app.app_context():
