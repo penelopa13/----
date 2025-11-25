@@ -2,6 +2,8 @@
 {% block title %}Талапкер — Главная{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <section class="hero">
   <div class="container hero-inner">
     <h1>ИИ-консультант для абитуриентов</h1>
@@ -36,13 +38,9 @@
   const chatForm = document.getElementById('chat-form');
   const messages = document.getElementById('messages');
 
-  // Определяем язык из сессии
+  // Язык
   const lang = "{{ session.get('lang', 'ru') }}";
-  const speechLangMap = {
-    'ru': 'ru-RU',
-    'kk': 'kk-KZ',
-    'en': 'en-US'
-  };
+  const speechLangMap = { 'ru': 'ru-RU', 'kk': 'kk-KZ', 'en': 'en-US' };
   const recognitionLang = speechLangMap[lang] || 'ru-RU';
 
   let recognition;
@@ -64,11 +62,12 @@
     };
 
     recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
+      console.error('Speech error:', event.error);
       voiceBtn.classList.remove('recording');
       isRecording = false;
+
       if (event.error === 'not-allowed') {
-        alert('Микрофон заблокирован. Разрешите доступ в настройках браузера.');
+        alert('Разрешите доступ к микрофону.');
       }
     };
 
@@ -89,56 +88,58 @@
         isRecording = true;
       } catch (err) {
         console.error(err);
-        alert('Не удалось запустить распознавание. Попробуйте позже.');
+        alert('Ошибка запуска микрофона.');
       }
     });
   } else {
-    voiceBtn.style.display = 'none'; // Скрываем, если браузер не поддерживает
+    voiceBtn.style.display = 'none';
   }
 
-  // === Отправка сообщения ===
-  chatForm.addEventListener('submit', (e) => {
+  // === Функция добавления сообщения ===
+  function addMessage(text, type = "bot") {
+    const div = document.createElement("div");
+    div.className = "message " + type;
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // === ОТПРАВКА СООБЩЕНИЯ ===
+  chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const text = userInput.value.trim();
     if (!text) return;
 
-    // Добавляем сообщение пользователя
-    const userMsg = document.createElement('div');
-    userMsg.className = 'message user';
-    userMsg.textContent = text;
-    messages.appendChild(userMsg);
+    // Сообщение пользователя
+    addMessage(text, "user");
+    userInput.value = "";
 
-    // Очищаем поле
-    userInput.value = '';
+    // Плашка "печатает..."
+    const typing = document.createElement("div");
+    typing.className = "message bot typing";
+    typing.textContent = "Пишу ответ...";
+    messages.appendChild(typing);
     messages.scrollTop = messages.scrollHeight;
 
-    // Имитация ответа бота
-    setTimeout(() => {
-      const botMsg = document.createElement('div');
-      botMsg.className = 'message bot';
-  // === Отправка на сервер ===
-  fetch("/api/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  })
-    .then(res => res.json())
-    .then(data => {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'message bot';
-        botMsg.textContent = data.reply;
-        messages.appendChild(botMsg);
-        messages.scrollTop = messages.scrollHeight;
-    })
-    .catch(err => {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'message bot';
-        botMsg.textContent = "Ошибка соединения с ИИ.";
-        messages.appendChild(botMsg);
-    });
-      messages.appendChild(botMsg);
-      messages.scrollTop = messages.scrollHeight;
-    }, 800);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+
+      const data = await res.json();
+
+      typing.remove(); // убираем индикатор
+
+      addMessage(data.reply, "bot");
+
+    } catch (err) {
+      typing.remove();
+      addMessage("Ошибка соединения. Попробуйте позже.", "bot");
+    }
   });
 </script>
+
 {% endblock %}

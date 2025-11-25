@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyAuM3vW7xKeZg8idyhOLcY_YX9bSI5IY18")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 load_dotenv()
 app = Flask(__name__)
@@ -186,73 +186,90 @@ def test_psy():
     questions = load_questions(lang)
     return render_template('test_psy.html', questions=questions, lang=lang)
 
+def is_admission_question(text: str) -> bool:
+    keywords = [
+        "поступ", "прием", "грант", "ент", "құжат", "оқуға",
+        "универ", "бакалавр", "магистратура", "admission",
+        "apply", "grant", "documents", "application"
+    ]
+    text = text.lower()
+    return any(k in text for k in keywords)
+
 @app.route('/api/chat', methods=['POST'])
 @login_required
 def api_chat():
     data = request.get_json() or {}
-    user_message = data.get("message", "").strip().lower()
+    user_message = data.get("message", "").strip()
     lang = session.get('lang', current_user.language)
 
     if not user_message:
         return jsonify({"reply": "Пустое сообщение."})
 
-    # --- 1. Ищем точное совпадение в FAQ ---
+    # === Фильтр: вопрос должен быть о поступлении ===
+    if not is_admission_question(user_message):
+        reply = {
+            "ru": "**Я могу отвечать только на вопросы, связанные с поступлением.**\nПожалуйста, уточните ваш вопрос.",
+            "kk": "**Мен тек оқуға түсуге қатысты сұрақтарға жауап бере аламын.**\nСұрағыңызды нақтылаңыз.",
+            "en": "**I can answer only admission-related questions.**\nPlease clarify your request."
+        }.get(lang, "Я могу отвечать только на вопросы по поступлению.")
+        return jsonify({"reply": reply, "markdown": True})
+
+    # === 1. FAQ exact match ===
     if FAQ_DATA:
+        msg = user_message.lower()
         for item in FAQ_DATA:
-            if any(keyword in user_message for keyword in [k.lower() for k in item.get('keywords', [])]):
-                answer_key = f"answer_{lang}" if lang in ['ru', 'kk', 'en'] else "answer_ru"
+            keys = [k.lower() for k in item.get("keywords", [])]
+            if any(k in msg for k in keys):
+                answer_key = f"answer_{lang}"
                 reply = item.get(answer_key) or item.get("answer_ru")
-                
-                # Сохраняем в историю
-                record = ChatHistory(user_id=current_user.id, message=user_message, response=reply)
-                db.session.add(record)
+
+                # Save in DB
+                db.session.add(ChatHistory(
+                    user_id=current_user.id,
+                    message=user_message,
+                    response=reply
+                ))
                 db.session.commit()
-                
-                return jsonify({"reply": reply})
 
-    # --- 2. Если не нашли — идём в Gemini с жёсткой инструкцией ---
+                return jsonify({"reply": reply, "markdown": True})
+
+    # === 2. Gemini fallback (Markdown enforced) ===
     try:
-        prompt = f"""Ты — официальный ИИ-консультант приёмной комиссии университета «Талапкер».
-Отвечай ТОЛЬКО на казахском, русском или английском (в зависимости от языка вопроса).
-Используй официальный, доброжелательный тон.
-Если не знаешь точного ответа — скажи: «Уточните, пожалуйста, ваш вопрос, я помогу!»
+        prompt = f"""
+Ты — ИИ-консультант приемной комиссии Университета Жубанова.
+Отвечай строго по теме: поступление, документы, гранты, сроки, программы, стоимость, общежитие.
 
-Вопрос пользователя: {data.get("message")}
+❗ Очень важно:
+- Форматируй ответ красиво в **Markdown**
+- Используй списки, заголовки, жирный текст
+- Не отправляй текст одним блоком
+- Объясняй структурировано и понятно
+- Не отвечай на темы, не связанные с приемной комиссией
 
-Ответ:"""
+Вопрос пользователя ({lang}):
+{user_message}
 
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.GenerationConfig(
-                temperature=0.3,  # низкая температура = более предсказуемый ответ
-                max_output_tokens=800
-            ),
-            safety_settings=[
-                {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-                {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-            ]
-        )
+Ответ в Markdown:
+"""
 
-        ai_text = response.text.strip()
+        model = genai.GenerativeModel('gemini-flash-latest')
+        response = model.generate_content(prompt)
 
-        # Сохраняем
-        record = ChatHistory(
+        ai_text = response.text.strip() if response.text else "Қате шықты, кейін қайталап көріңіз."
+
+        # Save
+        db.session.add(ChatHistory(
             user_id=current_user.id,
-            message=data.get("message"),
+            message=user_message,
             response=ai_text
-        )
-        db.session.add(record)
+        ))
         db.session.commit()
 
-        return jsonify({"reply": ai_text})
+        return jsonify({"reply": ai_text, "markdown": True})
 
     except Exception as e:
         print("Gemini error:", e)
-        return jsonify({"reply": "Извините, сейчас я не могу ответить. Попробуйте позже."})
-    
+        return jsonify({"reply": "Сервис уақытша қолжетімсіз.", "markdown": True})
 
 # === ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ ===
 @app.route('/profile')

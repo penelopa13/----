@@ -118,6 +118,95 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 });
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatBox = document.querySelector('.chat-box');
+
+if (chatForm) {
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    // Добавляем сообщение пользователя
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user';
+    userMsg.textContent = message;
+    chatBox.appendChild(userMsg);
+
+    chatInput.value = '';
+
+    // Отправка на сервер
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await resp.json();
+
+    // Добавляем ответ бота
+    const botMsg = document.createElement('div');
+    botMsg.className = 'message bot';
+
+    if (data.markdown) {
+      botMsg.innerHTML = marked.parse(data.reply);
+    } else {
+      botMsg.textContent = data.reply;
+    }
+
+    chatBox.appendChild(botMsg);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+}
+
+const chatForm = document.getElementById('chatForm');
+const chatInput = document.getElementById('chatInput');
+const chatBox = document.getElementById('chatBox');
+const typingIndicator = document.getElementById('typingIndicator');
+
+function addMessage(text, type = "bot", markdown = false) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+
+  if (markdown) {
+    div.innerHTML = marked.parse(text);
+  } else {
+    div.textContent = text;
+  }
+
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+if (chatForm) {
+  chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    addMessage(message, "user");
+    chatInput.value = "";
+
+    typingIndicator.style.display = "block";
+
+    const resp = await fetch("/api/chat", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ message })
+    });
+
+    const data = await resp.json();
+
+    typingIndicator.style.display = "none";
+
+    addMessage(data.reply, "bot", data.markdown);
+  });
+}
+
+
 
 // Прозрачность шапки при скролле
 window.addEventListener('scroll', () => {

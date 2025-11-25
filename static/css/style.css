@@ -1439,6 +1439,26 @@ textarea {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
+.chat-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;               /* 🔥 важно! фиксированная высота */
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.chat-box {
+  flex: 1;                      /* 🔥 вместо height:420 */
+  padding: 18px;
+  overflow-y: auto;
+  background: #f5f7fa;
+}
+
 
 /* === ИКОНКА === */
 .voice-btn i {
