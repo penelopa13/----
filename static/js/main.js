@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
-      const name = form.querySelector('[name="name"]')?.value || '';
-      const email = form.querySelector('[name="email"]')?.value || '';
-      const message = form.querySelector('[name="message"]')?.value || '';
+      const name = form.querySelector('[name="name"]')?.value.trim() || '';
+      const email = form.querySelector('[name="email"]')?.value.trim() || '';
+      const message = form.querySelector('[name="message"]')?.value.trim() || '';
       const btn = form.querySelector('button');
       if (btn) btn.disabled = true;
 
@@ -65,33 +65,38 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ name, email, message })
         });
         const data = await resp.json();
+
         const resultBlock = document.getElementById('formResult');
-        if (resultBlock) resultBlock.textContent = data.message || 'Отправлено';
-        else alert(data.message || 'Отправлено');
+        if (resultBlock) {
+          resultBlock.textContent = data.message || 'Отправлено успешно!';
+        } else {
+          alert(data.message || 'Отправлено успешно!');
+        }
+
         if (data.status === 'ok') form.reset();
-      } catch {
-        alert('Ошибка отправки');
+      } catch (err) {
+        alert('Ошибка отправки сообщения');
+        console.error(err);
       } finally {
         if (btn) btn.disabled = false;
       }
     });
   }
 
-  // Анимация появления элементов на странице контактов
-  const animatedElements = document.querySelectorAll(
-    '.contact-title, .contact-details, .contact-form'
-  );
-  if (animatedElements.length > 0) {
+  // Анимация появления на странице контактов
+  const animatedElements = document.querySelectorAll('.contact-title, .contact-details, .contact-form');
+  if (animatedElements.length) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('fade-in-up');
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in-up');
+        }
       });
     }, { threshold: 0.1 });
-
     animatedElements.forEach(el => observer.observe(el));
   }
 
-  // === Панель уведомлений ===
+  // Панель уведомлений
   const notifBtn = document.getElementById("notifBtn");
   const notifPanel = document.getElementById("notifPanel");
   const closeNotif = document.getElementById("closeNotif");
@@ -103,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
       notifPanel.classList.add("active");
       overlay.classList.add("active");
 
-      // 👇 Убираем бейдж при открытии панели
       const badge = notifBtn.querySelector(".notif-badge");
       if (badge) badge.style.display = "none";
     });
@@ -117,100 +121,64 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.addEventListener("click", closePanel);
   }
 
-});
-const chatForm = document.getElementById('chatForm');
-const chatInput = document.getElementById('chatInput');
-const chatBox = document.querySelector('.chat-box');
+  // Чат с ботом — ОДИН РАЗ, с индикатором "печатает" и поддержкой Markdown
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const chatBox = document.getElementById('chatBox');
+  const typingIndicator = document.getElementById('typingIndicator');
 
-if (chatForm) {
-  chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  const addMessage = (text, type = "bot", markdown = false) => {
+    if (!chatBox) return;
+    const div = document.createElement("div");
+    div.className = `message ${type}`;
 
-    const message = chatInput.value.trim();
-    if (!message) return;
-
-    // Добавляем сообщение пользователя
-    const userMsg = document.createElement('div');
-    userMsg.className = 'message user';
-    userMsg.textContent = message;
-    chatBox.appendChild(userMsg);
-
-    chatInput.value = '';
-
-    // Отправка на сервер
-    const resp = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await resp.json();
-
-    // Добавляем ответ бота
-    const botMsg = document.createElement('div');
-    botMsg.className = 'message bot';
-
-    if (data.markdown) {
-      botMsg.innerHTML = marked.parse(data.reply);
+    if (markdown && typeof marked === 'function') {
+      div.innerHTML = marked.parse(text);
     } else {
-      botMsg.textContent = data.reply;
+      div.textContent = text;
     }
 
-    chatBox.appendChild(botMsg);
+    chatBox.appendChild(div);
     chatBox.scrollTop = chatBox.scrollHeight;
-  });
-}
+  };
 
-const chatForm = document.getElementById('chatForm');
-const chatInput = document.getElementById('chatInput');
-const chatBox = document.getElementById('chatBox');
-const typingIndicator = document.getElementById('typingIndicator');
+  if (chatForm && chatInput && chatBox) {
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-function addMessage(text, type = "bot", markdown = false) {
-  const div = document.createElement("div");
-  div.className = "message " + type;
+      const message = chatInput.value.trim();
+      if (!message) return;
 
-  if (markdown) {
-    div.innerHTML = marked.parse(text);
-  } else {
-    div.textContent = text;
-  }
+      addMessage(message, "user");
+      chatInput.value = "";
 
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
+      if (typingIndicator) typingIndicator.style.display = "block";
 
-if (chatForm) {
-  chatForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+      try {
+        const resp = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
 
-    const message = chatInput.value.trim();
-    if (!message) return;
+        const data = await resp.json();
 
-    addMessage(message, "user");
-    chatInput.value = "";
+        if (typingIndicator) typingIndicator.style.display = "none";
 
-    typingIndicator.style.display = "block";
-
-    const resp = await fetch("/api/chat", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ message })
+        addMessage(data.reply || "Нет ответа от сервера", "bot", data.markdown);
+      } catch (err) {
+        if (typingIndicator) typingIndicator.style.display = "none";
+        addMessage("Ошибка соединения", "bot");
+        console.error(err);
+      }
     });
+  }
+});
 
-    const data = await resp.json();
-
-    typingIndicator.style.display = "none";
-
-    addMessage(data.reply, "bot", data.markdown);
-  });
-}
-
-
-
-// Прозрачность шапки при скролле
+// Прозрачность шапки при скролле (вне DOMContentLoaded — работает всегда)
 window.addEventListener('scroll', () => {
   const header = document.querySelector('.site-header');
-  if (!header) return;
-  header.classList.toggle('scrolled', window.scrollY > 50);
+  if (header) {
+    header.classList.toggle('scrolled', window.scrollY > 50);
+  }
 });
