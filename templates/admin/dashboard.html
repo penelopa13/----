@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Админ-панель{% endblock %}
+
 {% block content %}
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
@@ -11,11 +12,12 @@
             <i class="fas fa-sign-out-alt"></i> Выйти
         </a>
     </div>
-    <!-- Статистика — СТЕКЛЯННЫЕ КАРТОЧКИ -->
+
+<!-- Статистика — СТЕКЛЯННЫЕ КАРТОЧКИ -->
 <div class="row g-4 mb-5">
-    <!-- Пользователи -->
+    <!-- Пользователи — СИНИЙ -->
     <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="stat-card glass-card bg-primary-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden">
+        <div class="stat-card glass-card bg-primary-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="usersCard">
             <div class="d-flex align-items-center">
                 <div class="stat-icon me-3">
                     <i class="fas fa-users fa-2x"></i>
@@ -29,9 +31,9 @@
         </div>
     </div>
 
-    <!-- Тесты -->
+    <!-- Тесты пройдено — ЗЕЛЁНЫЙ -->
     <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="stat-card glass-card bg-success-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden">
+        <div class="stat-card glass-card bg-success-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="resultsCard">
             <div class="d-flex align-items-center">
                 <div class="stat-icon me-3">
                     <i class="fas fa-check-circle fa-2x"></i>
@@ -45,9 +47,9 @@
         </div>
     </div>
 
-    <!-- Сообщения -->
+    <!-- Сообщения — ЖЁЛТЫЙ/ОРАНЖЕВЫЙ -->
     <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-        <div class="stat-card glass-card bg-warning-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden">
+        <div class="stat-card glass-card bg-warning-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="messagesCard">
             <div class="d-flex align-items-center">
                 <div class="stat-icon me-3">
                     <i class="fas fa-envelope fa-2x"></i>
@@ -61,179 +63,291 @@
         </div>
     </div>
 </div>
-    <!-- Форма отправки уведомления -->
-    <div class="card border-0 shadow-lg" data-aos="fade-up" data-aos-delay="400">
-        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #1f2d3d, #2b8cff); border-radius: 16px 16px 0 0;">
-            <h3 class="mb-0">
-                <i class="fas fa-bell me-2"></i> Отправить уведомление
-            </h3>
+
+    <!-- Блоки с таблицами (скрыты по умолчанию) -->
+    <div id="dataSection" class="mt-5">
+
+        <!-- Пользователи -->
+        <div id="usersTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-users me-2 text-primary"></i> Пользователи</h3>
+                <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
+                    <i class="fas fa-eye-slash"></i> Скрыть
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Роль</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <td>{{ u.id }}</td>
+                            <td>{{ u.name or '—' }}</td>
+                            <td>{{ u.email }}</td>
+                            <td>
+                                {% if u.is_admin %}
+                                    <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRow({{ u.id }}, 'users')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="card-body p-4" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-radius: 0 0 16px 16px;">
+
+        <!-- Результаты тестов -->
+        <div id="resultsTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-check-circle me-2 text-success"></i> Результаты теста</h3>
+                <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
+                    <i class="fas fa-eye-slash"></i> Скрыть
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Пользователь ID</th>
+                            <th>MBTI</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in results %}
+                        <tr>
+                            <td>{{ r.id }}</td>
+                            <td>{{ r.user_id }}</td>
+                            <td><strong>{{ r.mbti_type }}</strong></td>
+                            <td>{{ r.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRow({{ r.id }}, 'results')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Сообщения из формы -->
+        <div id="messagesTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-envelope me-2 text-warning"></i> Сообщения из формы</h3>
+                <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
+                    <i class="fas fa-eye-slash"></i> Скрыть
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Сообщение</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in contact_messages %}
+                        <tr>
+                            <td>{{ m.id }}</td>
+                            <td>{{ m.name }}</td>
+                            <td>{{ m.email }}</td>
+                            <td>{{ m.message|truncate(80) }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRow({{ m.id }}, 'messages')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Форма отправки уведомления -->
+    <div class="card border-0 shadow-lg mt-5" data-aos="fade-up">
+        <div class="card-header bg-gradient text-white text-center py-4">
+            <h3 class="mb-0"><i class="fas fa-bell me-2"></i> Отправить уведомление</h3>
+        </div>
+        <div class="card-body p-5">
             <form id="notificationForm">
-                <div class="mb-3">
-                    <label for="notifTitle" class="form-label fw-semibold text-dark">
-                        <i class="fas fa-heading text-primary"></i> Заголовок
-                    </label>
-                    <input type="text" class="form-control form-control-lg shadow-sm" id="notifTitle" placeholder="Например: Приём документов завершён" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="notifMessage" class="form-label fw-semibold text-dark">
-                        <i class="fas fa-comment-dots text-success"></i> Сообщение
-                    </label>
-                    <textarea class="form-control shadow-sm" id="notifMessage" rows="4" placeholder="Введите текст уведомления..." required></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label for="notifType" class="form-label fw-semibold text-dark">
-                        <i class="fas fa-tag text-warning"></i> Тип уведомления
-                    </label>
-                    <select class="form-select form-select-lg shadow-sm" id="notifType">
-                        <option value="info">ℹ️ Информация</option>
-                        <option value="success">✅ Успех</option>
-                        <option value="warning">⚠️ Важно</option>
-                        <option value="urgent">🔥 Срочно</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-semibold text-dark">
-                        <i class="fas fa-paper-plane text-accent"></i> Кому отправить
-                    </label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="recipient" id="allUsers" value="all" checked>
-                        <label class="form-check-label" for="allUsers">
-                            Всем пользователям
-                        </label>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Заголовок</label>
+                        <input type="text" class="form-control form-control-lg" id="notifTitle" placeholder="Важное обновление" required>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="recipient" id="specificUser" value="specific">
-                        <label class="form-check-label" for="specificUser">
-                            Конкретному пользователю
-                        </label>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Сообщение</label>
+                        <textarea class="form-control" id="notifMessage" rows="4" required></textarea>
                     </div>
-                    <div id="userSelectWrapper" class="mt-2" style="display: none;">
-                        <select class="form-select shadow-sm" id="specificUserSelect">
-                            <option value="">— Выберите пользователя —</option>
-                            {% for user in users %}
-                            <option value="{{ user.id }}">{{ user.name or user.email }}</option>
-                            {% endfor %}
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Тип уведомления</label>
+                        <select class="form-select form-select-lg" id="notifType">
+                            <option value="info">Информация</option>
+                            <option value="success">Успех</option>
+                            <option value="warning">Важно</option>
+                            <option value="urgent">Срочно</option>
                         </select>
                     </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Кому</label>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="recipient" value="all" checked>
+                                <label class="form-check-label">Всем пользователям</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="recipient" value="specific">
+                                <label class="form-check-label">Конкретному</label>
+                            </div>
+                        </div>
+                        <div id="userSelectWrapper" class="mt-2" style="display:none;">
+                            <select class="form-select mt-2" id="specificUserSelect">
+                                <option value="">— Выберите пользователя —</option>
+                                {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.name or user.email }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="d-grid d-md-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-outline-secondary btn-lg px-4" onclick="clearForm()">
-                        <i class="fas fa-eraser"></i> Очистить
-                    </button>
-                    <button type="submit" class="btn btn-orange btn-lg px-5 shadow-sm">
-                        <i class="fas fa-paper-plane"></i> Отправить уведомление
+                <div class="text-end mt-4">
+                    <button type="button" class="btn btn-outline-secondary btn-lg me-3" onclick="clearForm()">Очистить</button>
+                    <button type="submit" class="btn btn-orange btn-lg px-5 shadow">
+                        <i class="fas fa-paper-plane"></i> Отправить
                     </button>
                 </div>
             </form>
         </div>
     </div>
-
-    <!-- Предпросмотр уведомления (всплывающий) -->
-    <div id="previewToast" class="toast align-items-center text-white border-0 position-fixed bottom-0 end-0 p-3" style="z-index: 11000; display: none;" role="alert">
-        <div class="d-flex">
-            <div class="toast-body fw-semibold">
-                <span id="previewIcon"></span> <span id="previewText"></span>
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-    </div>
 </div>
 
-<!-- Подключение AOS для анимаций -->
+<!-- Подключение всех скриптов и стилей в конце (перед </body>) -->
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
 <script>
     AOS.init({ duration: 600, once: true });
 
-    // Показать/скрыть выбор пользователя
+    // Показ/скрытие выбора пользователя
     document.querySelectorAll('input[name="recipient"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            document.getElementById('userSelectWrapper').style.display = 
-                this.value === 'specific' ? 'block' : 'none';
+        radio.addEventListener('change', () => {
+            document.getElementById('userSelectWrapper').style.display = radio.value === 'specific' ? 'block' : 'none';
         });
     });
 
-    // Очистка формы
     function clearForm() {
         document.getElementById('notificationForm').reset();
         document.getElementById('userSelectWrapper').style.display = 'none';
     }
 
-    // Отправка формы (заглушка)
-    document.getElementById('notificationForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+    // Показ таблицы
+    function showBlock(id) {
+        document.querySelectorAll('.data-block').forEach(el => el.style.display = 'none');
+        const block = document.getElementById(id);
+        block.style.display = 'block';
+        $(block).find('table').DataTable({
+            destroy: true,
+            pageLength: 10,
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Все"]],
+            language: { url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ru.json" }
+        });
+        window.scrollTo({ top: block.offsetTop - 100, behavior: 'smooth' });
+    }
 
-    const payload = {
-        title: document.getElementById('notifTitle').value,
-        message: document.getElementById('notifMessage').value,
-        type: document.getElementById('notifType').value,
-        recipient: document.querySelector('input[name="recipient"]:checked').value === 'all'
-            ? 'all'
-            : document.getElementById('specificUserSelect').value
-    };
+    function hideBlock() {
+        document.querySelectorAll('.data-block').forEach(el => el.style.display = 'none');
+    }
 
-    const res = await fetch('/api/admin/notify', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
+    // Удаление
+    function deleteRow(id, table) {
+        if (!confirm('Удалить запись? Это действие нельзя отменить.')) return;
+        fetch(`/api/admin/delete/${table}/${id}`, { method: 'DELETE' })
+            .then(r => r.json())
+            .then(d => {
+                if (d.status === 'ok') {
+                    alert('Запись удалена');
+                    location.reload();
+                } else {
+                    alert('Ошибка: ' + (d.message || 'Не удалось удалить'));
+                }
+            })
+            .catch(() => alert('Ошибка сети'));
+    }
+
+    // Клик по карточкам
+    document.getElementById('usersCard')?.addEventListener('click', () => showBlock('usersTable'));
+    document.getElementById('resultsCard')?.addEventListener('click', () => showBlock('resultsTable'));
+    document.getElementById('messagesCard')?.addEventListener('click', () => showBlock('messagesTable'));
+
+    // Отправка уведомления
+    document.getElementById('notificationForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const payload = {
+            title: document.getElementById('notifTitle').value.trim(),
+            message: document.getElementById('notifMessage').value.trim(),
+            type: document.getElementById('notifType').value,
+            recipient: document.querySelector('input[name="recipient"]:checked').value === 'all'
+                ? 'all'
+                : document.getElementById('specificUserSelect').value
+        };
+
+        try {
+            const res = await fetch('/api/admin/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            alert(data.message || 'Уведомление отправлено!');
+            e.target.reset();
+            document.getElementById('userSelectWrapper').style.display = 'none';
+        } catch {
+            alert('Ошибка отправки');
+        }
     });
-
-    const data = await res.json();
-    alert(data.message);
-});
-
 </script>
 
 <style>
-    .bg-gradient {
-        background: linear-gradient(135deg, #1f2d3d, #2b8cff) !important;
-    }
-    .btn-orange {
-        background: var(--accent-color);
-        color: white;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    .btn-orange:hover {
-        background: #e09e0c;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(255, 179, 15, 0.3);
-    }
-    .form-control, .form-select {
-        border-radius: 12px;
-        padding: 12px 16px;
-        font-size: 1rem;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 0.2rem rgba(255, 179, 15, 0.25);
-    }
-    .card {
-        border-radius: 16px;
-        overflow: hidden;
-    }
-    .toast {
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-    }
-    .btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-outline-danger:hover {
-    background: #dc3545;
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
-}
+    .cursor-pointer { cursor: pointer; transition: transform .2s; }
+    .cursor-pointer:hover { transform: translateY(-5px); }
+    .glass-card { backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    .bg-primary-glass  { background: rgba(13, 110, 253, 0.25); }   /* синий */
+    .bg-success-glass  { background: rgba(25, 135, 84, 0.25); }    /* зелёный */
+    .bg-warning-glass  { background: rgba(255, 193, 7, 0.25); }    /* жёлтый/оранжевый */
+    .glass-shine { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent); transform: rotate(30deg); pointer-events: none; }
+    .btn-orange { background: #ffb30f; border: none; font-weight: 600; }
+    .btn-orange:hover { background: #e09e0c; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,179,15,0.4); }
+    .bg-gradient { background: linear-gradient(135deg, #1f2d3d, #2b8cff) !important; }
+    .card { border-radius: 18px; overflow: hidden; }
 </style>
 {% endblock %}

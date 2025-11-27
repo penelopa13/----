@@ -296,6 +296,30 @@ def admin_dashboard():
                            users=users,
                            results=results,
                            contact_messages=contact_messages)
+@app.route('/api/admin/delete/<string:table>/<int:item_id>', methods=['DELETE'])
+@login_required
+def admin_delete(table, item_id):
+    if not current_user.is_admin:
+        return jsonify({'status': 'error', 'message': 'forbidden'}), 403
+
+    models = {
+        'users': User,
+        'results': TestResult,
+        'messages': ContactMessage
+    }
+
+    model = models.get(table)
+    if not model:
+        return jsonify({'status': 'error', 'message': 'bad table'}), 400
+
+    obj = model.query.get(item_id)
+    if not obj:
+        return jsonify({'status': 'error', 'message': 'not found'}), 404
+
+    db.session.delete(obj)
+    db.session.commit()
+
+    return jsonify({'status': 'ok'})
 
 # === РЕГИСТРАЦИЯ ===
 @app.route('/register', methods=['GET', 'POST'])
