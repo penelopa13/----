@@ -4,24 +4,144 @@
 {% block content %}
 <div class="container py-5">
   <h1 class="text-center mb-5">Подать заявку на поступление</h1>
-  <form method="POST" class="card shadow p-5 mx-auto" style="max-width:700px;">
+  
+  <form method="POST" action="{{ url_for('status') }}" class="card shadow p-5 mx-auto" style="max-width:750px;">
     <div class="row g-3">
-      <div class="col-md-6"><input name="full_name" placeholder="ФИО" class="form-control" required></div>
-      <div class="col-md-6"><input name="iin" placeholder="ИИН (12 цифр)" class="form-control" maxlength="12" required></div>
-      <div class="col-12"><input name="phone" placeholder="Телефон" class="form-control" required></div>
-      <div class="col-12"><input name="email" type="email" placeholder="Email" class="form-control" required></div>
-      <div class="col-12"><input name="education" placeholder="Школа / колледж" class="form-control" required></div>
-      <div class="col-12"><input name="specialty" placeholder="Желаемая специальность" class="form-control" required></div>
+
+      <!-- Имя и Фамилия -->
+      <div class="col-md-6">
+        <input name="first_name" placeholder="Имя" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <input name="last_name" placeholder="Фамилия" class="form-control" required>
+      </div>
+
+      <!-- Контакты -->
+      <div class="col-12">
+        <input name="phone" placeholder="Телефон" class="form-control" required>
+      </div>
+      <div class="col-12">
+        <input name="email" type="email" placeholder="Email" class="form-control" required>
+      </div>
+
+      <!-- Образование -->
+      <div class="col-12">
+        <input name="education" placeholder="Школа / колледж" class="form-control" required>
+      </div>
+
+      <!-- Желаемая специальность — теперь select с группами -->
+      <div class="col-12">
+        <select name="specialty" class="form-select" required>
+          <option value="" disabled selected>Выберите желаемую специальность</option>
+
+          <optgroup label="Факультет педагогики и менеджмента в образовании">
+            <option value="6B01102 — Психология и менеджмент образования">6B01102 — Психология и менеджмент образования</option>
+            <option value="6B01201 — Дошкольное обучение и воспитание">6B01201 — Дошкольное обучение и воспитание</option>
+            <option value="6B01301 — Педагогика и методика начального обучения">6B01301 — Педагогика и методика начального обучения</option>
+            <option value="6B01902 — Специальная педагогика">6B01902 — Специальная педагогика</option>
+            <option value="6B03101 — Психология">6B03101 — Психология</option>
+            <option value="6B03102 — Клиническая психология">6B03102 — Клиническая психология</option>
+          </optgroup>
+
+          <optgroup label="Исторический факультет">
+            <option value="6B01506 — География">6B01506 — География</option>
+            <option value="6B01603 — История и обществознание">6B01603 — История и обществознание</option>
+            <option value="6B02201 — История">6B02201 — История</option>
+            <option value="6B05203 — Ландшафтное проектирование">6B05203 — Ландшафтное проектирование</option>
+            <option value="6B11101 — Туризм">6B11101 — Туризм</option>
+          </optgroup>
+
+          <optgroup label="Профессионально-творческий факультет">
+            <option value="6B01401 — Музыкальное образование">6B01401 — Музыкальное образование</option>
+            <option value="6B01404 — Физическая культура и спорт">6B01404 — Физическая культура и спорт</option>
+            <option value="6B01406 — Художественное образование">6B01406 — Художественное образование</option>
+            <option value="6B02101 — Хореография">6B02101 — Хореография</option>
+            <option value="6B02102 — Дизайн">6B02102 — Дизайн</option>
+            <option value="6B07207 — Технология и конструирование изделий лёгкой промышленности">6B07207 — Технология и конструирование изделий лёгкой промышленности</option>
+            <option value="6B11102 — Культурно-досуговая работа">6B11102 — Культурно-досуговая работа</option>
+            <option value="6B01407 — Трудовое обучение и основы предпринимательства">6B01407 — Трудовое обучение и основы предпринимательства</option>
+          </optgroup>
+
+          <optgroup label="Технический факультет">
+            <option value="6B07106 — Электроэнергетика">6B07106 — Электроэнергетика</option>
+            <option value="6B07107 — Автоматизация и управление">6B07107 — Автоматизация и управление</option>
+            <option value="6B07201 — Горное дело">6B07201 — Горное дело</option>
+            <option value="6B07202 — Нефтегазовое дело">6B07202 — Нефтегазовое дело</option>
+            <option value="6B07203 — Металлургия">6B07203 — Металлургия</option>
+            <option value="6B07301 — Строительство">6B07301 — Строительство</option>
+            <option value="6B11301 — Организация перевозок, движения и эксплуатация транспорта">6B11301 — Организация перевозок, движения и эксплуатация транспорта</option>
+            <option value="6B07101 — Транспорт, транспортная техника и технологии">6B07101 — Транспорт, транспортная техника и технологии</option>
+          </optgroup>
+
+          <optgroup label="Факультет естествознания">
+            <option value="6B01513 — Биология">6B01513 — Биология</option>
+            <option value="6B05101 — Биология">6B05101 — Биология</option>
+            <option value="6B05102 — Биотехнология">6B05102 — Биотехнология</option>
+            <option value="6B05201 — Экология">6B05201 — Экология</option>
+            <option value="6B05302 — Химия">6B05302 — Химия</option>
+            <option value="6B01514 — Химия">6B01514 — Химия</option>
+            <option value="6B07206 — Технология продовольственных продуктов">6B07206 — Технология продовольственных продуктов</option>
+          </optgroup>
+
+          <optgroup label="Физико-математический факультет">
+            <option value="6B01501 — Математика">6B01501 — Математика</option>
+            <option value="6B05301 — Физика">6B05301 — Физика</option>
+            <option value="6B05401 — Математика">6B05401 — Математика</option>
+            <option value="6B06103 — Вычислительная техника и программное обеспечение">6B06103 — Вычислительная техника и программное обеспечение</option>
+            <option value="6B01503 — Информатика">6B01503 — Информатика</option>
+            <option value="6B06105 — Компьютерная инженерия">6B06105 — Компьютерная инженерия</option>
+            <option value="6B06102 — IT-медицина">6B06102 — IT-медицина</option>
+            <option value="6B01512 — Физика">6B01512 — Физика</option>
+          </optgroup>
+
+          <optgroup label="Филологический факультет">
+            <option value="6B01701 — Казахский язык и литература">6B01701 — Казахский язык и литература</option>
+            <option value="6B01702 — Русский язык и литература">6B01702 — Русский язык и литература</option>
+            <option value="6B02304 — Филология: казахская филология">6B02304 — Филология: казахская филология</option>
+          </optgroup>
+
+          <optgroup label="Факультет иностранных языков">
+            <option value="6B01706 — Иностранный язык: два иностранных языка">6B01706 — Иностранный язык: два иностранных языка</option>
+            <option value="6B02302 — Переводческое дело">6B02302 — Переводческое дело</option>
+            <option value="6B02303 — Иностранная филология">6B02303 — Иностранная филология</option>
+            <option value="6B01708 — Английский язык">6B01708 — Английский язык</option>
+          </optgroup>
+
+          <optgroup label="Факультет экономики и права">
+            <option value="6B04101 — Экономика">6B04101 — Экономика</option>
+            <option value="6B04102 — Менеджмент">6B04102 — Менеджмент</option>
+            <option value="6B04103 — Учет и аудит">6B04103 — Учет и аудит</option>
+            <option value="6B04104 — Финансы">6B04104 — Финансы</option>
+            <option value="6B04105 — Государственное и местное управление">6B04105 — Государственное и местное управление</option>
+            <option value="6B04201 — Право">6B04201 — Право</option>
+          </optgroup>
+
+          <optgroup label="Heriot-Watt Campus">
+            <option value="6B06107 — Компьютерная инженерия (Heriot-Watt)">6B06107 — Компьютерная инженерия</option>
+            <option value="6B07108 — Электроэнергетика (Heriot-Watt)">6B07108 — Электроэнергетика</option>
+            <option value="6B07108 — Электроэнергетика (Heriot-Watt)">6В07209 — Нефтяная инженерия и энергоменеджмент</option>
+          </optgroup>
+
+        </select>
+      </div>
+
+      <!-- Форма обучения -->
       <div class="col-md-6">
         <select name="grant_or_paid" class="form-select" required>
+          <option value="" disabled selected>Форма обучения</option>
           <option value="грант">Грант</option>
           <option value="платное">Платное</option>
         </select>
       </div>
-      <div class="col-md-6"><input name="unt_score" type="number" placeholder="Баллы ЕНТ" class="form-control"></div>
-      <div class="col-12"><textarea name="additional_info" placeholder="Доп. информация" class="form-control" rows="3"></textarea></div>
+
+      <!-- Комментарий -->
+      <div class="col-12">
+        <textarea name="comment" placeholder="Комментарий (по желанию)" class="form-control" rows="4"></textarea>
+      </div>
+
+      <!-- Кнопка отправки -->
       <div class="col-12 text-center mt-4">
-        <button class="btn btn-success btn-lg px-5">Отправить заявку</button>
+        <button type="submit" class="btn btn-success btn-lg px-5">Отправить заявку</button>
       </div>
     </div>
   </form>
