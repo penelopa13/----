@@ -13,6 +13,7 @@ from flask_login import (
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import google.generativeai as genai
+from flask_mail import Mail, Message
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
@@ -122,6 +123,19 @@ class Notification(db.Model):
 
     # null = всем пользователям
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+class Application(db.Model):
+    __tablename__ = 'applications'
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(120), nullable=False)
+    last_name = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    education = db.Column(db.String(200), nullable=False)
+    specialty = db.Column(db.String(200), nullable=False)
+    grant_or_paid = db.Column(db.String(50), nullable=False)
+    comment = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
 
 # --- User loader ---
@@ -367,12 +381,59 @@ def logout():
     return redirect(url_for('home'))
 
 # --- API Endpoints ---
-@app.route('/api/status')
-def api_status():
-    q = request.args.get('q', '')
-    if q == '':
-        return jsonify({'message': 'Введите номер заявки или Email'}), 400
-    return jsonify({'message': f'Статус для "{q}": Заявка принята, ожидает проверки.'})
+
+# --- Настройка почты ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # dilnaz_utegenova@mail.ru
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # пароль или app password
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')  # обязательно!
+
+mail = Mail(app)
+
+@app.route('/submit_application', methods=['POST'])
+def submit_application():
+    data = request.form
+    # Создаём заявку
+    app_entry = Application(
+        first_name=data.get('first_name'),
+        last_name=data.get('last_name'),
+        phone=data.get('phone'),
+        email=data.get('email'),
+        education=data.get('education'),
+        specialty=data.get('specialty'),
+        grant_or_paid=data.get('grant_or_paid'),
+        comment=data.get('comment')
+    )
+    db.session.add(app_entry)
+    db.session.commit()
+
+    # Отправка на почту
+    try:
+        msg = Message(
+            subject=f"Новая заявка: {app_entry.first_name} {app_entry.last_name}",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=['dilnaz22112005@gmail.com'],  # сюда
+            body=f"""
+Новая заявка на поступление:
+
+Имя: {app_entry.first_name}
+Фамилия: {app_entry.last_name}
+Телефон: {app_entry.phone}
+Email: {app_entry.email}
+Образование: {app_entry.education}
+Специальность: {app_entry.specialty}
+Форма обучения: {app_entry.grant_or_paid}
+Комментарий: {app_entry.comment or 'нет'}
+            """
+        )
+        mail.send(msg)
+    except Exception as e:
+        print("Ошибка при отправке письма:", e)
+
+    flash('Заявка успешно отправлена!', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/api/contact', methods=['POST'])
 def api_contact():
