@@ -1,16 +1,29 @@
 {% extends "base.html" %}
-
-{% block title %}Статус заявки - Талапкер{% endblock %}
+{% block title %}Подать заявку{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="container">
-        <h1>Проверка статуса заявки</h1>
-        <form class="status-form">
-            <input type="text" placeholder="Введите номер заявки или email" required>
-            <button type="submit" class="btn">Проверить</button>
-        </form>
-        <p class="status-result"></p>
+<div class="container py-5">
+  <h1 class="text-center mb-5">Подать заявку на поступление</h1>
+  <form method="POST" class="card shadow p-5 mx-auto" style="max-width:700px;">
+    <div class="row g-3">
+      <div class="col-md-6"><input name="full_name" placeholder="ФИО" class="form-control" required></div>
+      <div class="col-md-6"><input name="iin" placeholder="ИИН (12 цифр)" class="form-control" maxlength="12" required></div>
+      <div class="col-12"><input name="phone" placeholder="Телефон" class="form-control" required></div>
+      <div class="col-12"><input name="email" type="email" placeholder="Email" class="form-control" required></div>
+      <div class="col-12"><input name="education" placeholder="Школа / колледж" class="form-control" required></div>
+      <div class="col-12"><input name="specialty" placeholder="Желаемая специальность" class="form-control" required></div>
+      <div class="col-md-6">
+        <select name="grant_or_paid" class="form-select" required>
+          <option value="грант">Грант</option>
+          <option value="платное">Платное</option>
+        </select>
+      </div>
+      <div class="col-md-6"><input name="unt_score" type="number" placeholder="Баллы ЕНТ" class="form-control"></div>
+      <div class="col-12"><textarea name="additional_info" placeholder="Доп. информация" class="form-control" rows="3"></textarea></div>
+      <div class="col-12 text-center mt-4">
+        <button class="btn btn-success btn-lg px-5">Отправить заявку</button>
+      </div>
     </div>
-</section>
+  </form>
+</div>
 {% endblock %}
