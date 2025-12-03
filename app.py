@@ -1,6 +1,8 @@
 import datetime
+import keyword
 import os
 import json
+import re
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, request as flask_request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
@@ -242,81 +244,114 @@ def is_admission_question(text: str) -> bool:
     text = text.lower()
     return any(k in text for k in keywords)
 
+
+def detect_language(text):
+    # Определяем язык по кириллице и характерным буквам
+    text = text.lower()
+    kazakh_chars = 'әғқңөұүһі'
+    russian_chars = 'ыэё'
+    if any(c in text for c in kazakh_chars):
+        return 'kk'
+    if any(c in text for c in russian_chars):
+        return 'ru'
+    if re.search(r'[a-z]', text) and not re.search(r'[а-яё]', text):
+        return 'en'
+    return 'ru'  # по умолчанию
+
+def detect_language(text):
+    text = text.lower()
+    kazakh_chars = 'әғқңөұүһі'
+    russian_chars = 'ыэё'
+    if any(c in text for c in kazakh_chars):
+        return 'kk'
+    if any(c in text for c in russian_chars):
+        return 'ru'
+    if re.search(r'[a-z]', text) and not re.search(r'[а-яё]', text):
+        return 'en'
+    return 'ru'
+
 @app.route('/api/chat', methods=['POST'])
 @login_required
 def api_chat():
     data = request.get_json() or {}
     user_message = data.get("message", "").strip()
-    lang = session.get('lang', current_user.language)
-
+    
     if not user_message:
         return jsonify({"reply": "Пустое сообщение."})
 
-    # === Фильтр: вопрос должен быть о поступлении ===
-    if not is_admission_question(user_message):
-        reply = {
-            "ru": "**Я могу отвечать только на вопросы, связанные с поступлением.**\nПожалуйста, уточните ваш вопрос.",
-            "kk": "**Мен тек оқуға түсуге қатысты сұрақтарға жауап бере аламын.**\nСұрағыңызды нақтылаңыз.",
-            "en": "**I can answer only admission-related questions.**\nPlease clarify your request."
-        }.get(lang, "Я могу отвечать только на вопросы по поступлению.")
-        return jsonify({"reply": reply, "markdown": True})
+    # Определяем язык вопроса
+    question_lang = detect_language(user_message)
 
-    # === 1. FAQ exact match ===
+    # Проверяем точные совпадения в faq_exact.json
     if FAQ_DATA:
-        msg = user_message.lower()
+        msg_lower = user_message.lower()
         for item in FAQ_DATA:
-            keys = [k.lower() for k in item.get("keywords", [])]
-            if any(k in msg for k in keys):
-                answer_key = f"answer_{lang}"
-                reply = item.get(answer_key) or item.get("answer_ru")
-
-                # Save in DB
+            keywords = [k.lower() for k in item.get("keywords", [])]
+            if any(kw in msg_lower for kw in keywords):
+                answer = item.get(f"answer_{question_lang}") or item.get("answer_ru") or item.get("answer_kk", "Ответ временно недоступен.")
+                
+                # Сохраняем в историю
                 db.session.add(ChatHistory(
                     user_id=current_user.id,
                     message=user_message,
-                    response=reply
+                    response=answer
                 ))
                 db.session.commit()
+                
+                return jsonify({"reply": answer, "markdown": True})
 
-                return jsonify({"reply": reply, "markdown": True})
-
-    # === 2. Gemini fallback (Markdown enforced) ===
+    # Если нет точного ответа — Gemini
     try:
         prompt = f"""
-Ты — ИИ-консультант приемной комиссии Университета Жубанова.
-Отвечай строго по теме: поступление, документы, гранты, сроки, программы, стоимость, общежитие.
+Ты — ИИ-консультант по поступлению в АРГУ им. К. Жубанова.
+ОТВЕЧАЙ ТОЛЬКО НА ТОМ ЖЕ ЯЗЫКЕ, на котором задан вопрос ({question_lang}).
 
-❗ Очень важно:
-- Форматируй ответ красиво в **Markdown**
-- Используй списки, заголовки, жирный текст
-- Не отправляй текст одним блоком
-- Объясняй структурировано и понятно
-- Не отвечай на темы, не связанные с приемной комиссией
+Вопрос пользователя: {user_message}
 
-Вопрос пользователя ({lang}):
-{user_message}
+Правила:
+- Отвечай кратко и по делу
+- Используй Markdown (списки, жирный текст, заголовки)
+- Отвечай ТОЛЬКО по теме поступления, грантов, документов, сроков, общежития и т.д.
+- Если вопрос не по теме — скажи: "Я могу отвечать только на вопросы о поступлении."
 
-Ответ в Markdown:
+Ответ на {question_lang} языке:
 """
 
         model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(prompt)
+        reply = response.text.strip() if response.text else "Кешіріңіз, жауап бере алмадым."
 
-        ai_text = response.text.strip() if response.text else "Қате шықты, кейін қайталап көріңіз."
-
-        # Save
+        # Сохраняем в историю
         db.session.add(ChatHistory(
             user_id=current_user.id,
             message=user_message,
-            response=ai_text
+            response=reply
         ))
         db.session.commit()
 
-        return jsonify({"reply": ai_text, "markdown": True})
+        return jsonify({"reply": reply, "markdown": True})
 
     except Exception as e:
         print("Gemini error:", e)
-        return jsonify({"reply": "Сервис уақытша қолжетімсіз.", "markdown": True})
+        fallback = {
+            'ru': "Сервис временно недоступен. Попробуйте позже.",
+            'kk': "Қызмет уақытша қолжетімсіз. Кейін қайталап көріңіз.",
+            'en': "Service temporarily unavailable. Try again later."
+        }
+        return jsonify({"reply": fallback.get(question_lang, fallback['ru']), "markdown": True})    
+
+@app.route('/api/chat/history')
+@login_required
+def chat_history():
+    history = ChatHistory.query.filter_by(user_id=current_user.id).order_by(ChatHistory.timestamp).all()
+    return jsonify([
+        {
+            "message": h.message,
+            "response": h.response,
+            "timestamp": h.timestamp.strftime('%d.%m.%Y %H:%M')
+        } for h in history
+    ])
+
 
 # === ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ ===
 @app.route('/profile')
