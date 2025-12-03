@@ -1,10 +1,7 @@
-# app.py (обновлённая версия с админкой и перенаправлением)
-
 import datetime
 import os
 import json
-import random
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, request as flask_request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import (
     LoginManager, login_user, logout_user,
@@ -15,12 +12,32 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 from flask_mail import Mail, Message
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
 load_dotenv()
+# ==================== МУЛЬТИЯЗЫЧНОСТЬ ====================
+try:
+    with open('translations/translations.json', 'r', encoding='utf-8') as f:
+        TRANS = json.load(f)
+except FileNotFoundError:
+    print("ВНИМАНИЕ: translations/translations.json не найден!")
+    TRANS = {}
+    
+def t(key):
+    """Функция перевода, доступна в шаблонах как {{ t('Ключ') }}"""
+    if current_user.is_authenticated:
+        lang = session.get('lang', current_user.language or 'ru')
+    else:
+        lang = session.get('lang', 'ru')
+    
+    return TRANS.get(key, {}).get(lang, key)
+
 app = Flask(__name__)
 # Добавь в начало app.py (после импортов)
 FAQ_DATA = None
+# Делаем функцию t() и текущий язык доступными во всех шаблонах
+app.jinja_env.globals['t'] = t
+app.jinja_env.globals['lang'] = lambda: session.get('lang', current_user.language if current_user.is_authenticated else 'ru')
+
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 def load_faq_exact():
     global FAQ_DATA
@@ -166,6 +183,22 @@ def load_questions(lang='ru'):
 def calculate_ent_total(ent_data):
     total = sum([ent_data.get(key, 0) for key in ['math', 'reading', 'history', 'profile1', 'profile2']])
     return min(total, 140)
+
+# Добавь это один раз — где-то после моделей и before_request
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        session['lang'] = current_user.language
+
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    if lang not in ['ru', 'kk', 'en']:
+        lang = 'ru'
+    session['lang'] = lang
+    if current_user.is_authenticated:
+        current_user.language = lang
+        db.session.commit()
+    return redirect(flask_request.referrer or url_for('home'))
 
 # --- Routes ---
 @app.route('/')
@@ -520,11 +553,6 @@ def submit_test():
 
     return jsonify({'mbti': mbti, 'recommendations': rec})
 
-@app.route('/set_language/<lang>')
-def set_language(lang):
-    if lang in ['ru', 'kk', 'en']:
-        session['lang'] = lang
-    return redirect(request.referrer or url_for('home'))
 
 # === ИНИЦИАЛИЗАЦИЯ АДМИНА ===
 def create_admin():
@@ -636,10 +664,10 @@ def mark_read(notif_id):
 with app.app_context():
     db.create_all()
     create_admin()
-    load_faq_exact()  # ← добавь эту строку
-# === ЗАПУСК ПРИЛОЖЕНИЯ ===
+    load_faq_exact()
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        create_admin()  # Теперь вызываем вручную
+        create_admin()
     app.run(debug=True)

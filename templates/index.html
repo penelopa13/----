@@ -1,30 +1,30 @@
 {% extends "base.html" %}
-{% block title %}Талапкер — Главная{% endblock %}
+{% block title %}{{ t('Талапкер') }} — {{ t('Главная') }}{% endblock %}
 
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <section class="hero">
   <div class="container hero-inner">
-    <h1>ИИ-консультант для абитуриентов</h1>
-    <p>С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов</p>
-    <a class="btn orange" href="#chat-section">Узнать больше</a>
+    <h1>{{ t('ИИ-консультант для абитуриентов') }}</h1>
+    <p>{{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}</p>
+    <a class="btn orange" href="#chat-section">{{ t('Узнать больше') }}</a>
   </div>
 </section>
 
 <!-- Чат-бот -->
 <section id="chat-section" class="section container">
-  <h2>Чат с консультантом</h2>
+  <h2>{{ t('Чат с консультантом') }}</h2>
   <div id="chat-box" class="chat-box">
     <div class="messages" id="messages">
-      <div class="message bot">Здравствуйте! Я помогу вам разобраться с поступлением. Задайте ваш вопрос 👇</div>
+      <div class="message bot">{{ t('Здравствуйте! Я помогу вам разобраться с поступлением. Задайте ваш вопрос') }} 👇</div>
     </div>
     <form id="chat-form" class="chat-form">
-      <input type="text" id="user-input" placeholder="Введите ваш вопрос..." required autocomplete="off">
-      <button type="button" id="voice-btn" class="voice-btn" aria-label="Голосовой ввод">
+      <input type="text" id="user-input" placeholder="{{ t('Введите ваш вопрос...') }}" required autocomplete="off">
+      <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
   <i class="fas fa-microphone"></i>
 </button>
-      <button type="submit">Отправить</button>
+      <button type="submit">{{ t('Отправить') }}</button>
     </form>
   </div>
 </section>
@@ -32,13 +32,20 @@
 
 {% block scripts %}
 <script>
+  // Переводы для JS (чтобы Jinja их обработал правильно)
+  const translations = {
+    typing: "{{ t('Пишу ответ...') }}",
+    loginRequired: "{{ t('Войдите в систему для работы с чат-ботом.') }}",
+    micPermission: "{{ t('Разрешите доступ к микрофону.') }}",
+    micError: "{{ t('Ошибка запуска микрофона.') }}"
+  };
+
   // === Голосовой ввод ===
   const userInput = document.getElementById('user-input');
   const voiceBtn = document.getElementById('voice-btn');
   const chatForm = document.getElementById('chat-form');
   const messages = document.getElementById('messages');
 
-  // Язык
   const lang = "{{ session.get('lang', 'ru') }}";
   const speechLangMap = { 'ru': 'ru-RU', 'kk': 'kk-KZ', 'en': 'en-US' };
   const recognitionLang = speechLangMap[lang] || 'ru-RU';
@@ -65,9 +72,8 @@
       console.error('Speech error:', event.error);
       voiceBtn.classList.remove('recording');
       isRecording = false;
-
       if (event.error === 'not-allowed') {
-        alert('Разрешите доступ к микрофону.');
+        alert(translations.micPermission);
       }
     };
 
@@ -81,21 +87,19 @@
         recognition.stop();
         return;
       }
-
       try {
         recognition.start();
         voiceBtn.classList.add('recording');
         isRecording = true;
       } catch (err) {
         console.error(err);
-        alert('Ошибка запуска микрофона.');
+        alert(translations.micError);
       }
     });
   } else {
     voiceBtn.style.display = 'none';
   }
 
-  // === Функция добавления сообщения ===
   function addMessage(text, type = "bot") {
     const div = document.createElement("div");
     div.className = "message " + type;
@@ -104,21 +108,17 @@
     messages.scrollTop = messages.scrollHeight;
   }
 
-  // === ОТПРАВКА СООБЩЕНИЯ ===
   chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const text = userInput.value.trim();
     if (!text) return;
 
-    // Сообщение пользователя
     addMessage(text, "user");
     userInput.value = "";
 
-    // Плашка "печатает..."
     const typing = document.createElement("div");
     typing.className = "message bot typing";
-    typing.textContent = "Пишу ответ...";
+    typing.textContent = translations.typing;
     messages.appendChild(typing);
     messages.scrollTop = messages.scrollHeight;
 
@@ -128,18 +128,13 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text })
       });
-
       const data = await res.json();
-
-      typing.remove(); // убираем индикатор
-
+      typing.remove();
       addMessage(data.reply, "bot");
-
     } catch (err) {
       typing.remove();
-      addMessage("Войдите в систему для работы с чат-ботом.", "bot");
+      addMessage(translations.loginRequired, "bot");
     }
   });
 </script>
-
 {% endblock %}

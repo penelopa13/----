@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{% block title %}Талапкер{% endblock %}</title>
+  <title>{% block title %}{{ t('Талапкер') }}{% endblock %}</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <!-- Стили -->
@@ -128,7 +128,7 @@
       <!-- Логотип -->
       <a href="{{ url_for('home') }}" class="logo">
         <img src="{{ url_for('static', filename='images/logo_zhubanov.png') }}" alt="Талапкер" />
-        <span>Талапкер</span>
+        <span>{{ t('Талапкер') }}</span>
       </a>
 
       <!-- Кнопка для мобильного меню -->
@@ -137,27 +137,27 @@
       <!-- Навигация -->
       <nav class="nav" id="nav">
         <div class="nav-center">
-          <a href="{{ url_for('home') }}">Главная</a>
+          <a href="{{ url_for('home') }}">{{ t('Главная') }}</a>
           <div class="dropdown nav-dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="universityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Университет
+              {{ t('Университет') }}
             </a>
             <ul class="dropdown-menu glass-menu" aria-labelledby="universityDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('university') }}">Университет</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('programs') }}">Образовательные программы</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('university') }}">{{ t('Университет') }}</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('programs') }}">{{ t('Образовательные программы') }}</a></li>
             </ul>
           </div>
-          <a href="{{ url_for('status') }}">Подать заявку</a>
-          <a href="{{ url_for('test_psy') }}">Тест</a>
-          <a href="{{ url_for('calculator') }}">Калькулятор</a>
-          <a href="{{ url_for('contact') }}">Контакты</a>
+          <a href="{{ url_for('status') }}">{{ t('Подать заявку') }}</a>
+          <a href="{{ url_for('test_psy') }}">{{ t('Тест') }}</a>
+          <a href="{{ url_for('calculator') }}">{{ t('Калькулятор') }}</a>
+          <a href="{{ url_for('contact') }}">{{ t('Контакты') }}</a>
         </div>
 
         <div class="nav-right d-flex align-items-center gap-3">
           <a href="{{ url_for('profile') }}" class="btn small">
-            <i class="fa-solid fa-user"></i> Личный кабинет
+            <i class="fa-solid fa-user"></i> {{ t('Личный кабинет') }}
           </a>
-          <a href="{{ url_for('register') }}" class="btn small">Регистрация</a>
+          <a href="{{ url_for('register') }}" class="btn small">{{ t('Регистрация') }}</a>
 
           <div class="dropdown lang-switcher">
             <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -171,7 +171,7 @@
           </div>
 
           <!-- Уведомления -->
-          <a class="nav-link" href="#" id="notifBtn" aria-label="Уведомления">
+          <a class="nav-link" href="#" id="notifBtn" aria-label="{{ t('Уведомления') }}">
             <i class="fas fa-bell"></i>
             <span class="notif-badge">3</span>
           </a>
@@ -186,7 +186,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>© 2025 Университет. Все права защищены.</p>
+      <p>© 2025 {{ t('Университет') }}. {{ t('Все права защищены.') }}</p>
     </div>
   </footer>
 
@@ -202,7 +202,7 @@
   <div id="notifPanel">
     <span class="notif-badge" id="notifCount">0</span>
     <span class="notif-close" id="closeNotif">&times;</span>
-    <h4>Уведомления</h4>
+    <h4>{{ t('Уведомления') }}</h4>
     <ul id="notifList"></ul>
 
   </div>

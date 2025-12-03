@@ -1,21 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Образовательные программы - Талапкер{% endblock %}
+{% block title %}{{ t('Образовательные программы') }} - {{ t('Талапкер') }}{% endblock %}
 
 {% block content %}
 <section class="section">
     <div class="container">
-        <h1 align="center">ОБРАЗОВАТЕЛЬНЫЕ ПРОГРАММЫ</h1>
+<h1 align="center">{{ t('Образовательные программы') | upper }}</h1>
         <div class="card-body">
             <div class="single-post_img">
-                <h3 align="center"><b>БАКАЛАВРИАТ</b></h3>
-
+                <h3 align="center"><b>{{ t('БАКАЛАВРИАТ') }}</b></h3>
                 <!-- Факультет педагогики и менеджмента в образовании -->
-                <p align="center"><b>Факультет педагогики и менеджмента в образовании</b></p>
+                <p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
-                        <div class="accord-item_head">6В01102 - Психология и менеджмент образования</div>
+                        <div class="accord-item_head">6В01102 - {{ t('Психология и менеджмент образования') }}</div>
                         <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01102.png" alt="Психология и менеджмент образования">
+                            <img src="/static/images/programs/6B01102.png" alt="{{ t('Психология и менеджмент образования') }}">
                         </div>
                     </div>
                     <div class="accord-item">
@@ -51,7 +50,7 @@
                 </div>
 
                 <!-- Исторический факультет -->
-                <p align="center"><b>Исторический факультет</b></p>
+                <b><p align="center"><b>{{ t('Исторический факультет') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В01506 - География</div>
@@ -86,7 +85,7 @@
                 </div>
 
                 <!-- Профессионально-творческий факультет -->
-                <p align="center"><b>Профессионально-творческий факультет</b></p>
+                <b><p align="center"><b>{{ t('Профессионально-творческий факультет') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В01401 - Музыкальное образование</div>
@@ -139,7 +138,7 @@
                 </div>
 
                 <!-- Технический факультет -->
-                <p align="center"><b>Технический факультет</b></p>
+                <p align="center"><b>{{ t('Технический факультет') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В07106 - Электроэнергетика</div>
@@ -192,7 +191,7 @@
                 </div>
 
                 <!-- Факультет естествознания -->
-                <p align="center"><b>Факультет естествознания</b></p>
+                <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В01513 - Биология</div>
@@ -239,7 +238,7 @@
                 </div>
 
                 <!-- Физико-математический факультет -->
-                <p align="center"><b>Физико-математический факультет</b></p>
+                <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В01501 - Математика</div>
@@ -292,7 +291,7 @@
                 </div>
 
                 <!-- Филологический факультет -->
-                <p align="center"><b>Филологический факультет</b></p>
+               <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В01701 - Казахский язык и литература</div>
@@ -315,7 +314,7 @@
                 </div>
 
                 <!-- Факультет иностранных языков -->
-                <p align="center"><b>Факультет иностранных языков</b></p>
+                <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В01706 - Иностранный язык: два иностранных языка</div>
@@ -344,7 +343,7 @@
                 </div>
 
                 <!-- Факультет экономики и права -->
-                <p align="center"><b>Факультет экономики и права</b></p>
+                <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В04101 - Экономика</div>
@@ -385,7 +384,7 @@
                 </div>
 
                 <!-- Heriot-Watt Campus -->
-                <p align="center"><b>Heriot-Watt Campus</b></p>
+                <p align="center"><b>{{ t('Heriot-Watt Campus') }}</b></p>
                 <div class="accord">
                     <div class="accord-item">
                         <div class="accord-item_head">6В06107 - Компьютерная инженерия</div>

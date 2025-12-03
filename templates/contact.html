@@ -1,20 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}Контакты - Талапкер{% endblock %}
+{% block title %}{{ t('Контакты') }} - {{ t('Талапкер') }}{% endblock %}
 
 {% block content %}
 <section class="section contact-section">
   <div class="container contact-page">
-    <h1 class="contact-title">Контакты</h1>
+<h1 class="contact-title">{{ t('Контакты') }}</h1>
 
     <div class="contact-details">
-      <p><strong>Приемная комиссия для абитуриентов</strong></p>
-      <p>📞 Телефон: +7 776 786 12 85, +7 778 550 91 95</p>
-      <p>💬 WhatsApp: +7 747 518 35 83</p>
-      <p>📧 По приему и профориентации: 
+      <p><strong>{{ t('Приемная комиссия для абитуриентов') }}</strong></p>
+      <p>📞 {{ t('Телефон:') }} +7 776 786 12 85, +7 778 550 91 95</p>
+      <p>💬 {{ t('WhatsApp:') }} +7 747 518 35 83</p>
+      <p>📧 {{ t('По приему и профориентации:') }} 
         <a href="mailto:admissions@zhubanov.edu.kz">admissions@zhubanov.edu.kz</a>
       </p>
-      <p>📧 По практике и трудоустройству: 
+      <p>📧 {{ t('По практике и трудоустройству:') }} 
         <a href="mailto:career@zhubanov.edu.kz">career@zhubanov.edu.kz</a>
       </p>
     </div>
@@ -22,7 +22,7 @@
   </div>
 </section>
 <!-- Плавающая кнопка WhatsApp -->
-<a href="https://wa.me/774751835835" target="_blank" class="floating-btn whatsapp-btn" aria-label="Написать в WhatsApp">
+<a href="https://wa.me/774751835835" target="_blank" class="floating-btn whatsapp-btn" aria-label="{{ t('Написать в WhatsApp') }}"
   <i class="fab fa-whatsapp"></i>
 </a>
 
