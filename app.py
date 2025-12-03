@@ -565,6 +565,18 @@ def admin_notify():
                 recipient_id=u.id
             )
             db.session.add(notif)
+
+            # ← отправка email каждому
+            try:
+                msg = Message(
+                    subject=title,
+                    recipients=[u.email],
+                    body=f"{message}\n\nУниверситет Жубанова"
+                )
+                mail.send(msg)
+            except Exception as e:
+                print("Ошибка email:", e)
+
     else:
         user = User.query.get(int(recipient))
         if not user:
@@ -577,6 +589,18 @@ def admin_notify():
             recipient_id=user.id
         )
         db.session.add(notif)
+
+        # отправка email конкретному
+        try:
+            msg = Message(
+                subject=title,
+                recipients=[user.email],
+                body=f"{message}\n\nУниверситет Жубанова"
+            )
+            mail.send(msg)
+        except Exception as e:
+            print("Ошибка email:", e)
+
 
     db.session.commit()
     return jsonify({'status': 'ok', 'message': 'Уведомление отправлено'})
