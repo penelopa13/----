@@ -642,6 +642,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         create_admin()  # Теперь вызываем вручную
-    print("Сервер запущен: http://127.0.0.1:5000")
-    print("Админ: admin@site.com / admin123")
     app.run(debug=True)
