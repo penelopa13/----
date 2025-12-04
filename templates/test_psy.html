@@ -1,13 +1,12 @@
 {% extends "base.html" %}
-{% block title %}🧠 Personality Test{% endblock %}
+{% block title %}{{ t('🧠 Personality Test') }}{% endblock %}
 
 {% block content %}
 <section class="profile-section">
   <div class="profile-card wide" style="max-width: 720px;">
-    <h2 class="center" style="color: var(--accent-color); margin-bottom: 16px;">
-      🧠 Personality Test
-    </h2>
-
+<h2 class="center" style="color: var(--accent-color); margin-bottom: 16px;">
+  {{ t('🧠 Personality Test') }}
+</h2>
     <!-- Контейнер теста -->
     <div id="test-container">
       <div id="question-box" class="fade-in">
@@ -24,8 +23,8 @@
 
     <!-- Контейнер результата -->
     <div id="result-box" style="display:none;">
-      <h2 class="center" style="color: var(--accent-color);">✅ Тест завершён!</h2>
-      <p class="center" id="loading-text" style="color:#fff;">Результаты анализируются...</p>
+<h2 class="center" style="color: var(--accent-color);">{{ t('✅ Тест завершён!') }}</h2>
+<p class="center" id="loading-text" style="color:#fff;">{{ t('Результаты анализируются...') }}</p>
 
       <div id="final-result" class="mt-4" style="display:none;">
         <h3 class="center" style="color:#fff;">🎯 Твой тип личности:</h3>
