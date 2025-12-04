@@ -17,7 +17,7 @@
       <div id="progress" class="progress-text mt-3"></div>
 
       <div class="mt-3 buttons center">
-        <button id="prev-btn" class="btn small" disabled>← Назад</button>
+<button id="prev-btn" class="btn small" disabled>{{ t('← Назад') }}</button>
       </div>
     </div>
 
@@ -27,16 +27,16 @@
 <p class="center" id="loading-text" style="color:#fff;">{{ t('Результаты анализируются...') }}</p>
 
       <div id="final-result" class="mt-4" style="display:none;">
-        <h3 class="center" style="color:#fff;">🎯 Твой тип личности:</h3>
+<h3 class="center" style="color:#fff;">{{ t('🎯 Твой тип личности:') }}</h3>
         <p id="mbti-type" class="center mbti-type"></p>
 
         <p id="description" class="center mt-3 text-safe"></p>
 
-        <h4 class="center mt-3" style="color:var(--accent-color);">💡 Рекомендуемые направления:</h4>
+<h4 class="center mt-3" style="color:var(--accent-color);">{{ t('💡 Рекомендуемые направления:') }}</h4>
         <ul id="recommendations-list" class="recommendations-list"></ul>
 
         <div class="center mt-4">
-          <a href="/profile" class="btn orange">Перейти в профиль</a>
+<a href="/profile" class="btn orange">{{ t('Перейти в профиль') }}</a>
         </div>
       </div>
     </div>
