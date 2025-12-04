@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Админ-панель{% endblock %}
+{% block title %}{{ t('Админ-панель') }}{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
-            <h1 class="mb-2">Админ-панель</h1>
+            <h1 class="mb-2">{{ t('Админ-панель') }}</h1>
             <p class="text-muted mb-0">Добро пожаловать, <strong>{{ current_user.name or current_user.email }}</strong></p>
         </div>
         <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-lg px-5 shadow-sm d-flex align-items-center gap-2">
