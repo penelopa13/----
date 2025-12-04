@@ -1,274 +1,246 @@
 {
   "INTJ": {
-    "title": {
-      "ru": "Архитектор (INTJ)",
-      "kk": "Архитектор (INTJ)",
-      "en": "Architect (INTJ)"
-    },
+    "title": {"ru": "Архитектор (INTJ)", "kk": "Архитектор (INTJ)", "en": "Architect (INTJ)"},
     "description": {
-      "ru": "Ты аналитик и стратег. Любишь продумывать всё наперёд и стремишься к совершенству.",
-      "kk": "Сен талдаушысың және стратегсің. Барлығын алдын ала ойлап, жетілдіруге ұмтыласың.",
-      "en": "You are an analyst and strategist. You plan ahead and strive for perfection."
+      "ru": "Стратег и визионер. Ты видишь систему целиком, планируешь на годы вперёд и не терпишь пустой болтовни.",
+      "kk": "Стратег және визионер. Сен жүйені толық көресің, жылдар бойы жоспарлайсың және бос әңгімені көтермейсің.",
+      "en": "Strategist and visionary. You see the big picture, plan years ahead and hate small talk."
     },
-    "recommended_programs": {
-      "ru": ["Программирование", "Аналитика данных", "Инженерия", "Проектирование систем"],
-      "kk": ["Бағдарламалау", "Деректер талдауы", "Инженерия", "Жүйе жобалау"],
-      "en": ["Programming", "Data Analysis", "Engineering", "Systems Design"]
+    "percentages": {"I": 88, "N": 82, "T": 90, "J": 92},
+    "strengths": {
+      "ru": "Аналитика • Стратегическое мышление • Независимость • Решительность",
+      "kk": "Талдау • Стратегиялық ойлау • Тәуелсіздік • Шешімділік",
+      "en": "Analytics • Strategic thinking • Independence • Determination"
+    },
+    "professions": {
+      "ru": ["Архитектор ПО", "Data Scientist / ML-инженер", "Инвестиционный банкир", "Корпоративный юрист", "Научный исследователь", "Стратегический консультант"],
+      "kk": ["Бағдарлама архитекторы", "Data Scientist / ML-инженер", "Инвестициялық банкир", "Корпоративтік заңгер", "Ғылыми зерттеуші", "Стратегиялық кеңесші"],
+      "en": ["Software Architect", "Data Scientist / ML Engineer", "Investment Banker", "Corporate Lawyer", "Research Scientist", "Strategy Consultant"]
     }
   },
   "INTP": {
-    "title": {
-      "ru": "Логик (INTP)",
-      "kk": "Логик (INTP)",
-      "en": "Logician (INTP)"
-    },
+    "title": {"ru": "Логик (INTP)", "kk": "Логик (INTP)", "en": "Logician (INTP)"},
     "description": {
-      "ru": "Ты любишь анализировать и искать закономерности. Независим и оригинален в мышлении.",
-      "kk": "Сен талдау мен заңдылықтарды іздеуді ұнатасың. Тәуелсіз және ерекше ойлайсың.",
-      "en": "You love analyzing and finding patterns. Independent and original thinker."
+      "ru": "Теоретик и изобретатель. Ты живёшь в мире идей и можешь часами разбирать сложные концепции.",
+      "kk": "Теоретик және ойлап табушы. Сен идеялар әлемінде өмір сүресің және күрделі ұғымдарды сағаттап талдай аласың.",
+      "en": "Theorist and inventor. You live in the world of ideas and can spend hours dissecting complex concepts."
     },
-    "recommended_programs": {
-      "ru": ["Философия", "Математика", "Компьютерные науки", "Исследования"],
-      "kk": ["Философия", "Математика", "Компьютерлік ғылымдар", "Зерттеу"],
-      "en": ["Philosophy", "Mathematics", "Computer Science", "Research"]
+    "percentages": {"I": 92, "N": 88, "T": 94, "P": 78},
+    "strengths": {"ru": "Глубокий анализ • Креативность • Объективность • Любопытство", "kk": "Терең талдау • Шығармашылық • Объективтілік • Қызығушылық", "en": "Deep analysis • Creativity • Objectivity • Curiosity"},
+    "professions": {
+      "ru": ["Теоретический физик", "Математик-исследователь", "Разработчик алгоритмов", "Криптограф", "Философ", "Патентный эксперт"],
+      "kk": ["Теориялық физик", "Математик-зерттеуші", "Алгоритм әзірлеуші", "Криптограф", "Философ", "Патенттік сарапшы"],
+      "en": ["Theoretical Physicist", "Research Mathematician", "Algorithm Developer", "Cryptographer", "Philosopher", "Patent Examiner"]
     }
   },
   "ENTJ": {
-    "title": {
-      "ru": "Командир (ENTJ)",
-      "kk": "Командир (ENTJ)",
-      "en": "Commander (ENTJ)"
-    },
+    "title": {"ru": "Командир (ENTJ)", "kk": "Командир (ENTJ)", "en": "Commander (ENTJ)"},
     "description": {
-      "ru": "Ты лидер по природе. Умеешь организовывать людей и достигать целей.",
-      "kk": "Сен табиғатынан көшбасшысың. Адамдарды ұйымдастырып, мақсатқа жетуді білесің.",
-      "en": "You are a natural leader who knows how to organize people and achieve goals."
+      "ru": "Рождённый лидер. Ты берёшь ответственность, ставишь амбициозные цели и ведёшь людей за собой.",
+      "kk": "Туабітті көшбасшы. Сен жауапкершілікті өз мойныңа аласың, амбициялы мақсат қоясың және адамдарды ертіп кетесің.",
+      "en": "Natural-born leader. You take responsibility, set ambitious goals and lead people."
     },
-    "recommended_programs": {
-      "ru": ["Менеджмент", "Предпринимательство", "Бизнес", "Проектное управление"],
-      "kk": ["Менеджмент", "Кәсіпкерлік", "Бизнес", "Жоба менеджменті"],
-      "en": ["Management", "Entrepreneurship", "Business", "Project Management"]
+    "percentages": {"E": 90, "N": 80, "T": 92, "J": 88},
+    "strengths": {"ru": "Лидерство • Стратегия • Уверенность • Эффективность", "kk": "Көшбасшылық • Стратегия • Сенімділік • Тиімділік", "en": "Leadership • Strategy • Confidence • Efficiency"},
+    "professions": {
+      "ru": ["Генеральный директор (CEO)", "Управляющий хедж-фондом", "Топ-менеджер", "Политик", "Основатель стартапа", "Стратегический директор"],
+      "kk": ["Бас директор (CEO)", "Хедж-қор басқарушысы", "Топ-менеджер", "Саясаткер", "Стартап негізін қалаушы", "Стратегиялық директор"],
+      "en": ["CEO", "Hedge Fund Manager", "C-level Executive", "Politician", "Startup Founder", "Chief Strategy Officer"]
     }
   },
   "ENTP": {
-    "title": {
-      "ru": "Новатор (ENTP)",
-      "kk": "Жаңашыл (ENTP)",
-      "en": "Innovator (ENTP)"
-    },
+    "title": {"ru": "Новатор (ENTP)", "kk": "Жаңашыл (ENTP)", "en": "Debater (ENTP)"},
     "description": {
-      "ru": "Ты полон идей и энергии. Любишь спорить, создавать и улучшать всё вокруг.",
-      "kk": "Сен идея мен энергияға толысың. Пікірталасуды, жаңашылдық енгізуді жақсы көресің.",
-      "en": "You are full of ideas and energy. You love debating, creating, and improving everything around you."
+      "ru": "Генератор идей. Ты любишь спорить, изобретать и разрушать устоявшиеся правила.",
+      "kk": "Идея генераторы. Сен пікірталасуды, ойлап табуды және ескі ережелерді бұзуды ұнатасың.",
+      "en": "Idea generator. You love debating, inventing and breaking old rules."
     },
-    "recommended_programs": {
-      "ru": ["Маркетинг", "Журналистика", "Инновации", "Реклама"],
-      "kk": ["Маркетинг", "Журналистика", "Инновациялар", "Жарнама"],
-      "en": ["Marketing", "Journalism", "Innovation", "Advertising"]
+    "percentages": {"E": 88, "N": 90, "T": 85, "P": 82},
+    "strengths": {"ru": "Креативность • Быстрое мышление • Харизма • Адаптивность", "kk": "Шығармашылық • Жылдам ойлау • Харизма • Бейімделгіштік", "en": "Creativity • Quick thinking • Charisma • Adaptability"},
+    "professions": {
+      "ru": ["Предприниматель", "Маркетолог-стратег", "PR-директор", "Венчурный инвестор", "Креативный директор", "Продакт-менеджер"],
+      "kk": ["Кәсіпкер", "Маркетинг стратег", "PR-директор", "Венчурлық инвестор", "Креативті директор", "Продакт-менеджер"],
+      "en": ["Entrepreneur", "Growth Marketer", "PR Director", "Venture Capitalist", "Creative Director", "Product Manager"]
     }
   },
   "INFJ": {
-    "title": {
-      "ru": "Советник (INFJ)",
-      "kk": "Кеңесші (INFJ)",
-      "en": "Advocate (INFJ)"
-    },
+    "title": {"ru": "Советник (INFJ)", "kk": "Кеңесші (INFJ)", "en": "Advocate (INFJ)"},
     "description": {
-      "ru": "Ты стремишься помогать людям и создавать гармонию. Мыслями глубже других.",
-      "kk": "Сен адамдарға көмектесуге және үйлесімділік орнатуға ұмтыласың.",
-      "en": "You aim to help others and create harmony. You think deeply and empathetically."
+      "ru": "Идеалист с глубоким внутренним миром. Ты чувствуешь людей и хочешь менять мир к лучшему.",
+      "kk": "Терең ішкі әлемі бар идеалист. Сен адамдарды сезесің және әлемді жақсы жаққа өзгерткің келеді.",
+      "en": "Idealist with deep inner world. You feel people and want to make the world better."
     },
-    "recommended_programs": {
-      "ru": ["Психология", "Педагогика", "Социальная работа", "Литература"],
-      "kk": ["Психология", "Педагогика", "Әлеуметтік жұмыс", "Әдебиет"],
-      "en": ["Psychology", "Education", "Social Work", "Literature"]
+    "percentages": {"I": 85, "N": 90, "F": 88, "J": 85},
+    "strengths": {"ru": "Эмпатия • Интуиция • Вдохновение • Принципиальность", "kk": "Эмпатия • Интуиция • Шабыт • Принципшілдік", "en": "Empathy • Intuition • Inspiration • Integrity"},
+    "professions": {
+      "ru": ["Психолог-терапевт", "Писатель", "Коуч по развитию", "Социальный предприниматель", "Директор НКО", "Духовный наставник"],
+      "kk": ["Психолог-терапевт", "Жазушы", "Даму бойынша коуч", "Әлеуметтік кәсіпкер", "ҮЕҰ директоры", "Рухани тәлімгер"],
+      "en": ["Therapist", "Author", "Life Coach", "Social Entrepreneur", "NGO Director", "Spiritual Teacher"]
     }
   },
   "INFP": {
-    "title": {
-      "ru": "Посредник (INFP)",
-      "kk": "Делдал (INFP)",
-      "en": "Mediator (INFP)"
-    },
+    "title": {"ru": "Посредник (INFP)", "kk": "Делдал (INFP)", "en": "Mediator (INFP)"},
     "description": {
-      "ru": "Ты идеалист и мечтатель. Веришь в добро и хочешь менять мир к лучшему.",
-      "kk": "Сен идеалист және арманшылсың. Жақсылыққа сенесің және әлемді жақсартқың келеді.",
-      "en": "You are an idealist and dreamer. You believe in good and want to make the world better."
+      "ru": "Мечтатель и идеалист. Ты живёшь по своим ценностям и хочешь, чтобы мир стал добрее.",
+      "kk": "Арманшыл және идеалист. Сен өз құндылықтарыңмен өмір сүресің және әлем мейірімді болғанын қалайсың.",
+      "en": "Dreamer and idealist. You live by your values and want the world to be kinder."
     },
-    "recommended_programs": {
-      "ru": ["Филология", "Культура", "Психология", "Журналистика"],
-      "kk": ["Филология", "Мәдениет", "Психология", "Журналистика"],
-      "en": ["Philology", "Culture", "Psychology", "Journalism"]
+    "percentages": {"I": 90, "N": 88, "F": 92, "P": 80},
+    "strengths": {"ru": "Эмпатия • Творчество • Искренность • Глубина", "kk": "Эмпатия • Шығармашылық • Шыншылдық • Тереңдік", "en": "Empathy • Creativity • Authenticity • Depth"},
+    "professions": {
+      "ru": ["Писатель", "Художник", "Музыкант", "Психолог", "Эко-активист", "Поэт"],
+      "kk": ["Жазушы", "Суретші", "Музыкант", "Психолог", "Эко-белсенді", "Ақын"],
+      "en": ["Writer", "Artist", "Musician", "Counselor", "Environmental Activist", "Poet"]
     }
   },
   "ENFJ": {
-    "title": {
-      "ru": "Наставник (ENFJ)",
-      "kk": "Тәлімгер (ENFJ)",
-      "en": "Protagonist (ENFJ)"
-    },
+    "title": {"ru": "Наставник (ENFJ)", "kk": "Тәлімгер (ENFJ)", "en": "Protagonist (ENFJ)"},
     "description": {
-      "ru": "Ты вдохновляешь других, умеешь слушать и поддерживать.",
-      "kk": "Сен басқаларды шабыттандырасың, тыңдай аласың және қолдау көрсетесің.",
-      "en": "You inspire others, know how to listen, and offer support."
+      "ru": "Харизматичный лидер, который вдохновляет и помогает людям раскрывать потенциал.",
+      "kk": "Адамдарды шабыттандыратын және әлеуетін ашуға көмектесетін харизматикалық көшбасшы.",
+      "en": "Charismatic leader who inspires and helps people unlock their potential."
     },
-    "recommended_programs": {
-      "ru": ["Образование", "Коммуникации", "Психология", "Менеджмент"],
-      "kk": ["Білім", "Коммуникация", "Психология", "Менеджмент"],
-      "en": ["Education", "Communication", "Psychology", "Management"]
+    "percentages": {"E": 92, "N": 85, "F": 90, "J": 88},
+    "strengths": {"ru": "Харизма • Эмпатия • Лидерство • Мотивация", "kk": "Харизма • Эмпатия • Көшбасшылық • Мотивация", "en": "Charisma • Empathy • Leadership • Motivation"},
+    "professions": {
+      "ru": ["HR-директор", "Тренер по лидерству", "Политический деятель", "Учитель/преподаватель", "Телеведущий", "Коуч"],
+      "kk": ["HR-директор", "Лидерлік тренер", "Саяси қайраткер", "Мұғалім", "Тележүргізуші", "Коуч"],
+      "en": ["HR Director", "Leadership Coach", "Politician", "Teacher", "TV Host", "Executive Coach"]
     }
   },
   "ENFP": {
-    "title": {
-      "ru": "Активист (ENFP)",
-      "kk": "Белсенді (ENFP)",
-      "en": "Campaigner (ENFP)"
-    },
+    "title": {"ru": "Активист (ENFP)", "kk": "Белсенді (ENFP)", "en": "Campaigner (ENFP)"},
     "description": {
-      "ru": "Ты креативный, эмоциональный и легко находишь общий язык с людьми.",
-      "kk": "Сен креативтісің, сезімталсың және адамдармен тез тіл табысасың.",
-      "en": "You are creative, emotional, and easily connect with people."
+      "ru": "Энерджайзер и искры вдохновения. Ты заражаешь всех вокруг энтузиазмом и идеями.",
+      "kk": "Энергия көзі және шабыт ұшқыны. Сен барлығын ынта мен идеямен жұқтырасың.",
+      "en": "Energizer and spark of inspiration. You infect everyone with enthusiasm and ideas."
     },
-    "recommended_programs": {
-      "ru": ["Реклама", "PR", "Журналистика", "Дизайн"],
-      "kk": ["Жарнама", "PR", "Журналистика", "Дизайн"],
-      "en": ["Advertising", "PR", "Journalism", "Design"]
+    "percentages": {"E": 94, "N": 90, "F": 85, "P": 88},
+    "strengths": {"ru": "Креативность • Харизма • Энтузиазм • Гибкость", "kk": "Шығармашылық • Харизма • Ынта • Икемділік", "en": "Creativity • Charisma • Enthusiasm • Flexibility"},
+    "professions": {
+      "ru": ["Креативный директор", "SMM / Контент-мейкер", "Event-менеджер", "Журналист", "Блогер/инфлюенсер", "Тревел-блогер"],
+      "kk": ["Креативті директор", "SMM / Контент-мейкер", "Іс-шара менеджері", "Журналист", "Блогер", "Саяхат блогері"],
+      "en": ["Creative Director", "Content Creator", "Event Manager", "Journalist", "Influencer", "Travel Blogger"]
     }
   },
   "ISTJ": {
-    "title": {
-      "ru": "Инспектор (ISTJ)",
-      "kk": "Инспектор (ISTJ)",
-      "en": "Inspector (ISTJ)"
-    },
+    "title": {"ru": "Инспектор (ISTJ)", "kk": "Инспектор (ISTJ)", "en": "Logistician (ISTJ)"},
     "description": {
-      "ru": "Ты ответственный и дисциплинированный. Любишь порядок и точность.",
-      "kk": "Сен жауапты және тәртіптісің. Реттілікті және нақтылықты ұнатасың.",
-      "en": "You are responsible and disciplined. You love order and precision."
+      "ru": "Надёжный и ответственный. Ты ценишь порядок, традиции и чёткие правила.",
+      "kk": "Сенімді және жауапты. Сен тәртіпті, дәстүрді және нақты ережелерді бағалайсың.",
+      "en": "Reliable and responsible. You value order, tradition and clear rules."
     },
-    "recommended_programs": {
-      "ru": ["Право", "Бухгалтерия", "IT", "Архивное дело"],
-      "kk": ["Құқық", "Бухгалтерия", "IT", "Мұрағат ісі"],
-      "en": ["Law", "Accounting", "IT", "Archival Studies"]
+    "percentages": {"I": 85, "S": 88, "T": 90, "J": 95},
+    "strengths": {"ru": "Ответственность • Точность • Организованность • Долг", "kk": "Жауапкершілік • Дәлдік • Ұйымшылдық • Борыш", "en": "Responsibility • Precision • Organization • Duty"},
+    "professions": {
+      "ru": ["Аудитор", "Бухгалтер", "Юрист", "Госслужащий", "Военный офицер", "Архивариус"],
+      "kk": ["Аудитор", "Бухгалтер", "Заңгер", "Мемлекеттік қызметкер", "Әскери офицер", "Мұрағатшы"],
+      "en": ["Auditor", "Accountant", "Lawyer", "Civil Servant", "Military Officer", "Archivist"]
     }
   },
   "ISFJ": {
-    "title": {
-      "ru": "Защитник (ISFJ)",
-      "kk": "Қорғаушы (ISFJ)",
-      "en": "Defender (ISFJ)"
-    },
+    "title": {"ru": "Защитник (ISFJ)", "kk": "Қорғаушы (ISFJ)", "en": "Defender (ISFJ)"},
     "description": {
-      "ru": "Ты надёжный и заботливый человек. Всегда готов помочь близким.",
-      "kk": "Сен сенімді және қамқор адамсың. Әрқашан жақындарыңа көмектесуге дайынсың.",
-      "en": "You are reliable and caring, always ready to help your loved ones."
+      "ru": "Самый заботливый тип. Ты всегда готов помочь и поддержать близких.",
+      "kk": "Ең қамқор тип. Сен әрқашан жақындарыңа көмектесуге және қолдауға дайынсың.",
+      "en": "The most caring type. You are always ready to help and support loved ones."
     },
-    "recommended_programs": {
-      "ru": ["Медицина", "Психология", "Образование", "Социальная работа"],
-      "kk": ["Медицина", "Психология", "Білім", "Әлеуметтік жұмыс"],
-      "en": ["Medicine", "Psychology", "Education", "Social Work"]
+    "percentages": {"I": 88, "S": 90, "F": 92, "J": 85},
+    "strengths": {"ru": "Забота • Надёжность • Внимание к деталям • Верность", "kk": "Қамқорлық • Сенімділік • Бөлшектерге мән беру • Адалылық", "en": "Care • Reliability • Attention to detail • Loyalty"},
+    "professions": {
+      "ru": ["Медсестра/врач", "Социальный работник", "Учитель начальных классов", "Библиотекарь", "Администратор"],
+      "kk": ["Мейірбике/дәрігер", "Әлеуметтік қызметкер", "Бастауыш сынып мұғалімі", "Кітапханашы", "Әкімші"],
+      "en": ["Nurse/Doctor", "Social Worker", "Elementary Teacher", "Librarian", "Administrator"]
     }
   },
   "ESTJ": {
-    "title": {
-      "ru": "Руководитель (ESTJ)",
-      "kk": "Басшы (ESTJ)",
-      "en": "Executive (ESTJ)"
-    },
+    "title": {"ru": "Руководитель (ESTJ)", "kk": "Басшы (ESTJ)", "en": "Executive (ESTJ)"},
     "description": {
-      "ru": "Ты практичный лидер, который ценит порядок и эффективность.",
-      "kk": "Сен тәртіп пен тиімділікті бағалайтын практикалық көшбасшысың.",
-      "en": "You are a practical leader who values order and efficiency."
+      "ru": "Практичный организатор. Ты любишь, когда всё работает как часы.",
+      "kk": "Практикалық ұйымдастырушы. Саған барлығы сағаттай жұмыс істегені ұнайды.",
+      "en": "Practical organizer. You love when everything works like clockwork."
     },
-    "recommended_programs": {
-      "ru": ["Менеджмент", "Логистика", "Администрирование"],
-      "kk": ["Менеджмент", "Логистика", "Әкімшілік басқару"],
-      "en": ["Management", "Logistics", "Administration"]
+    "percentages": {"E": 90, "S": 88, "T": 92, "J": 94},
+    "strengths": {"ru": "Организация • Решительность • Практичность • Лидерство", "kk": "Ұйымдастыру • Шешімділік • Практикалық • Көшбасшылық", "en": "Organization • Decisiveness • Practicality • Leadership"},
+    "professions": {
+      "ru": ["Директор компании", "Логист", "Проектный менеджер", "Финансовый контролёр", "Офицер полиции"],
+      "kk": ["Компания директоры", "Логист", "Жоба менеджері", "Қаржылық контролёр", "Полиция офицері"],
+      "en": ["Company Director", "Logistics Manager", "Project Manager", "Financial Controller", "Police Officer"]
     }
   },
   "ESFJ": {
-    "title": {
-      "ru": "Дипломат (ESFJ)",
-      "kk": "Дипломат (ESFJ)",
-      "en": "Consul (ESFJ)"
-    },
+    "title": {"ru": "Дипломат (ESFJ)", "kk": "Дипломат (ESFJ)", "en": "Consul (ESFJ)"},
     "description": {
-      "ru": "Ты общительный, заботливый и дипломатичный. Стремишься к гармонии.",
-      "kk": "Сен ашық, қамқор және дипломатсың. Үйлесімділікке ұмтыласың.",
-      "en": "You are sociable, caring, and diplomatic. You strive for harmony."
+      "ru": "Душа компании и заботливый хозяин. Ты создаёшь гармонию вокруг себя.",
+      "kk": "Компанияның жаны және қамқор иесі. Сен айналаңда үйлесімділік орнатасың.",
+      "en": "Soul of the company and caring host. You create harmony around you."
     },
-    "recommended_programs": {
-      "ru": ["Психология", "Педагогика", "Менеджмент", "Туризм"],
-      "kk": ["Психология", "Педагогика", "Менеджмент", "Туризм"],
-      "en": ["Psychology", "Education", "Management", "Tourism"]
+    "percentages": {"E": 94, "S": 85, "F": 90, "J": 88},
+    "strengths": {"ru": "Общительность • Забота • Организация • Дипломатия", "kk": "Ашықтық • Қамқорлық • Ұйымдастырушылық • Дипломатия", "en": "Sociability • Care • Organization • Diplomacy"},
+    "professions": {
+      "ru": ["Менеджер по персоналу", "Организатор мероприятий", "Медперсонал", "Учитель", "Менеджер отеля"],
+      "kk": ["Персонал жөніндегі менеджер", "Іс-шара ұйымдастырушы", "Медперсонал", "Мұғалім", "Қонақ үй менеджері"],
+      "en": ["HR Manager", "Event Planner", "Nurse", "Teacher", "Hotel Manager"]
     }
   },
   "ISTP": {
-    "title": {
-      "ru": "Мастер (ISTP)",
-      "kk": "Шебер (ISTP)",
-      "en": "Virtuoso (ISTP)"
-    },
+    "title": {"ru": "Мастер (ISTP)", "kk": "Шебер (ISTP)", "en": "Virtuoso (ISTP)"},
     "description": {
-      "ru": "Ты практичный экспериментатор, любишь всё чинить и разбираться в механизмах.",
-      "kk": "Сен практикалықсың, құрылғыларды жөндеуді және түсінуді ұнатасың.",
-      "en": "You are a practical experimenter who loves to fix and understand how things work."
+      "ru": "Практик и мастер на все руки. Ты разбираешься в механизмах лучше всех.",
+      "kk": "Практик және қолынан бәрі келетін шебер. Сен механизмдерді барлығынан жақсы түсінесің.",
+      "en": "Practitioner and jack of all trades. You understand mechanisms better than anyone."
     },
-    "recommended_programs": {
-      "ru": ["Инженерия", "Автоматизация", "Робототехника", "Электроника"],
-      "kk": ["Инженерия", "Автоматтандыру", "Робототехника", "Электроника"],
-      "en": ["Engineering", "Automation", "Robotics", "Electronics"]
+    "percentages": {"I": 88, "S": 92, "T": 90, "P": 85},
+    "strengths": {"ru": "Логика • Ловкость • Спокойствие • Практичность", "kk": "Логика • Шеберлік • Сабырлылық • Практикалық", "en": "Logic • Dexterity • Calmness • Practicality"},
+    "professions": {
+      "ru": ["Инженер-механик", "Пилот", "Хирург", "Программист (низкоуровневый)", "Автомеханик", "Спецназ"],
+      "kk": ["Механик-инженер", "Ұшқыш", "Хирург", "Төменгі деңгейлі бағдарламашы", "Автомеханик", "Арнайы жасақ"],
+      "en": ["Mechanical Engineer", "Pilot", "Surgeon", "Systems Programmer", "Auto Mechanic", "Special Forces"]
     }
   },
   "ISFP": {
-    "title": {
-      "ru": "Художник (ISFP)",
-      "kk": "Суретші (ISFP)",
-      "en": "Artist (ISFP)"
-    },
+    "title": {"ru": "Художник (ISFP)", "kk": "Суретші (ISFP)", "en": "Adventurer (ISFP)"},
     "description": {
-      "ru": "Ты ценишь красоту и свободу. Любишь выражать себя через творчество.",
-      "kk": "Сен сұлулық пен еркіндікті бағалайсың. Өзіңді шығармашылық арқылы білдіресің.",
-      "en": "You value beauty and freedom. You express yourself through creativity."
+      "ru": "Ты живёшь здесь и сейчас, ценишь красоту и свободу самовыражения.",
+      "kk": "Сен осы сәтте өмір сүресің, сұлулық пен өзін-өзі білдіру еркіндігін бағалайсың.",
+      "en": "You live in the moment, value beauty and freedom of expression."
     },
-    "recommended_programs": {
-      "ru": ["Дизайн", "Музыка", "Искусство", "Фотография"],
-      "kk": ["Дизайн", "Музыка", "Өнер", "Фотосурет"],
-      "en": ["Design", "Music", "Art", "Photography"]
+    "percentages": {"I": 85, "S": 88, "F": 90, "P": 92},
+    "strengths": {"ru": "Творчество • Чувствительность • Гибкость • Внимание к деталям", "kk": "Шығармашылық • Сезімталдық • Икемділік • Бөлшектерге мән беру", "en": "Creativity • Sensitivity • Flexibility • Attention to detail"},
+    "professions": {
+      "ru": ["Дизайнер интерьера", "Фотограф", "Художник", "Флорист", "Кулинар", "Тату-мастер"],
+      "kk": ["Интерьер дизайнері", "Фотограф", "Суретші", "Флорист", "Аспаз", "Тату-шебер"],
+      "en": ["Interior Designer", "Photographer", "Artist", "Florist", "Chef", "Tattoo Artist"]
     }
   },
   "ESTP": {
-    "title": {
-      "ru": "Предприниматель (ESTP)",
-      "kk": "Кәсіпкер (ESTP)",
-      "en": "Entrepreneur (ESTP)"
-    },
+    "title": {"ru": "Предприниматель (ESTP)", "kk": "Кәсіпкер (ESTP)", "en": "Entrepreneur (ESTP)"},
     "description": {
-      "ru": "Ты энергичен и решителен. Любишь действовать и рисковать.",
-      "kk": "Сен белсенді және батылсың. Іс-әрекет пен тәуекелді ұнатасың.",
-      "en": "You are energetic and decisive. You love taking action and risks."
+      "ru": "Энерджайзер и мастер импровизации. Ты живёшь действием и риском.",
+      "kk": "Энергия көзі және импровизация шебері. Сен әрекет пен тәуекелмен өмір сүресің.",
+      "en": "Energizer and improvisation master. You live by action and risk."
     },
-    "recommended_programs": {
-      "ru": ["Бизнес", "Спорт", "Маркетинг", "Менеджмент"],
-      "kk": ["Бизнес", "Спорт", "Маркетинг", "Менеджмент"],
-      "en": ["Business", "Sports", "Marketing", "Management"]
+    "percentages": {"E": 95, "S": 90, "T": 88, "P": 92},
+    "strengths": {"ru": "Решительность • Харизма • Практичность • Адаптивность", "kk": "Шешімділік • Харизма • Практикалық • Бейімделгіштік", "en": "Decisiveness • Charisma • Practicality • Adaptability"},
+    "professions": {
+      "ru": ["Трейдер", "Продавец-консультант", "Спортсмен", "Риелтор", "Промоутер", "Каскадёр"],
+      "kk": ["Трейдер", "Сатушы-консультант", "Спортшы", "Риелтор", "Промоутер", "Каскадёр"],
+      "en": ["Stock Trader", "Sales Manager", "Athlete", "Real Estate Agent", "Promoter", "Stuntman"]
     }
   },
   "ESFP": {
-    "title": {
-      "ru": "Артист (ESFP)",
-      "kk": "Артист (ESFP)",
-      "en": "Entertainer (ESFP)"
-    },
+    "title": {"ru": "Артист (ESFP)", "kk": "Артист (ESFP)", "en": "Entertainer (ESFP)"},
     "description": {
-      "ru": "Ты живёшь моментом и даришь радость другим. Любишь быть в центре внимания.",
-      "kk": "Сен сәтте өмір сүресің және басқаларға қуаныш сыйлайсың.",
-      "en": "You live in the moment and bring joy to others. You love being the center of attention."
+      "ru": "Жизнь — это вечеринка! Ты любишь быть в центре внимания и дарить радость.",
+      "kk": "Өмір — мәңгілік кеш! Сен назар ортасында болғанды және қуаныш сыйлағанды ұнатасың.",
+      "en": "Life is a party! You love being in the spotlight and bringing joy."
     },
-    "recommended_programs": {
-      "ru": ["Актёрское мастерство", "Дизайн", "Маркетинг", "Музыка"],
-      "kk": ["Актёрлік өнер", "Дизайн", "Маркетинг", "Музыка"],
-      "en": ["Acting", "Design", "Marketing", "Music"]
+    "percentages": {"E": 98, "S": 88, "F": 92, "P": 94},
+    "strengths": {"ru": "Харизма • Энергия • Обаяние • Спонтанность", "kk": "Харизма • Энергия • Сүйкімділік • Өздігінен", "en": "Charisma • Energy • Charm • Spontaneity"},
+    "professions": {
+      "ru": ["Актёр", "Ведущий мероприятий", "Танцор", "Певец", "Тур-гид", "Аниматор"],
+      "kk": ["Актер", "Іс-шара жүргізушісі", "Биші", "Әнші", "Тур-гид", "Аниматор"],
+      "en": ["Actor", "Event Host", "Dancer", "Singer", "Tour Guide", "Entertainer"]
     }
   }
 }

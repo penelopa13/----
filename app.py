@@ -523,41 +523,34 @@ def get_questions():
     questions = load_questions(lang)
     return jsonify(questions)
 
-# --- Психологический тест ---
 def calculate_mbti(answers, questions):
-    mbti_axes = {'EI': 0, 'SN': 0, 'TF': 0, 'JP': 0}
-    mapping = {
-        'extroversion': 'EI', 'introversion': 'EI',
-        'sensing': 'SN', 'intuition': 'SN',
-        'thinking': 'TF', 'feeling': 'TF',
-        'judging': 'JP', 'perceiving': 'JP'
-    }
+    if len(answers) < 25:
+        return "INTP"  # fallback
 
-    for a in answers:
-        qid = a.get('id')
-        value = int(a.get('value', 0))
-        question = next((q for q in questions if q['id'] == qid), None)
-        if not question:
-            continue
-        cat = question.get('category', '').lower()
-        axis = mapping.get(cat, None)
-        if not axis:
-            continue
+    # Фильтруем None и считаем только валидные ответы
+    def safe_sum(slice_answers):
+        valid = [x for x in slice_answers if x is not None]
+        return sum(valid) if valid else 0
 
-        if axis == 'EI':
-            mbti_axes['EI'] += (value - 3) if cat == 'extroversion' else -(value - 3)
-        elif axis == 'SN':
-            mbti_axes['SN'] += (value - 3) if cat == 'sensing' else -(value - 3)
-        elif axis == 'TF':
-            mbti_axes['TF'] += (value - 3) if cat == 'thinking' else -(value - 3)
-        elif axis == 'JP':
-            mbti_axes['JP'] += (value - 3) if cat == 'judging' else -(value - 3)
+    # Делим вопросы по осям (по 7 на первые три, 5 на последнюю — стандартно)
+    ei_score = safe_sum(answers[0:7])      # вопросы 1–7 → E/I
+    ns_score = safe_sum(answers[7:14])     # 8–14 → S/N
+    tf_score = safe_sum(answers[14:21])    # 15–21 → T/F
+    jp_score = safe_sum(answers[21:25])    # 22–25 → J/P
 
-    result = ''
-    result += 'E' if mbti_axes['EI'] >= 0 else 'I'
-    result += 'S' if mbti_axes['SN'] >= 0 else 'N'
-    result += 'T' if mbti_axes['TF'] >= 0 else 'F'
-    result += 'J' if mbti_axes['JP'] >= 0 else 'P'
+    # Средний балл по оси (если все ответы — 3, то 21 для 7 вопросов)
+    mid_ei = 3.5 * min(len([x for x in answers[0:7] if x is not None]), 7)
+    mid_ns = 3.5 * min(len([x for x in answers[7:14] if x is not None]), 7)
+    mid_tf = 3.5 * min(len([x for x in answers[14:21] if x is not None]), 7)
+    mid_jp = 3.5 * min(len([x for x in answers[21:25] if x is not None]), 5)
+
+    # Формируем тип
+    result = ""
+    result += "E" if ei_score > mid_ei else "I"
+    result += "S" if ns_score > mid_ns else "N"
+    result += "T" if tf_score > mid_tf else "F"
+    result += "J" if jp_score > mid_jp else "P"
+
     return result
 
 @app.route('/api/test/submit', methods=['POST'])
@@ -571,10 +564,14 @@ def submit_test():
 
     mbti_data = load_mbti_data()
     result_info = mbti_data.get(mbti, {})
+
+    # ← ВОТ ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ!
     rec = {
-        'title': result_info.get('title', {}).get(lang, 'Не определено'),
-        'description': result_info.get('description', {}).get(lang, 'Попробуйте снова'),
-        'programs': result_info.get('recommended_programs', {}).get(lang, [])
+        'title': (result_info.get('title') or {}).get(lang, mbti),
+        'description': (result_info.get('description') or {}).get(lang, 'Описание временно недоступно.'),
+        'strengths': (result_info.get('strengths') or {}).get(lang, '—'),
+        'percentages': result_info.get('percentages', {}),
+        'professions': (result_info.get('professions') or {}).get(lang, ['Нет рекомендаций']),
     }
 
     result = TestResult(
@@ -586,7 +583,10 @@ def submit_test():
     db.session.add(result)
     db.session.commit()
 
-    return jsonify({'mbti': mbti, 'recommendations': rec})
+    return jsonify({
+        'mbti': mbti,
+        'recommendations': rec
+    })
 
 
 # === ИНИЦИАЛИЗАЦИЯ АДМИНА ===
