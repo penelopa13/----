@@ -1,38 +1,373 @@
 {% extends "base.html" %}
-
-{% block title %}Калькулятор баллов - Талапкер{% endblock %}
+{% block title %}Калькулятор шансов поступления - Талапкер{% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="container">
-    <h1>Калькулятор баллов</h1>
-    <form class="calculator-form" id="calcForm">
-      <input type="number" name="val1" placeholder="Баллы по предмету 1" required>
-      <input type="number" name="val2" placeholder="Баллы по предмету 2" required>
-      <input type="number" name="val3" placeholder="Баллы по предмету 3" required>
-      <button type="submit" class="btn">Рассчитать</button>
-    </form>
-    <p id="calcResult"></p>
+<section class="section py-5" style="min-height: calc(100vh - var(--header-h)); background: linear-gradient(135deg, #1f2d3d, #2b8cff);">
+  <div class="container py-5">
+    <div class="text-center mb-5">
+      <h1 class="display-5 fw-bold text-white">Калькулятор шансов поступления</h1>
+      <p class="lead text-white opacity-90">ЕНТ 2025 • АРГУ им. Жубанова • Все специальности</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9 col-xl-8">
+        <div class="glass-card p-5 shadow-lg">
+          <form id="calcForm" class="needs-validation" novalidate>
+
+            <!-- Уровень обучения -->
+            <div class="mb-4">
+              <label class="form-label text-white fw-bold mb-3">Уровень обучения</label>
+              <select class="form-select form-select-lg glass-select" id="level" required>
+                <option value="" disabled selected>Выберите уровень</option>
+                <option value="bachelor">Бакалавриат</option>
+                <option value="master">Магистратура</option>
+                <option value="phd">Докторантура</option>
+              </select>
+            </div>
+
+            <!-- Факультет -->
+            <div class="mb-4">
+              <label class="form-label text-white fw-bold mb-3">Факультет</label>
+              <select class="form-select form-select-lg glass-select" id="faculty" required disabled>
+                <option value="">Сначала выберите уровень</option>
+              </select>
+            </div>
+
+            <!-- Программа -->
+            <div class="mb-4">
+              <label class="form-label text-white fw-bold mb-3">Образовательная программа</label>
+              <select class="form-select form-select-lg glass-select" id="program" required disabled>
+                <option value="">Сначала выберите факультет</option>
+              </select>
+            </div>
+
+            <!-- Проходной балл 2024 -->
+            <div class="alert alert-info border-0 rounded-4 py-3 mb-4 glass-alert" id="thresholdInfo" style="display:none;">
+              <strong class="text-white">Проходной балл 2024:</strong><br>
+              <span class="text-success fw-bold">Грант:</span> <span id="grantThreshold" class="fw-bold">—</span> баллов | 
+              <span class="text-warning fw-bold">Контракт:</span> <span id="contractThreshold" class="fw-bold">—</span> баллов
+            </div>
+
+            <!-- Ввод баллов -->
+            <div id="scoresSection" style="display:none;">
+              <hr class="border-white opacity-25 my-5">
+              <h5 class="text-white text-center mb-4 fw-bold">Введите ваши баллы ЕНТ</h5>
+              <div class="row g-4" id="scoreInputs"></div>
+
+              <div class="text-center mt-5">
+                <button type="submit" class="btn btn-orange btn-lg px-5 shadow-lg">
+                  Рассчитать шансы
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Результат -->
+          <div id="resultSection" class="text-center mt-5 pt-4" style="display:none;">
+            <h2 class="text-white mb-4">Ваш результат</h2>
+            <h1 class="display-3 fw-bold text-warning" id="totalScore">0</h1>
+            <div id="chanceBadge" class="d-inline-block px-5 py-3 rounded-pill fs-3 fw-bold mb-4"></div>
+            <p class="lead text-white opacity-90" id="chanceText"></p>
+            <button class="btn btn-outline-light mt-4 px-5" onclick="location.reload()">Новый расчёт</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.getElementById('calcForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const vals = [
-    parseFloat(e.target.val1.value) || 0,
-    parseFloat(e.target.val2.value) || 0,
-    parseFloat(e.target.val3.value) || 0
-  ];
-  const res = await fetch('/api/calc', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ vals })
-  });
-  const data = await res.json();
-  document.getElementById('calcResult').textContent = "Общий балл: " + data.total;
+// ==================== ВСЕ ДАННЫЕ ====================
+const programsData = {
+  bachelor: {
+    "Факультет педагогики и менеджмента в образовании": {
+      "6В01102 Психология и менеджмент образования": { grant: 98, contract: 75, subjects: ["Математика", "Биология"] },
+      "6В01201 Дошкольное обучение и воспитание": { grant: 85, contract: 65, subjects: ["Казахский язык", "Русский язык"] },
+      "6В01301 Педагогика и методика начального обучения": { grant: 90, contract: 70, subjects: ["Математика", "Казахский язык"] },
+      "6В01902 Специальная педагогика": { grant: 92, contract: 68, subjects: ["Биология", "География"] },
+      "6В03101 Психология": { grant: 105, contract: 80, subjects: ["Биология", "География"] },
+      "6В03102 Клиническая психология": { grant: 110, contract: 85, subjects: ["Биология", "Химия"] }
+    },
+    "Исторический факультет": {
+      "6В01506 География": { grant: 88, contract: 65, subjects: ["География", "История Казахстана"] },
+      "6В01603 История и обществознание": { grant: 95, contract: 70, subjects: ["Всемирная история", "История Казахстана"] },
+      "6В02201 История": { grant: 95, contract: 70, subjects: ["Всемирная история", "История Казахстана"] },
+      "6В05203 Ландшафтное проектирование": { grant: 90, contract: 68, subjects: ["География", "Математика"] },
+      "6В11101 Туризм": { grant: 92, contract: 70, subjects: ["География", "Иностранный язык"] }
+    },
+    "Профессионально-творческий факультет": {
+      "6В01401 Музыкальное образование": { grant: 90, contract: 68, subjects: ["Музыка", "Казахский язык"] },
+      "6В01404 Физическая культура и спорт": { grant: 85, contract: 65, subjects: ["Биология", "Физическая подготовка"] },
+      "6В01406 Художественное образование": { grant: 92, contract: 70, subjects: ["Рисунок", "Композиция"] },
+      "6В02101 Хореография": { grant: 88, contract: 66, subjects: ["Танец", "Казахский язык"] },
+      "6В02102 Дизайн": { grant: 100, contract: 75, subjects: ["Рисунок", "Композиция"] },
+      "6В07207 Технология и конструирование изделий легкой промышленности": { grant: 90, contract: 68, subjects: ["Рисунок", "Черчение"] },
+      "6В11102 Культурно-досуговая работа": { grant: 88, contract: 66, subjects: ["История", "Человек. Общество. Право"] },
+      "6В01407 Трудовое обучение и основы предпринимательства": { grant: 87, contract: 65, subjects: ["Математика", "Физика"] }
+    },
+    "Технический факультет": {
+      "6В07106 Электроэнергетика": { grant: 95, contract: 70, subjects: ["Математика", "Физика"] },
+      "6В07107 Автоматизация и управление": { grant: 100, contract: 75, subjects: ["Математика", "Физика"] },
+      "6В07201 Горное дело": { grant: 92, contract: 68, subjects: ["Математика", "Физика"] },
+      "6В07202 Нефтегазовое дело": { grant: 105, contract: 80, subjects: ["Математика", "Физика"] },
+      "6В07203 Металлургия": { grant: 94, contract: 70, subjects: ["Химия", "Физика"] },
+      "6В07301 Строительство": { grant: 98, contract: 72, subjects: ["Математика", "Физика"] },
+      "6В11301 Организация перевозок, движения и эксплуатация транспорта": { grant: 90, contract: 68, subjects: ["Математика", "Физика"] },
+      "6В07101 Транспорт, транспортная техника и технологии": { grant: 93, contract: 70, subjects: ["Математика", "Физика"] }
+    },
+    "Факультет естествознания": {
+      "6В01513 Биология": { grant: 90, contract: 68, subjects: ["Биология", "Химия"] },
+      "6В05101 Биология": { grant: 92, contract: 68, subjects: ["Биология", "Химия"] },
+      "6В05102 Биотехнология": { grant: 98, contract: 74, subjects: ["Биология", "Химия"] },
+      "6В05201 Экология": { grant: 88, contract: 65, subjects: ["География", "Биология"] },
+      "6В05302 Химия": { grant: 90, contract: 67, subjects: ["Химия", "Биология"] },
+      "6В01514 Химия": { grant: 89, contract: 66, subjects: ["Химия", "Математика"] },
+      "6В07206 Технология продовольственных продуктов": { grant: 90, contract: 68, subjects: ["Химия", "Биология"] }
+    },
+    "Физико-математический факультет": {
+      "6В01501 Математика": { grant: 105, contract: 80, subjects: ["Математика", "Физика"] },
+      "6В05301 Физика": { grant: 102, contract: 78, subjects: ["Физика", "Математика"] },
+      "6В05401 Математика": { grant: 108, contract: 82, subjects: ["Математика", "Физика"] },
+      "6В06103 Вычислительная техника и программное обеспечение": { grant: 110, contract: 85, subjects: ["Математика", "Физика"] },
+      "6В01503 Информатика": { grant: 108, contract: 83, subjects: ["Математика", "Физика"] },
+      "6В06105 Компьютерная инженерия": { grant: 112, contract: 88, subjects: ["Математика", "Физика"] },
+      "6В06102 IT-медицина": { grant: 115, contract: 90, subjects: ["Математика", "Физика"] },
+      "6B01512 Физика": { grant: 100, contract: 76, subjects: ["Физика", "Математика"] }
+    },
+    "Филологический факультет": {
+      "6В01701 Казахский язык и литература": { grant: 110, contract: 85, subjects: ["Казахский язык", "Казахская литература"] },
+      "6В01702 Русский язык и литература": { grant: 100, contract: 78, subjects: ["Русский язык", "Русская литература"] },
+      "6В02304 Филология: казахская филология": { grant: 112, contract: 87, subjects: ["Казахский язык", "Казахская литература"] }
+    },
+    "Факультет иностранных языков": {
+      "6В01706 Иностранный язык: два иностранных языка": { grant: 118, contract: 92, subjects: ["Иностранный язык", "Всемирная история"] },
+      "6В02302 Переводческое дело": { grant: 115, contract: 90, subjects: ["Иностранный язык", "Казахский язык"] },
+      "6В02303 Иностранная филология": { grant: 120, contract: 94, subjects: ["Иностранный язык", "История Казахстана"] },
+      "6В01708 Английский язык": { grant: 115, contract: 88, subjects: ["Иностранный язык", "История Казахстана"] }
+    },
+    "Факультет экономики и права": {
+      "6В04101 Экономика": { grant: 105, contract: 80, subjects: ["Математика", "География"] },
+      "6В04102 Менеджмент": { grant: 108, contract: 82, subjects: ["Математика", "География"] },
+      "6В04103 Учет и аудит": { grant: 102, contract: 78, subjects: ["Математика", "География"] },
+      "6В04104 Финансы": { grant: 110, contract: 85, subjects: ["Математика", "География"] },
+      "6В04105 Государственное и местное управление": { grant: 100, contract: 78, subjects: ["Математика", "География"] },
+      "6В04201 Право": { grant: 115, contract: 90, subjects: ["История", "Человек. Общество. Право"] }
+    },
+    "Heriot-Watt Campus": {
+      "6В06107 Компьютерная инженерия": { grant: 120, contract: 95, subjects: ["Математика", "Физика"] },
+      "6В07108 Электроэнергетика": { grant: 118, contract: 93, subjects: ["Математика", "Физика"] },
+      "6В07209 Нефтяная инженерия и энергоменеджмент": { grant: 125, contract: 100, subjects: ["Математика", "Физика"] }
+    }
+  },
+
+  // МАГИСТРАТУРА и ДОКТОРАНТУРА — ждём от тебя, просто вставишь сюда по той же структуре
+  master: {},
+  phd: {}
+};
+
+const facultiesByLevel = {
+  bachelor: Object.keys(programsData.bachelor),
+  master: [],
+  phd: []
+};
+
+// ==================== ЛОГИКА ====================
+document.getElementById('level').addEventListener('change', function() {
+  const level = this.value;
+  const facultySelect = document.getElementById('faculty');
+  const programSelect = document.getElementById('program');
+
+  facultySelect.innerHTML = '<option value="">Выберите факультет</option>';
+  programSelect.innerHTML = '<option value="">Сначала выберите факультет</option>';
+  facultySelect.disabled = !level;
+  programSelect.disabled = true;
+  hideAll();
+
+  facultiesByLevel[level]?.forEach(f => facultySelect.add(new Option(f, f)));
 });
+
+document.getElementById('faculty').addEventListener('change', function() {
+  const level = document.getElementById('level').value;
+  const faculty = this.value;
+  const programSelect = document.getElementById('program');
+
+  programSelect.innerHTML = '<option value="">Выберите программу</option>';
+  programSelect.disabled = false;
+  hideAll();
+
+  const programs = programsData[level]?.[faculty];
+  if (programs) Object.keys(programs).forEach(p => programSelect.add(new Option(p, p)));
+});
+
+document.getElementById('program').addEventListener('change', function() {
+  const level = document.getElementById('level').value;
+  const faculty = document.getElementById('faculty').value;
+  const program = this.value;
+  hideAll();
+
+  const data = programsData[level]?.[faculty]?.[program];
+  if (!data) return;
+
+  document.getElementById('grantThreshold').textContent = data.grant;
+  document.getElementById('contractThreshold').textContent = data.contract;
+  document.getElementById('thresholdInfo').style.display = 'block';
+
+  const container = document.getElementById('scoreInputs');
+  container.innerHTML = '';
+
+  const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
+  const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
+
+  // Профильные — 0–50
+  profileSubjects.forEach(sub => {
+    container.innerHTML += `
+      <div class="col-lg-6">
+        <label class="form-label text-white opacity-90 fw-500">${sub}</label>
+        <input type="number" class="form-control form-control-lg text-center score-input" 
+               placeholder="0–50" min="0" max="50" required>
+      </div>`;
+  });
+
+  // Базовые предметы
+  baseSubjects.forEach(sub => {
+    let max = sub === "История Казахстана" ? 20 : 10;
+    let placeholder = sub === "История Казахстана" ? "0–20" : "0–10";
+
+    container.innerHTML += `
+      <div class="col-lg-6">
+        <label class="form-label text-white opacity-90 fw-500">${sub}</label>
+        <input type="number" class="form-control form-control-lg text-center score-input" 
+               placeholder="${placeholder}" min="0" max="${max}" required>
+      </div>`;
+  });
+
+  document.getElementById('scoresSection').style.display = 'block';
+});
+
+document.getElementById('calcForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  let total = 0;
+  let hasError = false;
+
+  document.querySelectorAll('.score-input').forEach(input => {
+    const val = parseInt(input.value) || 0;
+    const max = parseInt(input.max);
+
+    if (val > max || val < 0) {
+      input.classList.add('is-invalid');
+      hasError = true;
+    } else {
+      input.classList.remove('is-invalid');
+      total += val;
+    }
+  });
+
+  if (hasError) {
+    alert("Ошибка! Нельзя вводить больше максимального балла!");
+    return;
+  }
+
+  const grant = parseInt(document.getElementById('grantThreshold').textContent) || 0;
+  const contract = parseInt(document.getElementById('contractThreshold').textContent) || 0;
+
+  document.getElementById('totalScore').textContent = total;
+
+  const badge = document.getElementById('chanceBadge');
+  const text = document.getElementById('chanceText');
+
+  if (total >= grant && grant > 0) {
+    badge.textContent = "ГРАНТ ПОЧТИ В КАРМАНЕ!";
+    badge.className = "bg-success text-white rounded-pill fs-3 px-5 py-3";
+    text.textContent = "Поздравляю! Вы с высокой вероятностью получаете грант!";
+  } else if (total >= contract) {
+    badge.textContent = "ПРОХОДИТЕ НА КОНТРАКТ";
+    badge.className = "bg-warning text-dark rounded-pill fs-3 px-5 py-3";
+    text.textContent = "Вы проходите на платное. При недоборе — возможен грант!";
+  } else {
+    badge.textContent = "ШАНСЫ НИЗКИЕ";
+    badge.className = "bg-danger text-white rounded-pill fs-3 px-5 py-3";
+    text.textContent = `Нужно минимум ${contract} баллов для контракта. Подтяните предметы!`;
+  }
+
+  document.getElementById('resultSection').style.display = 'block';
+  document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
+});
+
+function hideAll() {
+  document.getElementById('thresholdInfo').style.display = 'none';
+  document.getElementById('scoresSection').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'none';
+}
 </script>
+
+<!-- СТИЛИ — 100% как у тебя в base.html и style.css -->
+<style>
+.glass-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.glass-select, .form-control {
+  {
+  background: rgba(255,255,255,0.15) !important;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  color: white !important;
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.glass-select:focus, .form-control:focus {
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 0.25rem rgba(255,179,15,0.3) !important;
+  background: rgba(255,255,255,0.22) !important;
+}
+
+.glass-alert {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-orange {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-orange:hover {
+  background: #e09e0c;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(255,179,15,0.4);
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+  background-image: none !important;
+}
+
+/* Стрелочка у селектов как у тебя в шапке */
+.glass-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16'%3e%3cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+}
+
+option {
+  background: #1f2d3d !important;
+  color: white !important;
+}
+</style>
 {% endblock %}
