@@ -15,194 +15,214 @@
 <section id="chat-section" class="section container">
   <h2>{{ t('Чат с консультантом') }}</h2>
 
-  <!-- Быстрые вопросы — в твоём стиле -->
-  <div id="quick-questions" style="margin: 40px auto 50px; text-align: center;"></div>
+  <!-- НОВЫЙ ДВУХКОЛОНОЧНЫЙ ЧАТ -->
+  <div class="chat-layout">
+    
+    <!-- ЛЕВАЯ ПАНЕЛЬ — быстрые вопросы -->
+<div class="chat-sidebar" id="chat-sidebar"> <!-- убран класс active -->
+     <!-- ВОТ ЭТА СТРОКА ДОЛЖНА БЫТЬ ИМЕННО ТАКОЙ -->
+<div class="sidebar-header">
+  <i class="fas fa-bolt"></i> {{t('Частые вопросы')}}
+  <button class="sidebar-close" id="sidebar-close">×</button>  <!-- ← ЭТО ОБЯЗАТЕЛЬНО! -->
+</div>
+      <div class="sidebar-content" id="quick-questions"></div>
+    </div>
 
-  <div id="chat-box" class="chat-box">
-    <div class="messages" id="messages">
-      <!-- Приветственное сообщение -->
-      <div class="message bot" style="background:linear-gradient(135deg,var(--secondary-color),var(--primary-color)); color:#fff; border-radius:18px; max-width:90%; margin:10px auto; text-align:center; padding:18px; font-size:1.05rem; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
-        {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
-        {{ t('Задайте любой вопрос или выберите один из частых') }}
+    <!-- ПРАВАЯ ПАНЕЛЬ — сам чат -->
+    <div class="chat-main">
+      <div id="chat-box" class="chat-box">
+        <div class="messages" id="messages">
+          <!-- Приветственное сообщение -->
+          <div class="message bot">
+            <div class="bubble" style="background:linear-gradient(135deg,var(--secondary-color),var(--primary-color)); color:#fff; border-radius:18px; padding:18px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
+              {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
+              {{ t('Задайте любой вопрос или выберите один из частых') }}
+            </div>
+          </div>
+        </div>
+          <!-- КРАСИВАЯ СТРЕЛКА — ОДНА, СНАРУЖИ, С УНИКАЛЬНЫМ ID -->
+  <button class="sidebar-toggle" id="sidebar-toggle">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+        <!-- Индикатор "печатает" -->
+        <div id="typing-indicator" style="display:none;" class="message bot">
+          <div class="bubble typing"><span></span><span></span><span></span></div>
+        </div>
+
+        <form id="chat-form" class="chat-form">
+          <input type="text" id="user-input" placeholder="{{ t('Сұрағыңызды жазыңыз...') }}" autocomplete="off">
+          <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
       </div>
     </div>
 
-    <form id="chat-form" class="chat-form">
-      <input type="text" id="user-input" placeholder="{{ t('Введите ваш вопрос...') }}" required autocomplete="off">
-      <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
-        <i class="fas fa-microphone"></i>
-      </button>
-      <button type="submit">{{ t('Отправить') }}</button>
-    </form>
+  
   </div>
 </section>
 {% endblock %}
 
-{% block styles %}
-<style>
-  #quick-questions {
-    display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
-    max-width: 1000px; margin: 40px auto 50px; padding: 0 20px;
-  }
-  .quick-btn {
-    background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
-    border: 1.8px solid rgba(255,179,15,0.4); color: var(--accent-color);
-    padding: 13px 22px; border-radius: 50px; font-size: 0.95rem; font-weight: 600;
-    cursor: pointer; transition: all 0.35s ease; box-shadow: 0 4px 15px rgba(255,179,15,0.15);
-    position: relative; overflow: hidden; z-index: 1;
-  }
-  .quick-btn::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: var(--accent-color); transform: translateX(-100%); transition: 0.35s; z-index: -1;
-  }
-  .quick-btn:hover::before { transform: translateX(0); }
-  .quick-btn:hover { color: #fff; border-color: var(--accent-color); transform: translateY(-3px); }
-</style>
-{% endblock %}
-
 {% block scripts %}
+
 <script>
-  const lang = "{{ session.get('lang', 'ru') }}";
-  const userInput = document.getElementById('user-input');
-  const messages = document.getElementById('messages');
+// === ВСЁ В ОДНОМ СКРИПТЕ — РАБОТАЕТ НА 100% ===
 
-  // === 1. Загрузка истории с сервера ===
-  async function loadChatHistory() {
-    try {
-      const res = await fetch('/api/chat/history');
-      if (!res.ok) return;
-      const history = await res.json();
-      
-      // Очищаем только стартовое приветствие, если есть реальная история
-      if (history.length > 0) {
-        messages.innerHTML = '';
-      }
+const lang = "{{ session.get('lang', 'ru') }}";
+const userInput = document.getElementById('user-input');
+const messages = document.getElementById('messages');
+const sidebar = document.getElementById('chat-sidebar');
+const toggleBtn = document.getElementById('sidebar-toggle');
+const closeBtn = document.getElementById('sidebar-close');
+const typingIndicator = document.getElementById('typing-indicator');
 
-      history.forEach(entry => {
-        addMessage(entry.message, 'user');
-        addMessage(entry.response, 'bot');
-      });
-    } catch (err) {
-      console.error("Не удалось загрузить историю чата");
-    }
+// === 1. Быстрые вопросы ===
+const quickQuestions = {
+  ru: ["Как подать документы?","Какие нужны документы?","Когда заканчивается приём?","Как получить грант?","Как узнать проходной балл?","Есть ли общежитие?","Какая стоимость обучения?","Какие есть специальности?"],
+  kk: ["Құжаттарды қалай тапсыруға болады?","Қандай құжаттар қажет?","Қабылдау қашан аяқталады?","Грантты қалай алуға болады?","Өтпелі баллды қалай білуге болады?","Жатақхана бар ма?","Оқу ақысы қанша?","Қандай мамандықтар бар?"],
+  en: ["How to apply?","What documents are required?","When does admission end?","How to get a scholarship?","How to check the passing score?","Is there a dormitory?","How much is tuition?","What programs are available?"]
+};
+
+document.getElementById('quick-questions').innerHTML = '';
+(quickQuestions[lang] || quickQuestions.ru).forEach(q => {
+  const btn = document.createElement('button');
+  btn.className = 'quick-btn';
+  btn.textContent = q;
+  btn.onclick = () => sendMessage(q);
+  document.getElementById('quick-questions').appendChild(btn);
+});
+
+// === 2. Точные ответы (преопределённые) ===
+const predefined = [
+  { keys: ["сроки", "қашан"], ru: "СРОКИ ПРИЁМА 2025–2026:\n• Бакалавриат: 1 июня – 25 июля\n• Магистратура: 1 июня – 15 июля\n• Докторантура: 1 июня – 10 июля" },
+  { keys: ["грант"], ru: "Да, есть государственные гранты. Результаты — на enbek.kz" },
+  { keys: ["стоимость", "ақысы"], ru: "Бакалавриат: 850–1 500 тыс. ₸/год\nМагистратура: от 1 100 тыс. ₸" },
+  { keys: ["общежитие", "жатақхана"], ru: "Да, есть. Стоимость: 15–25 тыс. ₸/мес." }
+];
+
+function getPredefinedAnswer(text) {
+  const lower = text.toLowerCase();
+  for (const item of predefined) {
+    if (item.keys.some(k => lower.includes(k))) return item.ru;
+  }
+  return null;
+}
+
+// === 3. Добавление сообщения ===
+function addMessage(text, type = "bot") {
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  if (type === "bot") {
+    div.innerHTML = marked.parse(text.replace(/\n/g, '  \n'));
+  } else {
+    div.textContent = text;
+  }
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// === 4. Отправка сообщения (главная функция) ===
+async function sendMessage(text) {
+  if (!text.trim()) return;
+
+  addMessage(text, "user");
+  userInput.value = "";
+
+  const predefined = getPredefinedAnswer(text);
+  if (predefined) {
+    setTimeout(() => addMessage(predefined, "bot"), 600);
+    return;
   }
 
-  // === 2. Быстрые вопросы ===
-  const quickQuestions = {
-    ru: ["Как подать документы?","Какие нужны документы?","Когда заканчивается приём?","Как получить грант?","Как узнать проходной балл?","Есть ли общежитие?","Какая стоимость обучения?","Какие есть специальности?"],
-    kk: ["Құжаттарды қалай тапсыруға болады?","Қандай құжаттар қажет?","Қабылдау қашан аяқталады?","Грантты қалай алуға болады?","Өтпелі баллды қалай білуге болады?","Жатақхана бар ма?","Оқу ақысы қанша?","Қандай мамандықтар бар?"],
-    en: ["How to apply?","What documents are required?","When does admission end?","How to get a scholarship?","How to check the passing score?","Is there a dormitory?","How much is tuition?","What programs are available?"]
+  if (typingIndicator) typingIndicator.style.display = "flex";
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    if (typingIndicator) typingIndicator.style.display = "none";
+    addMessage(data.reply, 'bot');
+  } catch (err) {
+    if (typingIndicator) typingIndicator.style.display = "none";
+    addMessage("Ошибка соединения", 'bot');
+  }
+}
+
+// === 5. Форма ===
+document.getElementById('chat-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const text = userInput.value.trim();
+  if (text) sendMessage(text);
+});
+
+// === 6. Голосовой ввод ===
+let recognition, isRecording = false;
+if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = lang === 'kk' ? 'kk-KZ' : lang === 'en' ? 'en-US' : 'ru-RU';
+  recognition.interimResults = true;
+
+  recognition.onresult = e => {
+    userInput.value = Array.from(e.results).map(r => r[0].transcript).join('');
+  };
+  recognition.onend = () => {
+    document.getElementById('voice-btn').classList.remove('recording');
+    isRecording = false;
   };
 
-  document.getElementById('quick-questions').innerHTML = '';
-  (quickQuestions[lang] || quickQuestions.ru).forEach(q => {
-    const btn = document.createElement('button');
-    btn.className = 'quick-btn';
-    btn.textContent = q;
-    btn.onclick = () => sendMessage(q);
-    document.getElementById('quick-questions').appendChild(btn);
-  });
-
-  // === 3. Точные ответы ===
-  const predefined = [
-    { keys: ["сроки", "қашан"], ru: "СРОКИ ПРИЁМА 2025–2026:\n• Бакалавриат: 1 июня – 25 июля\n• Магистратура: 1 июня – 15 июля\n• Докторантура: 1 июня – 10 июля" },
-    { keys: ["грант"], ru: "Да, есть государственные гранты. Результаты — на enbek.kz" },
-    { keys: ["стоимость", "ақысы"], ru: "Бакалавриат: 850–1 500 тыс. ₸/год\nМагистратура: от 1 100 тыс. ₸" },
-    { keys: ["общежитие", "жатақхана"], ru: "Да, есть. Стоимость: 15–25 тыс. ₸/мес." }
-  ];
-
-  function getPredefinedAnswer(text) {
-    const lower = text.toLowerCase();
-    for (const item of predefined) {
-      if (item.keys.some(k => lower.includes(k))) return item.ru;
-    }
-    return null;
-  }
-
-  // === 4. Добавление сообщения ===
-  function addMessage(text, type = "bot") {
-    const div = document.createElement('div');
-    div.className = `message ${type}`;
-    if (type === "bot") {
-      div.innerHTML = marked.parse(text.replace(/\n/g, '  \n'));
+  document.getElementById('voice-btn').addEventListener('click', () => {
+    if (isRecording) {
+      recognition.stop();
     } else {
-      div.textContent = text;
+      recognition.start();
+      document.getElementById('voice-btn').classList.add('recording');
+      isRecording = true;
     }
-    messages.appendChild(div);
-    messages.scrollTop = messages.scrollHeight;
-  }
-
-  // === 5. Отправка сообщения ===
-  async function sendMessage(text) {
-    if (!text.trim()) return;
-    addMessage(text, "user");
-    userInput.value = "";
-
-    const predefined = getPredefinedAnswer(text);
-    if (predefined) {
-      setTimeout(() => addMessage(predefined, "bot"), 600);
-      return;
-    }
-
-    const typing = document.createElement('div');
-    typing.className = 'message bot';
-    typing.textContent = 'Пишу ответ...';
-    typing.style.fontStyle = 'italic';
-    typing.style.color = '#888';
-    messages.appendChild(typing);
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
-      });
-      const data = await res.json();
-      typing.remove();
-      addMessage(data.reply, 'bot');
-    } catch (err) {
-      typing.remove();
-      addMessage("Ошибка соединения", 'bot');
-    }
-  }
-
-  // === 6. Форма ===
-  document.getElementById('chat-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const text = userInput.value.trim();
-    if (text) sendMessage(text);
   });
+} else {
+  document.getElementById('voice-btn').style.display = 'none';
+}
 
-  // === 7. Голосовой ввод (твой код) ===
-  let recognition, isRecording = false;
-  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    recognition = new SR();
-    recognition.lang = lang === 'kk' ? 'kk-KZ' : lang === 'en' ? 'en-US' : 'ru-RU';
-    recognition.interimResults = true;
-
-    recognition.onresult = e => {
-      userInput.value = Array.from(e.results).map(r => r[0].transcript).join('');
-    };
-    recognition.onend = () => {
-      document.getElementById('voice-btn').classList.remove('recording');
-      isRecording = false;
-    };
-
-    document.getElementById('voice-btn').addEventListener('click', () => {
-      if (isRecording) {
-        recognition.stop();
-      } else {
-        recognition.start();
-        document.getElementById('voice-btn').classList.add('recording');
-        isRecording = true;
-      }
+// === 7. Загрузка истории ===
+async function loadChatHistory() {
+  try {
+    const res = await fetch('/api/chat/history');
+    if (!res.ok) return;
+    const history = await res.json();
+    if (history.length > 0) messages.innerHTML = '';
+    history.forEach(entry => {
+      addMessage(entry.message, 'user');
+      addMessage(entry.response, 'bot');
     });
-  } else {
-    document.getElementById('voice-btn').style.display = 'none';
+  } catch (err) {
+    console.error("Не удалось загрузить историю");
   }
+}
+document.addEventListener('DOMContentLoaded', loadChatHistory);
 
-  // === ЗАГРУЗКА ИСТОРИИ ПРИ СТАРТЕ ===
-  document.addEventListener('DOMContentLoaded', loadChatHistory);
+// === 8. КРАСИВОЕ УПРАВЛЕНИЕ САЙДБАРОМ ===
+function openSidebar() { sidebar.classList.add('active'); }
+function closeSidebar() { sidebar.classList.remove('active'); }
+
+toggleBtn?.addEventListener('click', e => { e.stopPropagation(); openSidebar(); });
+closeBtn?.addEventListener('click', e => { e.stopPropagation(); closeSidebar(); });
+// Закрытие при клике вне сайдбара
+document.querySelector('.chat-layout')?.addEventListener('click', e => {
+  if (!e.target.closest('.chat-sidebar') && sidebar.classList.contains('active')) {
+    closeSidebar();
+  }
+});
+
+// Закрытие по клавише Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
+});
+
 </script>
+
 {% endblock %}
