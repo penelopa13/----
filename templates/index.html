@@ -63,7 +63,6 @@
   </div>
 </section>
 {% endblock %}
-
 {% block scripts %}
 
 <script>
@@ -76,24 +75,50 @@ const sidebar = document.getElementById('chat-sidebar');
 const toggleBtn = document.getElementById('sidebar-toggle');
 const closeBtn = document.getElementById('sidebar-close');
 const typingIndicator = document.getElementById('typing-indicator');
+const quickBox = document.getElementById('quick-questions');  // ← добавил
 
-// === 1. Быстрые вопросы ===
-const quickQuestions = {
-  ru: ["Как подать документы?","Какие нужны документы?","Когда заканчивается приём?","Как получить грант?","Как узнать проходной балл?","Есть ли общежитие?","Какая стоимость обучения?","Какие есть специальности?"],
-  kk: ["Құжаттарды қалай тапсыруға болады?","Қандай құжаттар қажет?","Қабылдау қашан аяқталады?","Грантты қалай алуға болады?","Өтпелі баллды қалай білуге болады?","Жатақхана бар ма?","Оқу ақысы қанша?","Қандай мамандықтар бар?"],
-  en: ["How to apply?","What documents are required?","When does admission end?","How to get a scholarship?","How to check the passing score?","Is there a dormitory?","How much is tuition?","What programs are available?"]
-};
+// === 1. Загрузка быстрых вопросов (ОБНОВЛЕНА) ===
+async function loadQuickQuestions() {
+  try {
+    const res = await fetch('/api/chat/options');
+    const data = await res.json();
+    quickBox.innerHTML = "";  // очищаем
 
-document.getElementById('quick-questions').innerHTML = '';
-(quickQuestions[lang] || quickQuestions.ru).forEach(q => {
-  const btn = document.createElement('button');
-  btn.className = 'quick-btn';
-  btn.textContent = q;
-  btn.onclick = () => sendMessage(q);
-  document.getElementById('quick-questions').appendChild(btn);
-});
+    data.options.forEach(q => {
+      const btn = document.createElement('button');
+      btn.className = 'quick-btn';
 
-// === 2. Точные ответы (преопределённые) ===
+      // Специально выделяем кнопку "Назад"
+      if (q.includes('Назад') || q.includes('Артқа') || q.includes('Back') || q.includes('назад')) {
+        btn.classList.add('back');
+        btn.innerHTML = q;  // с иконкой, если будет
+      } else {
+        btn.textContent = q;
+      }
+
+      btn.onclick = () => sendMessage(q);
+      quickBox.appendChild(btn);
+    });
+
+    // Кнопка "Задать свой вопрос" — оставляем как было
+    const ask = document.createElement('div');
+    ask.className = 'ask-own';
+    ask.innerHTML = `
+      <p style="opacity:0.7; margin-bottom:6px;">${t("Не нашли нужный вопрос?")}</p>
+      <button class="quick-btn special">${t("Задать свой вопрос")}</button>
+    `;
+    ask.querySelector("button").onclick = () => userInput.focus();
+    quickBox.appendChild(ask);
+
+  } catch (err) {
+    console.error("Ошибка загрузки опций:", err);
+  }
+}
+
+// Первый вызов — при загрузке страницы
+loadQuickQuestions();
+
+// === 2. Точные ответы (оставил как было) ===
 const predefined = [
   { keys: ["сроки", "қашан"], ru: "СРОКИ ПРИЁМА 2025–2026:\n• Бакалавриат: 1 июня – 25 июля\n• Магистратура: 1 июня – 15 июля\n• Докторантура: 1 июня – 10 июля" },
   { keys: ["грант"], ru: "Да, есть государственные гранты. Результаты — на enbek.kz" },
@@ -122,7 +147,7 @@ function addMessage(text, type = "bot") {
   messages.scrollTop = messages.scrollHeight;
 }
 
-// === 4. Отправка сообщения (главная функция) ===
+// === 4. Отправка сообщения (ГЛАВНОЕ ИСПРАВЛЕНИЕ) ===
 async function sendMessage(text) {
   if (!text.trim()) return;
 
@@ -131,11 +156,14 @@ async function sendMessage(text) {
 
   const predefined = getPredefinedAnswer(text);
   if (predefined) {
-    setTimeout(() => addMessage(predefined, "bot"), 600);
+    setTimeout(() => {
+      addMessage(predefined, "bot");
+      loadQuickQuestions();  // ← обновляем кнопки и после предопределённого ответа
+    }, 600);
     return;
   }
 
-  if (typingIndicator) typingIndicator.style.display = "flex";
+  typingIndicator.style.display = "flex";
 
   try {
     const res = await fetch('/api/chat', {
@@ -144,10 +172,15 @@ async function sendMessage(text) {
       body: JSON.stringify({ message: text })
     });
     const data = await res.json();
-    if (typingIndicator) typingIndicator.style.display = "none";
+
+    typingIndicator.style.display = "none";
     addMessage(data.reply, 'bot');
+
+    // КЛЮЧЕВАЯ СТРОКА: обновляем кнопки после КАЖДОГО ответа от сервера
+    loadQuickQuestions();
+
   } catch (err) {
-    if (typingIndicator) typingIndicator.style.display = "none";
+    typingIndicator.style.display = "none";
     addMessage("Ошибка соединения", 'bot');
   }
 }
@@ -159,7 +192,7 @@ document.getElementById('chat-form').addEventListener('submit', e => {
   if (text) sendMessage(text);
 });
 
-// === 6. Голосовой ввод ===
+// === 6. Голосовой ввод (без изменений) ===
 let recognition, isRecording = false;
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -188,7 +221,7 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   document.getElementById('voice-btn').style.display = 'none';
 }
 
-// === 7. Загрузка истории ===
+// === 7. Загрузка истории (без изменений) ===
 async function loadChatHistory() {
   try {
     const res = await fetch('/api/chat/history');
@@ -205,20 +238,19 @@ async function loadChatHistory() {
 }
 document.addEventListener('DOMContentLoaded', loadChatHistory);
 
-// === 8. КРАСИВОЕ УПРАВЛЕНИЕ САЙДБАРОМ ===
+// === 8. Управление сайдбаром (без изменений) ===
 function openSidebar() { sidebar.classList.add('active'); }
 function closeSidebar() { sidebar.classList.remove('active'); }
 
 toggleBtn?.addEventListener('click', e => { e.stopPropagation(); openSidebar(); });
 closeBtn?.addEventListener('click', e => { e.stopPropagation(); closeSidebar(); });
-// Закрытие при клике вне сайдбара
+
 document.querySelector('.chat-layout')?.addEventListener('click', e => {
   if (!e.target.closest('.chat-sidebar') && sidebar.classList.contains('active')) {
     closeSidebar();
   }
 });
 
-// Закрытие по клавише Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
 });

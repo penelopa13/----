@@ -2,6 +2,7 @@ import datetime
 import keyword
 import os
 import json
+import time
 import re
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, request as flask_request
 from flask_sqlalchemy import SQLAlchemy
@@ -203,8 +204,11 @@ def set_language(lang):
     return redirect(flask_request.referrer or url_for('home'))
 
 # --- Routes ---
+# === В home() добавь инициализацию при заходе ===
 @app.route('/')
 def home():
+    if current_user.is_authenticated:
+        init_chat_state()  # ← вот это важно!
     return render_template('index.html')
 
 @app.route('/university')
@@ -270,75 +274,159 @@ def detect_language(text):
         return 'en'
     return 'ru'
 
+
+DIALOG_SCENARIOS = {
+    "level_select": {
+        "ru": ["Бакалавриат", "Магистратура", "Докторантура"],
+        "kk": ["Бакалавриат", "Магистратура", "Докторантура"],
+        "en": ["Bachelor", "Master", "Doctorate"]
+    },
+    "bachelor_menu": {
+        "ru": ["После 11 класса", "После колледжа", "Документы", "Стоимость", "Сроки", "Общежитие"],
+        "kk": ["11 сыныптан кейін", "Колледжден кейін", "Құжаттар", "Бағасы", "Мерзімдер", "Жатақхана"],
+        "en": ["After school", "After college", "Documents", "Tuition fee", "Deadlines", "Dormitory"]
+    },
+    "bachelor_after_school": {
+        "ru": ["Какие документы нужны?", "Какие программы есть?", "Проходные баллы", "Есть ли грант?", "Общежитие"],
+        "kk": ["Қандай құжаттар керек?", "Қандай мамандықтар бар?", "Өтпелі баллдар", "Грант бар ма?", "Жатақхана"],
+        "en": ["Required documents?", "Available programs?", "Passing score", "Scholarship?", "Dormitory"]
+    }
+}
+# === ДОБАВЬ ЭТИ ФУНКЦИИ ПОСЛЕ DIALOG_SCENARIOS ===
+def init_chat_state():
+    """Инициализация состояния чата при первом заходе"""
+    if "chat_history" not in session:
+        session["chat_history"] = ["level_select"]
+        session["chat_state"] = "level_select"
+
+def push_state(state):
+    hist = session.get("chat_history", ["level_select"])
+    if hist[-1] != state:
+        hist.append(state)
+        session["chat_history"] = hist
+    session["chat_state"] = state
+
+def pop_state():
+    hist = session.get("chat_history", ["level_select"])
+    if len(hist) > 1:
+        hist.pop()
+        session["chat_history"] = hist
+    session["chat_state"] = hist[-1] if hist else "level_select"
+    return session["chat_state"]
+
+
+# === Обнови /api/chat/options ===
+@app.route('/api/chat/options')
+@login_required
+def chat_options():
+    init_chat_state()
+    state = session.get("chat_state", "level_select")
+    lang = session.get('lang', 'ru')
+    options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
+
+    # Добавляем "Назад", если не на главном экране
+    history = session.get("chat_history", [])
+    if len(history) > 1:
+        back_text = {"ru": "Назад", "kk": "Артқа", "en": "Back"}[lang]
+        options = [f"{back_text}"] + options
+
+    return jsonify({"options": options})
+
+
+# === ЗАМЕНИ ВЕСЬ МАРШРУТ /api/chat НА ЭТОТ ===
 @app.route('/api/chat', methods=['POST'])
 @login_required
 def api_chat():
+    init_chat_state()  # ← важно!
     data = request.get_json() or {}
     user_message = data.get("message", "").strip()
-    
     if not user_message:
         return jsonify({"reply": "Пустое сообщение."})
 
-    # Определяем язык вопроса
-    question_lang = detect_language(user_message)
+    msg = user_message.lower()
+    lang = session.get('lang', 'ru')
 
-    # Проверяем точные совпадения в faq_exact.json
+    # === НАВИГАЦИЯ: Назад ===
+    if msg in ["назад", "артқа", "back", "◀ назад", "◀"]:
+        current_state = pop_state()
+        reply = t("Вы вернулись назад.")
+        options = DIALOG_SCENARIOS.get(current_state, {}).get(lang, [])
+        return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
+
+    # === НАВИГАЦИЯ: Выбор уровня ===
+    level_map = {
+        "бакалавриат": "bachelor_menu",
+        "магистратура": "master_menu",
+        "докторантура": "phd_menu",
+        "bachelor": "bachelor_menu",
+        "master": "master_menu",
+        "phd": "phd_menu",
+        "бакалавр": "bachelor_menu",
+    }
+    for keyword, state in level_map.items():
+        if keyword in msg:
+            push_state(state)
+            reply = t("Отлично! Вы выбрали раздел.") + "\n\n" + t("Выберите тему:")
+            options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
+            return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
+
+    # === Подменю (например, "После 11 класса") ===
+    submenu_map = {
+        "после 11 класса": "bachelor_after_school",
+        "после колледжа": "bachelor_after_college",
+        "after school": "bachelor_after_school",
+        "after college": "bachelor_after_college",
+    }
+    for keyword, state in submenu_map.items():
+        if keyword in msg:
+            push_state(state)
+            reply = t("Вы выбрали:") + f" {user_message}\n\n" + t("Выберите вопрос:")
+            options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
+            return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
+
+    # === Проверка точных ответов из faq_exact.json ===
     if FAQ_DATA:
         msg_lower = user_message.lower()
         for item in FAQ_DATA:
             keywords = [k.lower() for k in item.get("keywords", [])]
             if any(kw in msg_lower for kw in keywords):
-                answer = item.get(f"answer_{question_lang}") or item.get("answer_ru") or item.get("answer_kk", "Ответ временно недоступен.")
-                
-                # Сохраняем в историю
-                db.session.add(ChatHistory(
-                    user_id=current_user.id,
-                    message=user_message,
-                    response=answer
-                ))
+                answer = item.get(f"answer_{lang}") or item.get("answer_ru", "Ответ временно недоступен.")
+                db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=answer))
                 db.session.commit()
-                
-                return jsonify({"reply": answer, "markdown": True})
+                return jsonify({"reply": answer, "options": [], "markdown": True})
 
-    # Если нет точного ответа — Gemini
+    # === Gemini (если ничего не подошло) ===
     try:
-        prompt = f"""
-Ты — ИИ-консультант по поступлению в АРГУ им. К. Жубанова.
-ОТВЕЧАЙ ТОЛЬКО НА ТОМ ЖЕ ЯЗЫКЕ, на котором задан вопрос ({question_lang}).
-
-Вопрос пользователя: {user_message}
+        prompt = f"""Ты — ИИ-консультант по поступлению в АРГУ им. К. Жубанова.
+Отвечай ТОЛЬКО на языке вопроса ({lang.upper()}).
+Вопрос: {user_message}
 
 Правила:
-- Отвечай кратко и по делу
-- Используй Markdown (списки, жирный текст, заголовки)
-- Отвечай ТОЛЬКО по теме поступления, грантов, документов, сроков, общежития и т.д.
-- Если вопрос не по теме — скажи: "Я могу отвечать только на вопросы о поступлении."
+- Кратко, по делу
+- Используй Markdown
+- Только про поступление, гранты, документы, общежитие и т.д.
+- Если вопрос не по теме — скажи: "Я помогаю только с вопросами о поступлении."
 
-Ответ на {question_lang} языке:
-"""
+Ответ:"""
 
         model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(prompt)
-        reply = response.text.strip() if response.text else "Кешіріңіз, жауап бере алмадым."
+        reply = response.text.strip() if response.text else "Извините, не смог ответить."
 
-        # Сохраняем в историю
-        db.session.add(ChatHistory(
-            user_id=current_user.id,
-            message=user_message,
-            response=reply
-        ))
+        db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=reply))
         db.session.commit()
 
-        return jsonify({"reply": reply, "markdown": True})
+        return jsonify({"reply": reply, "options": [], "markdown": True})
 
     except Exception as e:
         print("Gemini error:", e)
         fallback = {
             'ru': "Сервис временно недоступен. Попробуйте позже.",
-            'kk': "Қызмет уақытша қолжетімсіз. Кейін қайталап көріңіз.",
-            'en': "Service temporarily unavailable. Try again later."
+            'kk': "Қызмет уақытша қолжетімсіз.",
+            'en': "Service temporarily unavailable."
         }
-        return jsonify({"reply": fallback.get(question_lang, fallback['ru']), "markdown": True})    
+        return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
+    
 
 @app.route('/api/chat/history')
 @login_required
