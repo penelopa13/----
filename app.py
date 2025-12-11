@@ -51,6 +51,16 @@ def load_faq_exact():
     else:
         FAQ_DATA = []
 
+
+def load_dialog_scenarios():
+    global DIALOG_SCENARIOS
+    path = os.path.join('data', 'dialog_scenarios.json')
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            DIALOG_SCENARIOS = json.load(f)
+    else:
+        DIALOG_SCENARIOS = {}  # Fallback to empty or hardcoded defaults
+
 # --- Custom Jinja filter ---
 @app.template_filter('from_json')
 def from_json_filter(s):
@@ -376,6 +386,22 @@ def api_chat():
         "после колледжа": "bachelor_after_college",
         "after school": "bachelor_after_school",
         "after college": "bachelor_after_college",
+        "творческие программы": "bachelor_creative",
+        "шығармашылық бағдарламалар": "bachelor_creative",
+        "creative programs": "bachelor_creative",
+        "обычные программы": "bachelor_regular",
+        "қарапайым бағдарламалар": "bachelor_regular",
+        "regular programs": "bachelor_regular",
+        "программы": "master_programs",  # For master submenus
+        "бағдарламалар": "master_programs",
+        "programs": "master_programs",
+        "гранты": "master_grants",
+        "гранттар": "master_grants",
+        "grants": "master_grants",
+        "требования": "doctorate_requirements",  # For doctorate
+        "талаптар": "doctorate_requirements",
+        "requirements": "doctorate_requirements"
+        # Add more as needed for full coverage
     }
     for keyword, state in submenu_map.items():
         if keyword in msg:
@@ -397,7 +423,7 @@ def api_chat():
 
     # === Gemini (если ничего не подошло) ===
     try:
-        prompt = f"""Ты — ИИ-консультант по поступлению в АРГУ им. К. Жубанова.
+        prompt = f"""Ты — ИИ-консультант по поступлению в АРУ им. К. Жубанова.Тебя зовут Дории.И на каждом ответе используй свое имя.
 Отвечай ТОЛЬКО на языке вопроса ({lang.upper()}).
 Вопрос: {user_message}
 
@@ -679,6 +705,8 @@ def submit_test():
 
 # === ИНИЦИАЛИЗАЦИЯ АДМИНА ===
 def create_admin():
+
+    
     if not User.query.filter_by(email='admin@site.com').first():
         admin = User(
             name='Администратор',
