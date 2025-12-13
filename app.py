@@ -355,7 +355,10 @@ def api_chat():
 
     msg = user_message.lower()
     lang = session.get('lang', 'ru')
-
+    print(f"Получено сообщение: {user_message}, lang: {lang}")
+    print(f"Текущий state перед: {session.get('chat_state')}")
+    # После push_state или pop_state
+    print(f"Новый state: {session.get('chat_state')}")
     # === НАВИГАЦИЯ: Назад ===
     if msg in ["назад", "артқа", "back", "◀ назад", "◀"]:
         current_state = pop_state()
@@ -367,11 +370,16 @@ def api_chat():
     level_map = {
         "бакалавриат": "bachelor_menu",
         "магистратура": "master_menu",
-        "докторантура": "phd_menu",
+        "докторантура": "doctorate_menu",  # ← ИСПРАВЛЕНО: "doctorate_menu" вместо "phd_menu"
         "bachelor": "bachelor_menu",
         "master": "master_menu",
-        "phd": "phd_menu",
+        "phd": "doctorate_menu",  # ← ИСПРАВЛЕНО
+        "doctorate": "doctorate_menu",  # ← Добавьте для en
         "бакалавр": "bachelor_menu",
+        # Добавьте kk варианты (если слова отличаются, но здесь они похожи)
+        "бакалавриат (kk)": "bachelor_menu",  # Если нужно, но в JSON слова те же
+        "магистратура (kk)": "master_menu",
+        "докторантура (kk)": "doctorate_menu"
     }
     for keyword, state in level_map.items():
         if keyword in msg:
@@ -387,21 +395,24 @@ def api_chat():
         "after school": "bachelor_after_school",
         "after college": "bachelor_after_college",
         "творческие программы": "bachelor_creative",
-        "шығармашылық бағдарламалар": "bachelor_creative",
+        "шығармашылық бағдарламалар": "bachelor_creative",  # ← kk
         "creative programs": "bachelor_creative",
         "обычные программы": "bachelor_regular",
-        "қарапайым бағдарламалар": "bachelor_regular",
+        "қарапайым бағдарламалар": "bachelor_regular",  # ← kk
         "regular programs": "bachelor_regular",
-        "программы": "master_programs",  # For master submenus
-        "бағдарламалар": "master_programs",
+        "программы": "master_programs",  # Для master
+        "бағдарламалар": "master_programs",  # ← kk
         "programs": "master_programs",
         "гранты": "master_grants",
-        "гранттар": "master_grants",
+        "гранттар": "master_grants",  # ← kk
         "grants": "master_grants",
-        "требования": "doctorate_requirements",  # For doctorate
-        "талаптар": "doctorate_requirements",
-        "requirements": "doctorate_requirements"
-        # Add more as needed for full coverage
+        "требования": "doctorate_requirements",  # Для doctorate
+        "талаптар": "doctorate_requirements",  # ← kk
+        "requirements": "doctorate_requirements",
+        # Добавьте другие подменю, если есть (например, из JSON: "doctorate_programs")
+        "список программ докторантуры": "doctorate_programs",
+        "докторантура бағдарламаларының тізімі": "doctorate_programs",  # ← kk
+        "list of doctorate programs": "doctorate_programs"
     }
     for keyword, state in submenu_map.items():
         if keyword in msg:
@@ -423,7 +434,7 @@ def api_chat():
 
     # === Gemini (если ничего не подошло) ===
     try:
-        prompt = f"""Ты — ИИ-консультант по поступлению в АРУ имени К. Жубанова.Тебя зовут Талапкер. И на каждом ответе используй свое имя.Название универа К.Жубанова, а не А.Жубанова.А на казахскомЗАпомни!
+        prompt = f"""Ты — ИИ-консультант по поступлению в АРУ имени К. Жубанова.Тебя зовут Талапкер. И на каждом ответе используй свое имя. Название универа К.Жубанова, а не А.Жубанова.А на казахском будет Қ.Жұбанов атындағы АӨУ. ЗАпомни!
 Отвечай ТОЛЬКО на языке вопроса ({lang.upper()}).
 Вопрос: {user_message}
 
@@ -441,7 +452,7 @@ def api_chat():
 
         db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=reply))
         db.session.commit()
-
+        
         return jsonify({"reply": reply, "options": [], "markdown": True})
 
     except Exception as e:
@@ -452,7 +463,7 @@ def api_chat():
             'en': "Service temporarily unavailable."
         }
         return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
-    
+
 
 @app.route('/api/chat/history')
 @login_required
