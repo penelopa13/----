@@ -284,24 +284,6 @@ def detect_language(text):
         return 'en'
     return 'ru'
 
-
-DIALOG_SCENARIOS = {
-    "level_select": {
-        "ru": ["Бакалавриат", "Магистратура", "Докторантура"],
-        "kk": ["Бакалавриат", "Магистратура", "Докторантура"],
-        "en": ["Bachelor", "Master", "Doctorate"]
-    },
-    "bachelor_menu": {
-        "ru": ["После 11 класса", "После колледжа", "Документы", "Стоимость", "Сроки", "Общежитие"],
-        "kk": ["11 сыныптан кейін", "Колледжден кейін", "Құжаттар", "Бағасы", "Мерзімдер", "Жатақхана"],
-        "en": ["After school", "After college", "Documents", "Tuition fee", "Deadlines", "Dormitory"]
-    },
-    "bachelor_after_school": {
-        "ru": ["Какие документы нужны?", "Какие программы есть?", "Проходные баллы", "Есть ли грант?", "Общежитие"],
-        "kk": ["Қандай құжаттар керек?", "Қандай мамандықтар бар?", "Өтпелі баллдар", "Грант бар ма?", "Жатақхана"],
-        "en": ["Required documents?", "Available programs?", "Passing score", "Scholarship?", "Dormitory"]
-    }
-}
 # === ДОБАВЬ ЭТИ ФУНКЦИИ ПОСЛЕ DIALOG_SCENARIOS ===
 def init_chat_state():
     """Инициализация состояния чата при первом заходе"""
@@ -381,6 +363,20 @@ def api_chat():
         "магистратура (kk)": "master_menu",
         "докторантура (kk)": "doctorate_menu"
     }
+    msg_clean = msg.strip().lower()
+
+    for keyword, state in level_map.items():
+        if keyword == msg_clean:
+            push_state(state)
+            reply = t("Отлично! Вы выбрали раздел.") + "\n\n" + t("Выберите тему:")
+            options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
+            return jsonify({
+                "reply": reply,
+                "options": options,
+                "update_options": True,
+                "markdown": True
+            })
+
     for keyword, state in level_map.items():
         if keyword in msg:
             push_state(state)
@@ -827,6 +823,13 @@ with app.app_context():
     db.create_all()
     create_admin()
     load_faq_exact()
+
+with app.app_context():
+    db.create_all()
+    create_admin()
+    load_faq_exact()
+    load_dialog_scenarios()   # ← ВОТ ЭТО ОБЯЗАТЕЛЬНО
+
 
 if __name__ == '__main__':
     with app.app_context():
