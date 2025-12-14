@@ -1,0 +1,108 @@
+.btn { 
+  background: #fff; 
+  color: var(--primary-color); 
+  padding: 12px 20px; 
+  border-radius: 8px; 
+  text-decoration: none; 
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.btn:hover {
+  background: var(--accent-color);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transform: scale(1.05);
+}
+
+.btn.orange {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+.btn.orange:hover {
+  background: #e09e0c;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.btn.small {
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  padding: 8px 14px;
+}
+
+.btn.small:hover {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+/* Voice button */
+.voice-btn {
+  position: relative;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border: 2.5px solid #d1d5db;
+  color: #4b5563;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.voice-btn:hover {
+  background: linear-gradient(135deg, #fff8f0, #ffedcc);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(255,179,15,0.25), 0 3px 6px rgba(0,0,0,0.12);
+}
+
+.voice-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.voice-btn.recording {
+  background: linear-gradient(135deg, #ff3b30, #ff6b6b);
+  border-color: #ff3b30;
+  color: white;
+  animation: recordingPulse 1.6s infinite;
+}
+
+.voice-btn.recording::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3), transparent 70%);
+  border-radius: 50%;
+  animation: ripple 1.5s infinite;
+}
+
+.floating-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: #fff;
+  font-size: 1.7rem;
+  padding: 16px 18px;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}

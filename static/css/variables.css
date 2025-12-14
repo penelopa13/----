@@ -1,0 +1,9 @@
+:root {
+  --primary-color: #1e88e5;
+  --secondary-color: #42a5f5;
+  --accent-color: #f9a825;
+  --bg-light: #f5f7fa;
+  --text-dark: #222;
+  --radius: 14px;
+  --glass-bg: rgba(255,255,255,0.25);
+}

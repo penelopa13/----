@@ -1,0 +1,317 @@
+/* === Университет: Карусель === */
+.university-hero {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hero-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.hero-slide.active {
+  opacity: 1;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(15,23,36,0.7), rgba(43,140,255,0.4));
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 6%;
+  right: 4%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  z-index: 2;
+  width: auto;
+  text-align: right;
+}
+
+.hero-caption {
+  background: rgba(15,23,36,0.7);
+  backdrop-filter: blur(14px);
+  padding: 1.8rem 2.2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.15);
+  max-width: 420px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  text-align: right;
+  color: #fff;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+.hero-slide.active .hero-caption {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.hero-caption.hidden {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.hero-title {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 800;
+  color: var(--accent-color);
+  margin: 0 0 1rem;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  line-height: 1.2;
+}
+
+.hero-text {
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: #e5e8ff;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Кнопки карусели */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(15,23,36,0.7);
+  color: #fff;
+  border: none;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.carousel-btn:hover {
+  background: var(--secondary-color);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 25px rgba(43,140,255,0.4);
+}
+
+.prev { left: 30px; }
+.next { right: 30px; }
+
+/* Точки */
+.carousel-dots {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.dot {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot.active, .dot:hover {
+  background: var(--accent-color);
+  transform: scale(1.3);
+  box-shadow: 0 0 15px rgba(255,179,15,0.6);
+}
+
+/* === Статистика === */
+.stats-section {
+  background: linear-gradient(135deg, #f8f9fc, #e3e8f5);
+  padding: 80px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 35px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-value {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin: 0.5rem 0;
+}
+
+.stat-label {
+  color: #666;
+  font-weight: 600;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  line-height: 1.4;
+}
+
+/* === История (таймлайн) === */
+.history-section {
+  background: #fff;
+  padding: 80px 0;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 2.2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 1.4rem;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--secondary-color), var(--accent-color));
+  border-radius: 2px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1.8rem;
+  padding-left: 2.6rem;
+}
+
+.timeline-year {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  background: #fff;
+  border: 3px solid var(--secondary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  transform: translateX(-50%);
+}
+
+.timeline-item.active .timeline-year {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 15px rgba(255,179,15,0.5);
+}
+
+.timeline-item p {
+  margin: 0;
+  color: #444;
+  font-weight: 500;
+  font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+  line-height: 1.5;
+}
+
+.history-img {
+  border-radius: 16px;
+  transition: transform 0.4s ease;
+  max-width: 100%;
+  height: auto;
+}
+
+.history-img:hover {
+  transform: scale(1.03);
+}
+
+/* === Партнёры === */
+.partners-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 40px 0;
+}
+
+.partner-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: 14px;
+  text-align: center;
+  transition: all 0.3s ease;
+  width: 160px;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.partner-card:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.partner-card img {
+  height: 50px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  margin-bottom: 0.8rem;
+}
+
+.partner-name {
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  color: #ddd;
+  line-height: 1.3;
+  padding: 0 4px;
+}
+
+/* Адаптивность университета */
+@media (max-width: 768px) {
+  .hero-title { font-size: 2.2rem; }
+  .hero-caption { padding: 1.8rem 2rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 576px) {
+  .hero-title { font-size: 1.8rem; }
+  .hero-text { font-size: 1.1rem; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .timeline { padding-left: 1.6rem; }
+  .timeline::before { left: 1rem; }
+  .timeline-item { padding-left: 2rem; }
+  .timeline-year { width: 2rem; height: 2rem; font-size: 0.75rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-caption { padding: 1.4rem 1.6rem; border-radius: 16px; }
+  .partner-card { width: 140px; padding: 1rem; }
+  .partner-name { font-size: 0.75rem; }
+  .stats-grid { gap: 1.2rem; }
+}

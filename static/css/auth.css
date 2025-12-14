@@ -1,0 +1,74 @@
+.login-section, .register-section {
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1f2d3d, #2b8cff);
+  padding: 40px 20px;
+}
+
+.register-section { background: linear-gradient(135deg, #2b8cff, #1f2d3d); }
+
+.login-card, .register-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 40px 50px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  color: #fff;
+}
+
+.login-card h2, .register-card h2 {
+  margin-bottom: 24px;
+  font-size: 1.8rem;
+  color: var(--accent-color);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.auth-form input::placeholder { color: rgba(255, 255, 255, 0.7); }
+
+.auth-form input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 8px rgba(255, 179, 15, 0.5);
+  outline: none;
+}
+
+.login-card .btn.orange, .register-card .btn.orange {
+  width: 100%;
+  padding: 12px 0;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+.register-link, .login-link {
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.register-link a, .login-link a {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.register-link a:hover, .login-link a:hover { text-decoration: underline; }
