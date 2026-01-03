@@ -5,413 +5,522 @@
 <section class="section">
     <div class="container">
 <h1 align="center">{{ t('Образовательные программы') | upper }}</h1>
+<!-- Меню для скролла к разделам -->
+<div class="levels-menu d-flex justify-content-center gap-3 mb-4">
+    <a href="#bachelor" class="btn btn-outline-primary">{{ t('Бакалавриат') }}</a>
+    <a href="#master" class="btn btn-outline-primary">{{ t('Магистратура') }}</a>
+    <a href="#phd" class="btn btn-outline-primary">{{ t('Докторантура') }}</a>
+</div>
         <div class="card-body">
             <div class="single-post_img">
-                <h3 align="center"><b>{{ t('БАКАЛАВРИАТ') }}</b></h3>
-                <!-- Факультет педагогики и менеджмента в образовании -->
-                <p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01102 - {{ t('Психология и менеджмент образования') }}</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01102.png" alt="{{ t('Психология и менеджмент образования') }}">
+                <div id="bachelor">
+                    <h3 align="center"><b>{{ t('БАКАЛАВРИАТ') }}</b></h3>
+                    <!-- Факультет педагогики и менеджмента в образовании -->
+                    <p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01102 - {{ t('Психология и менеджмент образования') }}</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01102.png" alt="{{ t('Психология и менеджмент образования') }}">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01201 - Дошкольное обучение и воспитание</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01201.jpg" alt="Дошкольное обучение и воспитание">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01301 - Педагогика и методика начального обучения</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01301.jpg" alt="Педагогика и методика начального обучения">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01902 - Специальная педагогика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01902.jpg" alt="Специальная педагогика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В03101 - Психология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B03101.jpg" alt="Психология">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В03102 - Клиническая психология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B03102.jpg" alt="Клиническая психология">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01201 - Дошкольное обучение и воспитание</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01201.jpg" alt="Дошкольное обучение и воспитание">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01301 - Педагогика и методика начального обучения</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01301.jpg" alt="Педагогика и методика начального обучения">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01902 - Специальная педагогика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01902.jpg" alt="Специальная педагогика">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В03101 - Психология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B03101.jpg" alt="Психология">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В03102 - Клиническая психология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B03102.jpg" alt="Клиническая психология">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Исторический факультет -->
-                <b><p align="center"><b>{{ t('Исторический факультет') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01506 - География</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01506.jpg" alt="География">
+                    <!-- Исторический факультет -->
+                    <b><p align="center"><b>{{ t('Исторический факультет') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01506 - География</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01506.jpg" alt="География">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01603 - История и обществознание</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01603.jpg" alt="История и обществознание">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В02201 - История</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B02201.jpg" alt="История">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05203 - Ландшафтное проектирование</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05203.jpg" alt="Ландшафтное проектирование">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В11101 - Туризм</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B11101.jpg" alt="Туризм">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01603 - История и обществознание</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01603.jpg" alt="История и обществознание">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В02201 - История</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B02201.jpg" alt="История">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05203 - Ландшафтное проектирование</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05203.jpg" alt="Ландшафтное проектирование">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В11101 - Туризм</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B11101.jpg" alt="Туризм">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Профессионально-творческий факультет -->
-                <b><p align="center"><b>{{ t('Профессионально-творческий факультет') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01401 - Музыкальное образование</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01401.jpg" alt="Музыкальное образование">
+                    <!-- Профессионально-творческий факультет -->
+                    <b><p align="center"><b>{{ t('Профессионально-творческий факультет') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01401 - Музыкальное образование</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01401.jpg" alt="Музыкальное образование">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01404 - Физическая культура и спорт</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01404.jpg" alt="Физическая культура и спорт">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01406 - Художественное образование</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01406.jpg" alt="Художественное образование">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В02101 - Хореография</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B02101.jpg" alt="Хореография">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В02102 - Дизайн</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B02102.jpg" alt="Дизайн">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07207 - Технология и конструирование изделий легкой промышленности</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07207.jpg" alt="Технология и конструирование изделий легкой промышленности">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В11102 - Культурно-досуговая работа</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B11102.jpg" alt="Культурно-досуговая работа">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01407 - Трудовое обучение и основы предпринимательства</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01407.jpg" alt="Трудовое обучение и основы предпринимательства">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01404 - Физическая культура и спорт</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01404.jpg" alt="Физическая культура и спорт">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01406 - Художественное образование</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01406.jpg" alt="Художественное образование">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В02101 - Хореография</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B02101.jpg" alt="Хореография">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В02102 - Дизайн</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B02102.jpg" alt="Дизайн">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07207 - Технология и конструирование изделий легкой промышленности</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07207.jpg" alt="Технология и конструирование изделий легкой промышленности">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В11102 - Культурно-досуговая работа</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B11102.jpg" alt="Культурно-досуговая работа">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01407 - Трудовое обучение и основы предпринимательства</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01407.jpg" alt="Трудовое обучение и основы предпринимательства">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Технический факультет -->
-                <p align="center"><b>{{ t('Технический факультет') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07106 - Электроэнергетика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07106.jpg" alt="Электроэнергетика">
+                    <!-- Технический факультет -->
+                    <p align="center"><b>{{ t('Технический факультет') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07106 - Электроэнергетика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07106.jpg" alt="Электроэнергетика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07107 - Автоматизация и управление</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07107.jpg" alt="Автоматизация и управление">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07201 - Горное дело</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07201.jpg" alt="Горное дело">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07202 - Нефтегазовое дело</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07202.jpg" alt="Нефтегазовое дело">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07203 - Металлургия</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07203.jpg" alt="Металлургия">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07301 - Строительство</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07301.jpg" alt="Строительство">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В11301 - Организация перевозок, движения и эксплуатация транспорта</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B11301.jpg" alt="Организация перевозок">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07101 - Транспорт, транспортная техника и технологии</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07101.jpg" alt="Транспорт, транспортная техника и технологии">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07107 - Автоматизация и управление</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07107.jpg" alt="Автоматизация и управление">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07201 - Горное дело</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07201.jpg" alt="Горное дело">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07202 - Нефтегазовое дело</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07202.jpg" alt="Нефтегазовое дело">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07203 - Металлургия</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07203.jpg" alt="Металлургия">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07301 - Строительство</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07301.jpg" alt="Строительство">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В11301 - Организация перевозок, движения и эксплуатация транспорта</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B11301.jpg" alt="Организация перевозок">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07101 - Транспорт, транспортная техника и технологии</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07101.jpg" alt="Транспорт, транспортная техника и технологии">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Факультет естествознания -->
-                <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01513 - Биология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01513.jpg" alt="Биология">
+                    <!-- Факультет естествознания -->
+                    <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01513 - Биология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01513.jpg" alt="Биология">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05101 - Биология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05101.jpg" alt="Биология">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05102 - Биотехнология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05102.jpg" alt="Биотехнология">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05201 - Экология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05201.jpg" alt="Экология">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05302 - Химия</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05302.jpg" alt="Химия">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01514 - Химия</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01514.jpg" alt="Химия">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07206 - Технология продовольственных продуктов</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07206.jpg" alt="Технология продовольственных продуктов">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05101 - Биология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05101.jpg" alt="Биология">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05102 - Биотехнология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05102.jpg" alt="Биотехнология">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05201 - Экология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05201.jpg" alt="Экология">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05302 - Химия</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05302.jpg" alt="Химия">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01514 - Химия</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01514.jpg" alt="Химия">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07206 - Технология продовольственных продуктов</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07206.jpg" alt="Технология продовольственных продуктов">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Физико-математический факультет -->
-                <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01501 - Математика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01501.jpg" alt="Математика">
+                    <!-- Физико-математический факультет -->
+                    <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01501 - Математика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01501.jpg" alt="Математика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05301 - Физика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05301.jpg" alt="Физика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В05401 - Математика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B05401.jpg" alt="Математика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В06103 - Вычислительная техника и программное обеспечение</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B06103.jpg" alt="Вычислительная техника и ПО">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01503 - Информатика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01503.jpg" alt="Информатика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В06105 - Компьютерная инженерия</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B06105.jpg" alt="Компьютерная инженерия">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В06102 - IT-медицина</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B06102.jpg" alt="IT-медицина">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6B01512 - Физика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01512.jpg" alt="Физика">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05301 - Физика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05301.jpg" alt="Физика">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В05401 - Математика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B05401.jpg" alt="Математика">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В06103 - Вычислительная техника и программное обеспечение</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B06103.jpg" alt="Вычислительная техника и ПО">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01503 - Информатика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01503.jpg" alt="Информатика">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В06105 - Компьютерная инженерия</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B06105.jpg" alt="Компьютерная инженерия">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В06102 - IT-медицина</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B06102.jpg" alt="IT-медицина">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6B01512 - Физика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01512.jpg" alt="Физика">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Филологический факультет -->
-               <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01701 - Казахский язык и литература</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01701.jpg" alt="Казахский язык и литература">
+                    <!-- Филологический факультет -->
+                <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01701 - Казахский язык и литература</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01701.jpg" alt="Казахский язык и литература">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01702 - Русский язык и литература</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01702.jpg" alt="Русский язык и литература">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В02304 - Филология: казахская филология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B02304.jpg" alt="Казахская филология">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01702 - Русский язык и литература</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01702.jpg" alt="Русский язык и литература">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В02304 - Филология: казахская филология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B02304.jpg" alt="Казахская филология">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Факультет иностранных языков -->
-                <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01706 - Иностранный язык: два иностранных языка</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01706.jpg" alt="Иностранный язык: два иностранных языка">
+                    <!-- Факультет иностранных языков -->
+                    <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01706 - Иностранный язык: два иностранных языка</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01706.jpg" alt="Иностранный язык: два иностранных языка">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В02302 - Переводческое дело</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B02302.jpg" alt="Переводческое дело">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В02303 - Иностранная филология</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B02303.jpg" alt="Иностранная филология">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В01708 - Английский язык</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B01708.jpg" alt="Английский язык">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В02302 - Переводческое дело</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B02302.jpg" alt="Переводческое дело">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В02303 - Иностранная филология</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B02303.jpg" alt="Иностранная филология">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В01708 - Английский язык</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B01708.jpg" alt="Английский язык">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Факультет экономики и права -->
-                <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В04101 - Экономика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B04101.jpg" alt="Экономика">
+                    <!-- Факультет экономики и права -->
+                    <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В04101 - Экономика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B04101.jpg" alt="Экономика">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В04102 - Менеджмент</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B04102.jpg" alt="Менеджмент">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В04103 - Учет и аудит</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B04103.jpg" alt="Учет и аудит">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В04104 - Финансы</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B04104.jpg" alt="Финансы">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В04105 - Государственное и местное управление</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B04105.jpg" alt="Государственное и местное управление">
+                            </div>
+                        </div>
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В04201 - Право</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B04201.jpg" alt="Право">
+                            </div>
                         </div>
                     </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В04102 - Менеджмент</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B04102.jpg" alt="Менеджмент">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В04103 - Учет и аудит</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B04103.jpg" alt="Учет и аудит">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В04104 - Финансы</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B04104.jpg" alt="Финансы">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В04105 - Государственное и местное управление</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B04105.jpg" alt="Государственное и местное управление">
-                        </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В04201 - Право</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B04201.jpg" alt="Право">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Heriot-Watt Campus -->
-                <p align="center"><b>{{ t('Heriot-Watt Campus') }}</b></p>
-                <div class="accord">
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В06107 - Компьютерная инженерия</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B06107.jpg" alt="Компьютерная инженерия">
+                    <!-- Heriot-Watt Campus -->
+                    <p align="center"><b>{{ t('Heriot-Watt Campus') }}</b></p>
+                    <div class="accord">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В06107 - Компьютерная инженерия</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B06107.jpg" alt="Компьютерная инженерия">
+                            </div>
                         </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07108 - Электроэнергетика</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07108.jpg" alt="Электроэнергетика">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07108 - Электроэнергетика</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07108.jpg" alt="Электроэнергетика">
+                            </div>
                         </div>
-                    </div>
-                    <div class="accord-item">
-                        <div class="accord-item_head">6В07209 - Нефтяная инженерия и энергоменеджмент</div>
-                        <div class="accord-item_content">
-                            <img src="/static/images/programs/6B07209.jpg" alt="Нефтяная инженерия и энергоменеджмент">
+                        <div class="accord-item">
+                            <div class="accord-item_head">6В07209 - Нефтяная инженерия и энергоменеджмент</div>
+                            <div class="accord-item_content">
+                                <img src="/static/images/programs/6B07209.jpg" alt="Нефтяная инженерия и энергоменеджмент">
+                            </div>
                         </div>
-                    </div>
-                </div>
+                </div>  
+                <div id="master" style="margin-top: 50px;">
 
+ <div id="master" style="margin-top:50px;">
+<h3 align="center"><b>{{ t('МАГИСТРАТУРА') }}</b></h3>
+
+<!-- ФПиМ -->
+<p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01101 – {{ t('Педагогика и психология') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01105 – {{ t('Педагогические измерения') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01106 – {{ t('Менеджмент и лидерство в образовании') }}</div></div>
+</div>
+
+<!-- Дошкольное -->
+<p align="center"><b>{{ t('Дошкольное и начальное образование') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01201 – {{ t('Дошкольное обучение и воспитание') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01301 – {{ t('Педагогика и методика начального обучения') }}</div></div>
+</div>
+
+<!-- Физ-мат -->
+<p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01501 – {{ t('Математика') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01502 – {{ t('Физика') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01503 – {{ t('Информатика') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01504 – {{ t('Химия') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01505 – {{ t('Биология') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01506 – {{ t('География') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01601 – {{ t('История') }}</div></div>
+</div>
+
+<!-- Филология -->
+<p align="center"><b>{{ t('Филологический факультет') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01701 – {{ t('Казахский язык и литература') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01704 – {{ t('Русский язык и литература') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M01706 – {{ t('Иностранный язык: два иностранных языка') }}</div></div>
+</div>
+
+<!-- Экономика и право -->
+<p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04101 – {{ t('Экономика') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04105 – {{ t('Государственное и местное управление') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04102 – {{ t('Менеджмент (СОП)') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04108 – {{ t('Деловое администрирование') }}</div></div>
+<div class="accord-item" data-duration="1"><div class="accord-item_head">7M04119 – {{ t('Деловое администрирование') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04104 – {{ t('Финансы') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04121 – {{ t('Цифровой маркетинг') }}</div></div>
+
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M04201 – {{ t('Юриспруденция') }}</div></div>
+<div class="accord-item" data-duration="1"><div class="accord-item_head">7M04202 – {{ t('Юриспруденция') }}</div></div>
+</div>
+
+<!-- IT -->
+<p align="center"><b>{{ t('Факультет информационных технологий') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M06102 – {{ t('Информационные системы') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M06103 – {{ t('Вычислительная техника и программное обеспечение') }}</div></div>
+</div>
+
+<!-- Инженерия -->
+<p align="center"><b>{{ t('Инженерно-технический факультет') }}</b></p>
+<div class="accord">
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M07102 – {{ t('Химическая технология органических веществ') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M07106 – {{ t('Электроэнергетика') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M07107 – {{ t('Транспорт, транспортная техника и технологии') }}</div></div>
+<div class="accord-item" data-duration="1"><div class="accord-item_head">7M07107 – {{ t('Транспорт, транспортная техника и технологии') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M07202 – {{ t('Нефтегазовое дело') }}</div></div>
+<div class="accord-item" data-duration="1"><div class="accord-item_head">7M07210 – {{ t('Нефтегазовое дело') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M07201 – {{ t('Горное дело') }}</div></div>
+<div class="accord-item" data-duration="1"><div class="accord-item_head">7M07209 – {{ t('Горное дело') }}</div></div>
+<div class="accord-item" data-duration="2"><div class="accord-item_head">7M07203 – {{ t('Металлургия') }}</div></div>
+<div class="accord-item" data-duration="1"><div class="accord-item_head">7M07213 – {{ t('Металлургия') }}</div></div>
+</div>
+</div>
+
+    <div id="phd" style="margin-top: 50px;">
+        <h3 align="center"><b>{{ t('ДОКТОРАНТУРА') }}</b></h3>
+        <!-- Пример факультета: коды обычно 8DXXXXX -->
+        <!-- Физико-математический факультет (пример) -->
+        <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
+        <div class="accord">
+            <div class="accord-item">
+                <div class="accord-item_head">8D01501 - {{ t('Математика') }}</div>
+                <div class="accord-item_content">
+                    <img src="/static/images/programs/8D01501.jpg" alt="{{ t('Математика') }}">
+                </div>
+            </div>
+            <!-- Добавьте больше -->
+            <div class="accord-item">
+                <div class="accord-item_head">8D05301 - Физика</div>
+                <div class="accord-item_content">
+                    <img src="/static/images/programs/8D05301.jpg" alt="Физика">
+                </div>
+            </div>
+            <!-- ... -->
+        </div>
+    <!-- Добавьте другие факультеты, если нужно -->
+</div>  
+            </div>
             </div>
         </div>
     </div>
 </section>
 
 <style>
+ 
     .accord {
         margin: 10px auto;
         max-width: 800px;
@@ -461,6 +570,16 @@
     .accord-item.active .accord-item_content {
         display: block;
     }
+    .levels-menu {
+    flex-wrap: wrap;
+}
+.levels-menu a {
+    transition: all 0.3s;
+}
+.levels-menu a:hover {
+    background-color: #007bff;
+    color: white;
+}
 </style>
 
 <script>
@@ -470,5 +589,27 @@
             item.classList.toggle('active');
         });
     });
+    // Плавный скролл к якорям
+document.querySelectorAll('.levels-menu a').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+function filterDuration(years) {
+    document.querySelectorAll('#master .accord-item').forEach(item => {
+        const d = item.dataset.duration;
+        if (years === 'all' || d == years) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
 </script>
 {% endblock %}
