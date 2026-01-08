@@ -57,7 +57,7 @@
                     </div>
 
                     <!-- Исторический факультет -->
-                    <b><p align="center"><b>{{ t('Исторический факультет') }}</b></p>
+                    <p align="center"><b>{{ t('Исторический факультет') }}</b></p>
                     <div class="accord">
                         <div class="accord-item">
                             <div class="accord-item_head">6В01506 - География</div>
@@ -92,7 +92,7 @@
                     </div>
 
                     <!-- Профессионально-творческий факультет -->
-                    <b><p align="center"><b>{{ t('Профессионально-творческий факультет') }}</b></p>
+                    <p align="center"><b>{{ t('Профессионально-творческий факультет') }}</b></p>
                     <div class="accord">
                         <div class="accord-item">
                             <div class="accord-item_head">6В01401 - Музыкальное образование</div>
@@ -412,7 +412,7 @@
                             </div>
                         </div>
                 </div>  
-                <div id="master" style="margin-top: 50px;">
+             
             <div id="master" style="margin-top:50px;">
             <h3 align="center"><b>{{ t('МАГИСТРАТУРА') }}</b></h3>
 
@@ -864,6 +864,7 @@
             </div>
             </div>
         </div>
+        <button id="back-to-top" title="Наверх">↑</button>
 </section>
 
 <style>
@@ -927,6 +928,28 @@
     background-color: #007bff;
     color: white;
 }
+#back-to-top {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
+    display: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: opacity 0.3s, transform 0.3s;
+}
+#back-to-top:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}
 </style>
 
 <script>
@@ -957,6 +980,21 @@ function filterDuration(years) {
         }
     });
 }
+// Логика для кнопки "Наверх"
+const backToTopButton = document.getElementById('back-to-top');
+
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) { // Показывать кнопку после прокрутки 300px
+        backToTopButton.style.display = 'block';
+    } else {
+        backToTopButton.style.display = 'none';
+    }
+});
+
+backToTopButton.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
 
 </script>
 {% endblock %}
