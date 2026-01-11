@@ -50,7 +50,7 @@
         </div>
 
         <form id="chat-form" class="chat-form">
-          <input type="text" id="user-input" placeholder="{{ t('Сұрағыңызды жазыңыз...') }}" autocomplete="off">
+         <textarea id="user-input" placeholder="{{ t('Сұрағыңызды жазыңыз...') }}" rows="1" autocomplete="off"></textarea>
           <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
             <i class="fas fa-microphone"></i>
           </button>
@@ -141,12 +141,13 @@ function addMessage(text, type = "bot") {
   if (type === "bot") {
     div.innerHTML = marked.parse(text.replace(/\n/g, '  \n'));
   } else {
-    div.textContent = text;
+    // Для пользователя: заменяем \n на <br> и вставляем как HTML
+    const formattedText = text.replace(/\n/g, '<br>');
+    div.innerHTML = formattedText;  // Теперь переносы сохранятся
   }
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
-
 // === 4. Отправка сообщения (ГЛАВНОЕ ИСПРАВЛЕНИЕ) ===
 async function sendMessage(text) {
   if (!text.trim()) return;
@@ -189,7 +190,27 @@ async function sendMessage(text) {
 document.getElementById('chat-form').addEventListener('submit', e => {
   e.preventDefault();
   const text = userInput.value.trim();
-  if (text) sendMessage(text);
+  if (text) {
+    sendMessage(text);
+    userInput.value = '';
+    userInput.style.height = 'auto'; // сбрасываем высоту после отправки
+  }
+});
+
+// Добавляем обработку Enter / Shift+Enter
+userInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();           // предотвращаем перенос строки
+    const text = userInput.value.trim();
+    if (text) {
+      sendMessage(text);
+      userInput.value = '';
+      userInput.style.height = 'auto';
+    }
+  }
+  // Авто-расширение высоты по мере набора текста
+  this.style.height = 'auto';
+  this.style.height = (this.scrollHeight) + 'px';
 });
 
 // === 6. Голосовой ввод (без изменений) ===

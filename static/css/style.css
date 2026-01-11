@@ -1780,6 +1780,8 @@ textarea {
   background: var(--accent-color);
   color: #000;
   border-bottom-right-radius: 4px;
+  white-space: pre-wrap;  /* Сохраняет пробелы и переносы как в исходном тексте */
+  word-wrap: break-word;  /* Перенос длинных слов */
 }
 .message.bot {
   align-self: flex-start;
@@ -1810,7 +1812,6 @@ textarea {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-12px); }
 }
-
 /* ПОЛЕ ВВОДА — прикреплено снизу */
 .chat-form {
   padding: 16px 20px;
@@ -1821,24 +1822,48 @@ textarea {
   gap: 12px;
   box-shadow: 0 -6px 20px rgba(0,0,0,0.06);
   z-index: 10;
+  max-width: 100%;
 }
 
-.chat-form input {
+.chat-form textarea {
   flex: 1;
   padding: 14px 20px;
   border: 1.8px solid #e2e8f0;
-  border-radius: 50px;
+  border-radius: 24px;          /* чуть мягче углы */
   font-size: 1rem;
   background: #fafafa;
   transition: all 0.3s ease;
+  min-width: 600px;
+  min-height: 48px;             /* начальная высота как у input */
+  max-height: 160px;            /* максимум до скролла внутри поля */
+  overflow-y: auto;             /* скролл, когда текст очень длинный */
+  resize: none;                 /* запрещаем тянуть за уголок */
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
-.chat-form input:focus {
+
+.chat-form textarea:focus {
   outline: none;
   border-color: var(--accent-color);
   background: white;
   box-shadow: 0 0 0 4px rgba(255,179,15,0.15);
 }
 
+/* Красивый скроллбар внутри textarea */
+.chat-form textarea::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-form textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-form textarea::-webkit-scrollbar-thumb {
+  background: rgba(255,179,15,0.4);
+  border-radius: 3px;
+}
+.chat-form textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
 /* Кнопки в форме */
 .chat-form button {
   width: 48px; height: 48px;
