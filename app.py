@@ -150,9 +150,10 @@ class Notification(db.Model):
     notif_type = db.Column(db.String(20), default='info')
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-
-    # null = всем пользователям
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+    # Добавляем связь
+    recipient = db.relationship('User', foreign_keys=[recipient_id], lazy='joined')
 
 class Application(db.Model):
     __tablename__ = 'applications'
@@ -496,13 +497,32 @@ def admin_dashboard():
         return redirect(url_for('profile'))
 
     users = User.query.all()
-    results = TestResult.query.order_by(TestResult.created_at.desc()).limit(10).all()
+    results = TestResult.query.join(User, TestResult.user_id == User.id)\
+                      .add_columns(
+                          TestResult.id,
+                          TestResult.mbti_type,
+                          TestResult.created_at,
+                          User.id.label('user_id'),
+                          User.name.label('user_name'),
+                          User.email.label('user_email')
+                      )\
+                      .order_by(TestResult.created_at.desc())\
+                      .limit(50).all()   # увеличил лимит
+
     contact_messages = ContactMessage.query.order_by(ContactMessage.id.desc()).all()
+    
+    # Новые данные
+    notifications = Notification.query.order_by(Notification.created_at.desc()).limit(100).all()
+    applications = Application.query.order_by(Application.created_at.desc()).limit(100).all()
 
     return render_template('admin/dashboard.html',
                            users=users,
                            results=results,
-                           contact_messages=contact_messages)
+                           contact_messages=contact_messages,
+                           notifications=notifications,
+                           applications=applications)
+
+
 @app.route('/api/admin/delete/<string:table>/<int:item_id>', methods=['DELETE'])
 @login_required
 def admin_delete(table, item_id):
@@ -512,7 +532,9 @@ def admin_delete(table, item_id):
     models = {
         'users': User,
         'results': TestResult,
-        'messages': ContactMessage
+        'messages': ContactMessage,
+        'notifications': Notification,     # ← новое
+        'applications': Application        # ← новое
     }
 
     model = models.get(table)

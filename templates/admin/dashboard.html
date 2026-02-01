@@ -13,58 +13,90 @@
         </a>
     </div>
 
-<!-- Статистика — СТЕКЛЯННЫЕ КАРТОЧКИ -->
-<div class="row g-4 mb-5">
-    <!-- Пользователи — СИНИЙ -->
-    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="stat-card glass-card bg-primary-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="usersCard">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3">
-                    <i class="fas fa-users fa-2x"></i>
+    <!-- Статистика — карточки -->
+    <div class="row g-4 mb-5">
+        <!-- Пользователи — СИНИЙ -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-card glass-card bg-primary-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="usersCard">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-semibold opacity-90">Пользователей</h5>
+                        <h2 class="mb-0 display-5 fw-bold">{{ users|length }}</h2>
+                    </div>
                 </div>
-                <div>
-                    <h5 class="mb-1 fw-semibold opacity-90">Пользователей</h5>
-                    <h2 class="mb-0 display-5 fw-bold">{{ users|length }}</h2>
-                </div>
+                <div class="glass-shine"></div>
             </div>
-            <div class="glass-shine"></div>
+        </div>
+
+        <!-- Тесты пройдено — ЗЕЛЁНЫЙ -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-card glass-card bg-success-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="resultsCard">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-semibold opacity-90">Тестов пройдено</h5>
+                        <h2 class="mb-0 display-5 fw-bold">{{ results|length }}</h2>
+                    </div>
+                </div>
+                <div class="glass-shine"></div>
+            </div>
+        </div>
+
+        <!-- Сообщения — ЖЁЛТЫЙ -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="stat-card glass-card bg-warning-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="messagesCard">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-envelope fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-semibold opacity-90">Сообщений</h5>
+                        <h2 class="mb-0 display-5 fw-bold">{{ contact_messages|length }}</h2>
+                    </div>
+                </div>
+                <div class="glass-shine"></div>
+            </div>
+        </div>
+
+        <!-- Уведомления — ГОЛУБОЙ -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="stat-card glass-card bg-info-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="notificationsCard">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-bell fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-semibold opacity-90">Уведомлений</h5>
+                        <h2 class="mb-0 display-5 fw-bold">{{ notifications|length }}</h2>
+                    </div>
+                </div>
+                <div class="glass-shine"></div>
+            </div>
+        </div>
+
+        <!-- Заявки — КРАСНЫЙ -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
+            <div class="stat-card glass-card bg-danger-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="applicationsCard">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon me-3">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1 fw-semibold opacity-90">Заявок</h5>
+                        <h2 class="mb-0 display-5 fw-bold">{{ applications|length }}</h2>
+                    </div>
+                </div>
+                <div class="glass-shine"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Тесты пройдено — ЗЕЛЁНЫЙ -->
-    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="stat-card glass-card bg-success-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="resultsCard">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3">
-                    <i class="fas fa-check-circle fa-2x"></i>
-                </div>
-                <div>
-                    <h5 class="mb-1 fw-semibold opacity-90">Тестов пройдено</h5>
-                    <h2 class="mb-0 display-5 fw-bold">{{ results|length }}</h2>
-                </div>
-            </div>
-            <div class="glass-shine"></div>
-        </div>
-    </div>
-
-    <!-- Сообщения — ЖЁЛТЫЙ/ОРАНЖЕВЫЙ -->
-    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-        <div class="stat-card glass-card bg-warning-glass text-white p-4 rounded-4 shadow-lg position-relative overflow-hidden cursor-pointer" id="messagesCard">
-            <div class="d-flex align-items-center">
-                <div class="stat-icon me-3">
-                    <i class="fas fa-envelope fa-2x"></i>
-                </div>
-                <div>
-                    <h5 class="mb-1 fw-semibold opacity-90">Сообщений</h5>
-                    <h2 class="mb-0 display-5 fw-bold">{{ contact_messages|length }}</h2>
-                </div>
-            </div>
-            <div class="glass-shine"></div>
-        </div>
-    </div>
-</div>
-
-    <!-- Блоки с таблицами (скрыты по умолчанию) -->
+    <!-- Блоки с таблицами -->
     <div id="dataSection" class="mt-5">
 
         <!-- Пользователи -->
@@ -124,7 +156,8 @@
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Пользователь ID</th>
+                            <th>Пользователь</th>
+                            <th>Email</th>
                             <th>MBTI</th>
                             <th>Дата</th>
                             <th>Действия</th>
@@ -134,7 +167,8 @@
                         {% for r in results %}
                         <tr>
                             <td>{{ r.id }}</td>
-                            <td>{{ r.user_id }}</td>
+                            <td>{{ r.user_name or '—' }} (ID: {{ r.user_id }})</td>
+                            <td>{{ r.user_email }}</td>
                             <td><strong>{{ r.mbti_type }}</strong></td>
                             <td>{{ r.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
                             <td>
@@ -186,9 +220,118 @@
                 </table>
             </div>
         </div>
+
+        <!-- Уведомления -->
+        <div id="notificationsTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-bell me-2 text-info"></i> Уведомления</h3>
+                <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
+                    <i class="fas fa-eye-slash"></i> Скрыть
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Заголовок</th>
+                            <th>Сообщение</th>
+                            <th>Тип</th>
+                            <th>Получатель</th>
+                            <th>Дата</th>
+                            <th>Прочитано</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for n in notifications %}
+                        <tr>
+                            <td>{{ n.id }}</td>
+                            <td>{{ n.title }}</td>
+                            <td>{{ n.message|truncate(60) }}</td>
+                            <td><span class="badge bg-{{ n.notif_type if n.notif_type in ['info','success','warning','danger'] else 'secondary' }}">{{ n.notif_type }}</span></td>
+                            <td>
+                                {% if n.recipient %}
+                                    {{ n.recipient.name or n.recipient.email }} (ID: {{ n.recipient_id }})
+                                {% else %}
+                                    <span class="badge bg-secondary">Всем</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ n.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+                            <td>
+                                {% if n.is_read %}
+                                    <i class="fas fa-check text-success"></i>
+                                {% else %}
+                                    <i class="fas fa-times text-danger"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRow({{ n.id }}, 'notifications')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Заявки на поступление -->
+        <div id="applicationsTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="fas fa-file-alt me-2 text-danger"></i> Заявки на поступление</h3>
+                <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
+                    <i class="fas fa-eye-slash"></i> Скрыть
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя Фамилия</th>
+                            <th>Телефон</th>
+                            <th>Email</th>
+                            <th>Образование</th>
+                            <th>Специальность</th>
+                            <th>Форма</th>
+                            <th>Комментарий</th>
+                            <th>Дата</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in applications %}
+                        <tr>
+                            <td>{{ a.id }}</td>
+                            <td>{{ a.first_name }} {{ a.last_name }}</td>
+                            <td>{{ a.phone }}</td>
+                            <td>{{ a.email }}</td>
+                            <td>{{ a.education }}</td>
+                            <td>{{ a.specialty }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if a.grant_or_paid == 'grant' else 'primary' }}">
+                                    {{ a.grant_or_paid|upper }}
+                                </span>
+                            </td>
+                            <td>{{ a.comment|truncate(50) or '—' }}</td>
+                            <td>{{ a.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteRow({{ a.id }}, 'applications')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Форма отправки уведомления -->
+    <!-- Форма отправки уведомления (оставляем как было) -->
     <div class="card border-0 shadow-lg mt-5" data-aos="fade-up">
         <div class="card-header bg-gradient text-white text-center py-4">
             <h3 class="mb-0"><i class="fas fa-bell me-2"></i> Отправить уведомление</h3>
@@ -246,7 +389,7 @@
     </div>
 </div>
 
-<!-- Подключение всех скриптов и стилей в конце (перед </body>) -->
+<!-- Стили и скрипты -->
 <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
@@ -270,7 +413,6 @@
         document.getElementById('userSelectWrapper').style.display = 'none';
     }
 
-    // Показ таблицы
     function showBlock(id) {
         document.querySelectorAll('.data-block').forEach(el => el.style.display = 'none');
         const block = document.getElementById(id);
@@ -288,9 +430,8 @@
         document.querySelectorAll('.data-block').forEach(el => el.style.display = 'none');
     }
 
-    // Удаление
     function deleteRow(id, table) {
-        if (!confirm('Удалить запись? Это действие нельзя отменить.')) return;
+        if (!confirm('Удалить запись? Действие нельзя отменить.')) return;
         fetch(`/api/admin/delete/${table}/${id}`, { method: 'DELETE' })
             .then(r => r.json())
             .then(d => {
@@ -308,6 +449,8 @@
     document.getElementById('usersCard')?.addEventListener('click', () => showBlock('usersTable'));
     document.getElementById('resultsCard')?.addEventListener('click', () => showBlock('resultsTable'));
     document.getElementById('messagesCard')?.addEventListener('click', () => showBlock('messagesTable'));
+    document.getElementById('notificationsCard')?.addEventListener('click', () => showBlock('notificationsTable'));
+    document.getElementById('applicationsCard')?.addEventListener('click', () => showBlock('applicationsTable'));
 
     // Отправка уведомления
     document.getElementById('notificationForm').addEventListener('submit', async e => {
@@ -341,9 +484,11 @@
     .cursor-pointer { cursor: pointer; transition: transform .2s; }
     .cursor-pointer:hover { transform: translateY(-5px); }
     .glass-card { backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-    .bg-primary-glass  { background: rgba(13, 110, 253, 0.25); }   /* синий */
-    .bg-success-glass  { background: rgba(25, 135, 84, 0.25); }    /* зелёный */
-    .bg-warning-glass  { background: rgba(255, 193, 7, 0.25); }    /* жёлтый/оранжевый */
+    .bg-primary-glass  { background: rgba(13, 110, 253, 0.25); }
+    .bg-success-glass  { background: rgba(25, 135, 84, 0.25); }
+    .bg-warning-glass  { background: rgba(255, 193, 7, 0.25); }
+    .bg-info-glass     { background: rgba(13, 202, 240, 0.25); }
+    .bg-danger-glass   { background: rgba(220, 53, 69, 0.25); }
     .glass-shine { position: absolute; top: -100%; left: -100%; width: 300%; height: 300%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent); transform: rotate(30deg); pointer-events: none; }
     .btn-orange { background: #ffb30f; border: none; font-weight: 600; }
     .btn-orange:hover { background: #e09e0c; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255,179,15,0.4); }
