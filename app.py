@@ -163,7 +163,11 @@ class Application(db.Model):
     email = db.Column(db.String(120), nullable=False)
     education = db.Column(db.String(200), nullable=False)
     specialty = db.Column(db.String(200), nullable=False)
-    grant_or_paid = db.Column(db.String(50), nullable=False)
+    grant_or_paid = db.Column(
+            db.String(50),
+            nullable=False,
+            server_default='paid'          # или 'unknown', 'не указано' и т.п.
+        )    
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -581,22 +585,31 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')  # обязате
 
 mail = Mail(app)
 
+
+
 @app.route('/submit_application', methods=['POST'])
 def submit_application():
     data = request.form
-    # Создаём заявку
+    
+    # ──────────────────────────────── ИСПРАВЛЕНИЕ ────────────────────────────────
+    grant_or_paid = data.get('grant_or_paid') or 'unknown'     # если поля нет → 'paid'
+    # ──────────────────────────────────────────────────────────────────────────────
+
     app_entry = Application(
-        first_name=data.get('first_name'),
-        last_name=data.get('last_name'),
-        phone=data.get('phone'),
-        email=data.get('email'),
-        education=data.get('education'),
-        specialty=data.get('specialty'),
-        grant_or_paid=data.get('grant_or_paid'),
-        comment=data.get('comment')
+        first_name    = data.get('first_name'),
+        last_name     = data.get('last_name'),
+        phone         = data.get('phone'),
+        email         = data.get('email'),
+        education     = data.get('education'),
+        specialty     = data.get('specialty'),
+        grant_or_paid = grant_or_paid,                    # ← теперь всегда строка
+        comment       = data.get('comment')
     )
+    
     db.session.add(app_entry)
     db.session.commit()
+    
+    # остальной код (отправка почты, flash, redirect) остаётся без изменений
 
     # Отправка на почту
     try:
