@@ -1525,7 +1525,7 @@ textarea {
 .text-white-70 { opacity: 0.7; }
 /* === СТЕКЛЯННЫЕ КАРТОЧКИ СТАТИСТИКИ === */
 .glass-card {
-    background: rgba(255, 255, 255, 0.15) !important;
+    background: rgba(255, 255, 255, 0.15);  /* Убрали !important для background — фикс переопределения цвета */
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.2);
