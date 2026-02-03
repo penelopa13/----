@@ -1,3 +1,6 @@
+/* ============================================================= */
+/* ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И СБРОС СТИЛЕЙ */
+/* ============================================================= */
 :root {
   --primary-color:#1f2d3d;
   --secondary-color:#2b8cff;
@@ -29,6 +32,9 @@ body {
   padding: 0 20px;
 }
 
+/* ============================================================= */
+/* ШАПКА САЙТА (HEADER) */
+/* ============================================================= */
 /* ---------- Header ---------- */
 .site-header {
   position: sticky;
@@ -100,6 +106,52 @@ body {
 }
 .nav a:hover { background:rgba(255,255,255,0.05); }
 
+/* Подвкладка Университет */
+.nav-dropdown {
+  position: relative;
+}
+
+/* Мобильное меню */
+.nav-toggle { display:none; background:none; border:none; color:#fff; font-size:22px; }
+@media(max-width:800px){
+  .nav { 
+    position:fixed; 
+    right:0; 
+    top:var(--header-h); 
+    background:#05202c; 
+    height:calc(100vh - var(--header-h)); 
+    width:260px; 
+    flex-direction:column; 
+    transform:translateX(100%); 
+    transition:transform .25s; 
+  }
+  .nav.open { transform:translateX(0); }
+  .nav-center { flex-direction: column; }
+  .nav-right { flex-direction: column; }
+  .nav-toggle { display:block; }
+}
+
+/* Дополнительные стили для шапки */
+.site-header {
+  background: linear-gradient(90deg, #0f1724, #1a2335);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Навигация (дополнительно) */
+.nav a {
+  color: #e5e8ff;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: color 0.3s ease;
+}
+.nav a:hover {
+  color: var(--accent-color);
+}
+
+/* ============================================================= */
+/* КНОПКИ (BUTTONS) */
+/* ============================================================= */
 /* ---------- Buttons ---------- */
 .btn { 
   background:#fff; 
@@ -130,6 +182,32 @@ body {
   transform: scale(1.05);
 }
 
+/* Кнопки (дополнительно) */
+.btn.small {
+  background: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+  padding: 8px 14px;
+}
+.btn.small:hover {
+  background: var(--accent-color);
+  color: #fff;
+}
+
+/* Кнопка регистрации — выделена */
+.btn.orange {
+  background: var(--accent-color);
+  color: #fff;
+  border: none;
+}
+.btn.orange:hover {
+  background: #e09e0c;
+  color: #fff;
+}
+
+/* ============================================================= */
+/* ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКОВ (LANG SWITCHER) */
+/* ============================================================= */
 /* ---------- Lang Switcher ---------- */
 .lang-switcher {
   display: flex;
@@ -150,115 +228,9 @@ body {
   color: var(--accent-color);
 }
 
-/* mobile menu */
-.nav-toggle { display:none; background:none; border:none; color:#fff; font-size:22px; }
-@media(max-width:800px){
-  .nav { 
-    position:fixed; 
-    right:0; 
-    top:var(--header-h); 
-    background:#05202c; 
-    height:calc(100vh - var(--header-h)); 
-    width:260px; 
-    flex-direction:column; 
-    transform:translateX(100%); 
-    transition:transform .25s; 
-  }
-  .nav.open { transform:translateX(0); }
-  .nav-center { flex-direction: column; }
-  .nav-right { flex-direction: column; }
-  .nav-toggle { display:block; }
-}
-
-/* ---------- Main ---------- */
-.site-main { flex: 1; }
-
-/* ---------- Hero ---------- */
-.hero { 
-  background:linear-gradient(90deg,var(--primary-color),var(--secondary-color)); 
-  color:#fff; 
-  padding:60px 0; 
-}
-.hero-inner { 
-  min-height:calc(100vh - var(--header-h) - 120px); 
-  display:flex; 
-  flex-direction:column; 
-  justify-content:center; 
-  align-items:flex-start; 
-}
-.hero h1 { font-size:40px; margin-bottom:12px; }
-.hero p { font-size:18px; margin-bottom:18px; }
-
-/* ---------- Features ---------- */
-.features { 
-  display:flex; 
-  gap:20px; 
-  justify-content:space-between; 
-  margin:40px 0; 
-}
-.feature { 
-  background:#fff; 
-  padding:20px; 
-  border-radius:12px; 
-  box-shadow:0 6px 18px rgba(15,20,30,.06); 
-  flex:1; 
-  text-align:center; 
-}
-.section { 
-  padding:40px 0; 
-  text-align:center; 
-}
-
-/* ---------- FAQ ---------- */
-.faq-list { margin-top:20px; }
-.faq-item { margin-bottom:12px; }
-.faq-question { 
-  width:100%; 
-  text-align:left; 
-  padding:14px; 
-  border-radius:8px; 
-  background:#fff; 
-  border:none; 
-  font-weight:700; 
-  cursor:pointer; 
-  box-shadow:0 4px 12px rgba(0,0,0,.04); 
-}
-.faq-answer { 
-  overflow:hidden; 
-  max-height:0; 
-  padding:0 14px; 
-  transition:max-height .25s; 
-  background:#fff; 
-  border-radius:8px; 
-  margin-top:6px; 
-}
-
-/* ---------- Forms ---------- */
-input[type="text"], 
-input[type="email"], 
-input[type="number"], 
-textarea {
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #e3e7eb;
-  width:100%;
-  max-width:420px;
-}
-.contact-form { 
-  display:flex; 
-  flex-direction:column; 
-  gap:10px; 
-  align-items:center; 
-}
-
-/* ---------- Footer ---------- */
-.site-footer {
-  background:#0f1724;
-  color:#fff;
-  padding:18px 0;
-  text-align:center;
-}
-/* --- Dropdown (языки) --- */
+/* ============================================================= */
+/* ДРОПДАУН (DROPDOWN) ДЛЯ ЯЗЫКОВ И МЕНЮ */
+/* ============================================================= */
 /* --- Dropdown (языки) --- */
 .dropdown-toggle {
   color: #fff !important;
@@ -295,51 +267,7 @@ textarea {
   color: #fff;
 }
 
-.site-header {
-  background: linear-gradient(90deg, #0f1724, #1a2335);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-/* Навигация */
-.nav a {
-  color: #e5e8ff;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: color 0.3s ease;
-}
-.nav a:hover {
-  color: var(--accent-color);
-}
-
-/* Кнопки */
-.btn.small {
-  background: transparent;
-  color: var(--accent-color);
-  border: 1px solid var(--accent-color);
-  padding: 8px 14px;
-}
-.btn.small:hover {
-  background: var(--accent-color);
-  color: #fff;
-}
-
-/* Кнопка регистрации — выделена */
-.btn.orange {
-  background: var(--accent-color);
-  color: #fff;
-  border: none;
-}
-.btn.orange:hover {
-  background: #e09e0c;
-  color: #fff;
-}
-/* --- Подвкладка Университет --- */
-/* --- Подвкладка Университет --- */
-.nav-dropdown {
-  position: relative;
-}
-
+/* Подвкладка Университет */
 .glass-menu {
   position: absolute;
   top: 100%;
@@ -368,6 +296,117 @@ textarea {
   background: var(--accent-color);
   color: #fff;
 }
+
+/* ============================================================= */
+/* ОСНОВНОЙ КОНТЕНТ (MAIN) */
+/* ============================================================= */
+/* ---------- Main ---------- */
+.site-main { flex: 1; }
+
+/* ============================================================= */
+/* ГЕРОЙ-СЕКЦИЯ (HERO) */
+/* ============================================================= */
+/* ---------- Hero ---------- */
+.hero { 
+  background:linear-gradient(90deg,var(--primary-color),var(--secondary-color)); 
+  color:#fff; 
+  padding:60px 0; 
+}
+.hero-inner { 
+  min-height:calc(100vh - var(--header-h) - 120px); 
+  display:flex; 
+  flex-direction:column; 
+  justify-content:center; 
+  align-items:flex-start; 
+}
+.hero h1 { font-size:40px; margin-bottom:12px; }
+.hero p { font-size:18px; margin-bottom:18px; }
+
+/* ============================================================= */
+/* СЕКЦИЯ ФИЧ (FEATURES) */
+/* ============================================================= */
+/* ---------- Features ---------- */
+.features { 
+  display:flex; 
+  gap:20px; 
+  justify-content:space-between; 
+  margin:40px 0; 
+}
+.feature { 
+  background:#fff; 
+  padding:20px; 
+  border-radius:12px; 
+  box-shadow:0 6px 18px rgba(15,20,30,.06); 
+  flex:1; 
+  text-align:center; 
+}
+.section { 
+  padding:40px 0; 
+  text-align:center; 
+}
+
+/* ============================================================= */
+/* FAQ (ЧАСТЫЕ ВОПРОСЫ) */
+/* ============================================================= */
+/* ---------- FAQ ---------- */
+.faq-list { margin-top:20px; }
+.faq-item { margin-bottom:12px; }
+.faq-question { 
+  width:100%; 
+  text-align:left; 
+  padding:14px; 
+  border-radius:8px; 
+  background:#fff; 
+  border:none; 
+  font-weight:700; 
+  cursor:pointer; 
+  box-shadow:0 4px 12px rgba(0,0,0,.04); 
+}
+.faq-answer { 
+  overflow:hidden; 
+  max-height:0; 
+  padding:0 14px; 
+  transition:max-height .25s; 
+  background:#fff; 
+  border-radius:8px; 
+  margin-top:6px; 
+}
+
+/* ============================================================= */
+/* ФОРМЫ (FORMS) */
+/* ============================================================= */
+/* ---------- Forms ---------- */
+input[type="text"], 
+input[type="email"], 
+input[type="number"], 
+textarea {
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #e3e7eb;
+  width:100%;
+  max-width:420px;
+}
+.contact-form { 
+  display:flex; 
+  flex-direction:column; 
+  gap:10px; 
+  align-items:center; 
+}
+
+/* ============================================================= */
+/* ПОДВАЛ (FOOTER) */
+/* ============================================================= */
+/* ---------- Footer ---------- */
+.site-footer {
+  background:#0f1724;
+  color:#fff;
+  padding:18px 0;
+  text-align:center;
+}
+
+/* ============================================================= */
+/* СТРАНИЦА ЛОГИНА (LOGIN PAGE) */
+/* ============================================================= */
 /* --- Login Page --- */
 .login-section {
   min-height: calc(100vh - var(--header-h));
@@ -453,6 +492,10 @@ textarea {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================= */
+/* СТРАНИЦА РЕГИСТРАЦИИ (REGISTER PAGE) */
+/* ============================================================= */
 /* --- Register Page --- */
 .register-section {
   min-height: calc(100vh - var(--header-h));
@@ -545,6 +588,10 @@ textarea {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ============================================================= */
+/* СЕКЦИЯ КОНТАКТОВ (CONTACTS) */
+/* ============================================================= */
 /* --- Контакты (светлая версия с анимацией) --- */
 /* --- Контакты (центрированный стиль) --- */
 .contact-section {
@@ -610,6 +657,9 @@ textarea {
   transform: translateY(0) !important;
 }
 
+/* ============================================================= */
+/* ПЛАВАЮЩАЯ КНОПКА WHATSAPP (FLOATING BUTTON) */
+/* ============================================================= */
 /* Плавающая кнопка WhatsApp */
 /* Плавающая кнопка WhatsApp */
 .floating-btn {
@@ -634,6 +684,10 @@ textarea {
   box-shadow: 0 6px 16px rgba(0,0,0,0.35);
   color: #fff;
 }
+
+/* ============================================================= */
+/* ЛИЧНЫЙ КАБИНЕТ (PROFILE) */
+/* ============================================================= */
 /* --- Иконка уведомлений --- */
 /* === УЛУЧШЕННЫЙ ЛИЧНЫЙ КАБИНЕТ === */
 .profile-card.wide {
@@ -837,6 +891,7 @@ textarea {
     margin-top: 8px;
   }
 }
+
 /* === ФОН ПРОФИЛЯ — ТОЧНО КАК У РЕГИСТРАЦИИ === */
 .profile-section {
   min-height: calc(100vh - var(--header-h));
@@ -860,6 +915,10 @@ textarea {
   pointer-events: none;
   z-index: -1;
 }
+
+/* ============================================================= */
+/* СЕКЦИЯ УНИВЕРСИТЕТА (UNIVERSITY) */
+/* ============================================================= */
 /* === ГЕРОЙ С КАРУСЕЛЬЮ === */
 .university-hero {
   position: relative;
@@ -1157,6 +1216,10 @@ textarea {
   .hero-text { font-size: 1.1rem; }
   .stats-grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================================= */
+/* ЗАЩИТА ОТ ПЕРЕПОЛНЕНИЯ ТЕКСТА И АДАПТИВНАЯ ТИПОГРАФИКА */
+/* ============================================================= */
 /* === ЗАЩИТА ОТ ПЕРЕПОЛНЕНИЯ ТЕКСТА (ФИНАЛЬНАЯ) === */
 
 .text-safe {
@@ -1235,6 +1298,7 @@ textarea {
     gap: 1.2rem;
   }
 }
+
 /* === ИСПРАВЛЕНИЕ ТАЙМЛАЙНА === */
 .timeline {
   position: relative;
@@ -1287,6 +1351,10 @@ textarea {
     font-size: 0.75rem;
   }
 }
+
+/* ============================================================= */
+/* КНОПКА ГОЛОСОВОГО ВВОДА (VOICE BUTTON) */
+/* ============================================================= */
 /* === УЛУЧШЕННАЯ КНОПКА ГОЛОСОВОГО ВВОДА — БЕЗ БЕЛОГО БЛИКА === */
 .voice-btn {
   position: relative;
@@ -1371,26 +1439,6 @@ textarea {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
-.chat-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 40px auto;
-  background: #fff;
-  border-radius: 16px;
-  display: flex;
-  flex-direction: column;
-  height: 600px;               /* 🔥 важно! фиксированная высота */
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-}
-
-.chat-box {
-  flex: 1;                      /* 🔥 вместо height:420 */
-  padding: 18px;
-  overflow-y: auto;
-  background: #f5f7fa;
-}
-
 
 /* === ИКОНКА === */
 .voice-btn i {
@@ -1447,6 +1495,10 @@ textarea {
     font-size: 1rem;
   }
 }
+
+/* ============================================================= */
+/* ШРИФТЫ И ТИПОГРАФИКА (FONTS AND TYPOGRAPHY) */
+/* ============================================================= */
 /* === ШРИФТЫ И ТИПОГРАФИКА ПРОФИЛЯ === */
 .profile-card.wide,
 .profile-section,
@@ -1504,6 +1556,9 @@ textarea {
   color: rgba(255,255,255,0.8);
 }
 
+/* ============================================================= */
+/* АДМИН-ПАНЕЛЬ (ADMIN PANEL) */
+/* ============================================================= */
 /* Glass карточки в админке */
 .bg-glass {
   background: rgba(255, 255, 255, 0.1) !important;
@@ -1523,6 +1578,10 @@ textarea {
 
 .text-white-90 { opacity: 0.9; }
 .text-white-70 { opacity: 0.7; }
+
+/* ============================================================= */
+/* СТЕКЛЯННЫЕ КАРТОЧКИ СТАТИСТИКИ (GLASS CARDS) */
+/* ============================================================= */
 /* === СТЕКЛЯННЫЕ КАРТОЧКИ СТАТИСТИКИ === */
 .glass-card {
     background: rgba(255, 255, 255, 0.15);  /* Убрали !important для background — фикс переопределения цвета */
@@ -1608,7 +1667,31 @@ textarea {
     .stat-card { padding: 1.2rem !important; }
 }
 
+/* ============================================================= */
+/* ЧАТ (CHAT) */
+/* ============================================================= */
+.chat-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 600px;               /* 🔥 важно! фиксированная высота */
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
 
+.chat-box {
+  flex: 1;                      /* 🔥 вместо height:420 */
+  padding: 18px;
+  overflow-y: auto;
+  background: #f5f7fa;
+}
+
+/* ============================================================= */
+/* ВЕРТИКАЛЬНЫЙ САЙДБАР + ЧАТ (SIDEBAR + CHAT LAYOUT) */
 /* ============================================================= */
 /* ВЕРТИКАЛЬНЫЙ САЙДБАР + ЧАТ (как в Telegram AI) — ТАЛАПКЕР 2025 */
 /* ============================================================= */
@@ -1653,6 +1736,9 @@ textarea {
   }
   .chat-sidebar.active { transform: translateX(0); }
 }
+
+/* ============================================================= */
+/* САЙДБАР (SIDEBAR) */
 /* ============================================================= */
 /* САЙДБАР — ФИНАЛЬНАЯ ВЕРСИЯ (100% РАБОЧАЯ)                     */
 /* ============================================================= */
@@ -1740,6 +1826,9 @@ textarea {
   box-shadow: 0 8px 20px rgba(255,179,15,0.25);
 }
 
+/* ============================================================= */
+/* ОСНОВНАЯ ЧАСТЬ ЧАТА (CHAT MAIN) */
+/* ============================================================= */
 /* Правая часть — сам чат */
 .chat-main {
   flex: 1;
@@ -1812,6 +1901,10 @@ textarea {
   0%, 60%, 100% { transform: translateY(0); }
   30% { transform: translateY(-12px); }
 }
+
+/* ============================================================= */
+/* ФОРМА ВВОДА ЧАТА (CHAT FORM) */
+/* ============================================================= */
 /* ПОЛЕ ВВОДА — прикреплено снизу */
 .chat-form {
   padding: 16px 20px;
@@ -1904,6 +1997,8 @@ textarea {
   100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
 }
 
+/* ============================================================= */
+/* КНОПКА ОТКРЫТИЯ САЙДБАРА (SIDEBAR TOGGLE) */
 /* ============================================================= */
 /* КРАСИВАЯ СТРЕЛКА-ОТКРЫВАТЕЛЬ САЙДБАРА (как в Telegram 2025)   */
 /* ============================================================= */
