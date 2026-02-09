@@ -759,7 +759,7 @@ def create_admin():
         admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()
-        print("Админ создан: admin@site.com / admin123")
+        
 
 @app.route('/api/admin/notify', methods=['POST'])
 @login_required

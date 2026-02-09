@@ -5,9 +5,9 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <section class="hero" style="height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; position: relative; overflow: hidden;">
-  <div class="hero-inner" style="background-image: url('/static/images/zhubanov.jpg'); background-size: cover; background-position: center; color: #fff; height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); position: relative; /* Для позиционирования оверлея и лого */">
-    <!-- Полупрозрачный оверлей для лучшей читаемости текста на фоне фото -->
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); z-index: 1;"></div>
+  <div class="hero-inner" style="background-image: url('/static/images/zhubanov.png'); background-size: cover; background-position: center; color: #fff; height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); position: relative; /* Для позиционирования оверлея и лого */">
+    <!-- Полупрозрачный градиентный оверлей для лучшей читаемости текста на фоне фото -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15,23,36,0.7), rgba(43,140,255,0.4)); z-index: 1;"></div>
     
     <!-- Текст с z-index выше оверлея -->
     <h1 style="position: relative; z-index: 2;">{{ t('ИИ-консультант для абитуриентов') }}</h1>
