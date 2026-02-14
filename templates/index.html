@@ -19,7 +19,8 @@
     <!-- Текст с пульсацией в овале (как hero-badge в оригинальном сайте) -->
     <div class="hero-badge" style="position: relative; z-index: 2;">{{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}</div>
     
-    <a class="btn orange" href="#chat-section" style="position: relative; z-index: 2;">{{ t('Узнать больше') }}</a>
+    <!-- Улучшенная кнопка "Узнать больше" (с градиентом, hover-эффектом подъёма, тенью и плавным переходом, как в оригинальном .btn-primary) -->
+    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;"> {{ t('Узнать больше') }}</a>
   </div>
 </section>
 
@@ -132,6 +133,27 @@
     50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
   }
 
+  /* Улучшенные стили для кнопки (как .btn-primary в оригинальном: градиент, hover с подъёмом, тенью) */
+  .btn-primary {
+    padding: 1.2rem 3rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Оранжевый градиент для вашего стиля "orange" */
+    color: #fff;
+    border: 2px solid transparent;
+    box-shadow: 0 10px 30px rgba(255, 126, 95, 0.4); /* Тень в оранжевых тонах */
+  }
+  .btn-primary:hover {
+    transform: translateY(-5px); /* Подъём вверх на hover */
+    box-shadow: 0 15px 40px rgba(255, 126, 95, 0.6); /* Усиленная тень */
+  }
+
   /* Анимации для текста (как в оригинальном: float и shine) */
   @keyframes titleFloat {
     0%, 100% { transform: translateY(0); }
@@ -149,6 +171,11 @@
     .hero-badge {
       font-size: 1.1rem;
       padding: 0.8rem 1.5rem;
+    }
+    .btn-primary {
+      width: 100%; /* Полная ширина на мобильных */
+      max-width: 280px;
+      text-align: center;
     }
   }
   @media (max-width: 480px) {
