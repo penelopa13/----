@@ -19,8 +19,8 @@
     <!-- Текст с пульсацией в овале (как hero-badge в оригинальном сайте) -->
     <div class="hero-badge" style="position: relative; z-index: 2;">{{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}</div>
     
-    <!-- Улучшенная кнопка "Узнать больше" (с градиентом, hover-эффектом подъёма, тенью и плавным переходом, как в оригинальном .btn-primary) -->
-    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;"> {{ t('Узнать больше') }}</a>
+    <!-- Улучшенная кнопка "Узнать больше" (с градиентом, hover-эффектом подъёма, тенью, shine и плавным переходом, как в оригинальном .btn-primary) -->
+    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;">{{ t('Узнать больше') }}</a>
   </div>
 </section>
 
@@ -87,7 +87,7 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* Частицы (particles) для эффекта (как в оригинальном, но теперь синие) */
+  /* Частицы (particles) для эффекта (как в оригинальном, но теперь синие и крупнее) */
   .particles {
     position: fixed;
     width: 100%;
@@ -98,8 +98,8 @@
   }
   .particle {
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 8px; /* Увеличен размер с 4px до 8px */
+    height: 8px; /* Увеличен размер с 4px до 8px */
     background: rgba(102, 126, 234, 0.6); /* Синий цвет (#667eea с прозрачностью) */
     border-radius: 50%;
     animation: particleFloat 20s infinite linear;
@@ -133,7 +133,7 @@
     50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
   }
 
-  /* Улучшенные стили для кнопки (как .btn-primary в оригинальном: градиент, hover с подъёмом, тенью) */
+  /* Улучшенные стили для кнопки (как .btn-primary в оригинальном: градиент, hover с подъёмом, тенью, shine и плавным переходом) */
   .btn-primary {
     padding: 1.2rem 3rem;
     border-radius: 50px;
@@ -144,14 +144,17 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(45deg, #ff7e5f, #feb47b); /* Оранжевый градиент для вашего стиля "orange" */
+    background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff7e5f); /* Оранжевый градиент с shine-эффектом */
+    background-size: 200% auto; /* Для shine */
     color: #fff;
     border: 2px solid transparent;
     box-shadow: 0 10px 30px rgba(255, 126, 95, 0.4); /* Тень в оранжевых тонах */
+    animation: textShine 3s linear infinite; /* Добавлен shine-эффект, как у текста */
   }
   .btn-primary:hover {
     transform: translateY(-5px); /* Подъём вверх на hover */
     box-shadow: 0 15px 40px rgba(255, 126, 95, 0.6); /* Усиленная тень */
+    animation: textShine 1.5s linear infinite; /* Ускоренный shine на hover для динамики */
   }
 
   /* Анимации для текста (как в оригинальном: float и shine) */
