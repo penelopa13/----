@@ -4,14 +4,21 @@
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+<!-- Добавляем анимированный градиентный фон и частицы (как в оригинальном сайте) -->
+<div class="bg-gradient"></div>
+<div class="particles" id="particles"></div>
+
 <section class="hero" style="height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; position: relative; overflow: hidden;">
-  <div class="hero-inner" style="background-image: url('/static/images/zhubanov.png'); background-size: cover; background-position: center; color: #fff; height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); position: relative; /* Для позиционирования оверлея и лого */">
-    <!-- Полупрозрачный градиентный оверлей для лучшей читаемости текста на фоне фото -->
+  <div class="hero-inner" style="background-image: url('/static/images/zhubanov.png'); background-size: cover; background-position: center; color: #fff; height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); position: relative;">
+    <!-- Полупрозрачный градиентный оверлей (улучшенный, как в оригинале) -->
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15,23,36,0.7), rgba(43,140,255,0.4)); z-index: 1;"></div>
     
-    <!-- Текст с z-index выше оверлея -->
-    <h1 style="position: relative; z-index: 2;">{{ t('ИИ-консультант для абитуриентов') }}</h1>
-    <p style="position: relative; z-index: 2;">{{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}</p>
+    <!-- Красивый текст над фото (как в оригинальном: с градиентом, анимацией float и shine) -->
+    <h1 class="hero-title" style="position: relative; z-index: 2; font-size: 4.5rem; font-weight: 900; margin-bottom: 2rem; background: linear-gradient(45deg, #fff, #e0e0e0, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; animation: titleFloat 3s ease-in-out infinite, textShine 3s linear infinite; background-size: 200% auto;">{{ t('ИИ-консультант для абитуриентов') }}</h1>
+    
+    <!-- Текст с пульсацией в овале (как hero-badge в оригинальном сайте) -->
+    <div class="hero-badge" style="position: relative; z-index: 2;">{{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}</div>
+    
     <a class="btn orange" href="#chat-section" style="position: relative; z-index: 2;">{{ t('Узнать больше') }}</a>
   </div>
 </section>
@@ -19,24 +26,19 @@
 <section id="chat-section" class="section container">
   <h2>{{ t('Чат с консультантом') }}</h2>
 
-  <!-- НОВЫЙ ДВУХКОЛОНОЧНЫЙ ЧАТ -->
+  <!-- НОВЫЙ ДВУХКОЛОНОЧНЫЙ ЧАТ (без изменений) -->
   <div class="chat-layout">
-    
-    <!-- ЛЕВАЯ ПАНЕЛЬ — быстрые вопросы -->
-    <div class="chat-sidebar" id="chat-sidebar"> <!-- убран класс active -->
-      <!-- ВОТ ЭТА СТРОКА ДОЛЖНА БЫТЬ ИМЕННО ТАКОЙ -->
+    <div class="chat-sidebar" id="chat-sidebar">
       <div class="sidebar-header">
         <i class="fas fa-bolt"></i> {{t('Частые вопросы')}}
-        <button class="sidebar-close" id="sidebar-close">×</button>  <!-- ← ЭТО ОБЯЗАТЕЛЬНО! -->
+        <button class="sidebar-close" id="sidebar-close">×</button>
       </div>
       <div class="sidebar-content" id="quick-questions"></div>
     </div>
 
-    <!-- ПРАВАЯ ПАНЕЛЬ — сам чат -->
     <div class="chat-main">
       <div id="chat-box" class="chat-box">
         <div class="messages" id="messages">
-          <!-- Приветственное сообщение -->
           <div class="message bot">
             <div class="bubble" style="background:linear-gradient(135deg,var(--secondary-color),var(--primary-color)); color:#fff; border-radius:18px; padding:18px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
               {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
@@ -44,11 +46,9 @@
             </div>
           </div>
         </div>
-        <!-- КРАСИВАЯ СТРЕЛКА — ОДНА, СНАРУЖИ, С УНИКАЛЬНЫМ ID -->
         <button class="sidebar-toggle" id="sidebar-toggle">
           <i class="fas fa-chevron-right"></i>
         </button>
-        <!-- Индикатор "печатает" -->
         <div id="typing-indicator" style="display:none;" class="message bot">
           <div class="bubble typing"><span></span><span></span><span></span></div>
         </div>
@@ -62,16 +62,122 @@
         </form>
       </div>
     </div>
-
-  
   </div>
 </section>
 {% endblock %}
+
 {% block scripts %}
+<style>
+  /* Анимированный градиентный фон (как в оригинальном сайте) */
+  .bg-gradient {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    animation: gradientShift 15s ease infinite;
+    background-size: 200% 200%;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Частицы (particles) для эффекта (как в оригинальном, но теперь синие) */
+  .particles {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(102, 126, 234, 0.6); /* Синий цвет (#667eea с прозрачностью) */
+    border-radius: 50%;
+    animation: particleFloat 20s infinite linear;
+  }
+  @keyframes particleFloat {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
+  }
+
+  /* Пульсация для hero-badge (как в оригинальном сайте) */
+  .hero-badge {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 700;
+    font-size: 1.4rem;
+    opacity: 0.95;
+    line-height: 1.8;
+    max-width: 900px;
+    text-align: center;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+  }
+
+  /* Анимации для текста (как в оригинальном: float и shine) */
+  @keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes textShine {
+    to { background-position: 200% center; }
+  }
+
+  /* Адаптив для мобильных (как в оригинальном, базово) */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.8rem !important;
+    }
+    .hero-badge {
+      font-size: 1.1rem;
+      padding: 0.8rem 1.5rem;
+    }
+  }
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 2.2rem !important;
+    }
+    .hero-badge {
+      font-size: 1rem;
+      padding: 0.8rem 1.5rem;
+    }
+  }
+</style>
 
 <script>
-// === ВСЁ В ОДНОМ СКРИПТЕ — РАБОТАЕТ НА 100% ===
+// Создание частиц (как в оригинальном сайте)
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 50; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 20 + 's';
+    particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+    container.appendChild(particle);
+  }
+}
+createParticles();
 
+// Остальной ваш скрипт без изменений
 const lang = "{{ session.get('lang', 'ru') }}";
 const userInput = document.getElementById('user-input');
 const messages = document.getElementById('messages');
@@ -79,23 +185,21 @@ const sidebar = document.getElementById('chat-sidebar');
 const toggleBtn = document.getElementById('sidebar-toggle');
 const closeBtn = document.getElementById('sidebar-close');
 const typingIndicator = document.getElementById('typing-indicator');
-const quickBox = document.getElementById('quick-questions');  // ← добавил
+const quickBox = document.getElementById('quick-questions');
 
-// === 1. Загрузка быстрых вопросов (ОБНОВЛЕНА) ===
 async function loadQuickQuestions() {
   try {
     const res = await fetch('/api/chat/options');
     const data = await res.json();
-    quickBox.innerHTML = "";  // очищаем
+    quickBox.innerHTML = "";
 
     data.options.forEach(q => {
       const btn = document.createElement('button');
       btn.className = 'quick-btn';
 
-      // Специально выделяем кнопку "Назад"
       if (q.includes('Назад') || q.includes('Артқа') || q.includes('Back') || q.includes('назад')) {
         btn.classList.add('back');
-        btn.innerHTML = q;  // с иконкой, если будет
+        btn.innerHTML = q;
       } else {
         btn.textContent = q;
       }
@@ -104,7 +208,6 @@ async function loadQuickQuestions() {
       quickBox.appendChild(btn);
     });
 
-    // Кнопка "Задать свой вопрос" — оставляем как было
     const ask = document.createElement('div');
     ask.className = 'ask-own';
     ask.innerHTML = `
@@ -119,10 +222,8 @@ async function loadQuickQuestions() {
   }
 }
 
-// Первый вызов — при загрузке страницы
 loadQuickQuestions();
 
-// === 2. Точные ответы (оставил как было) ===
 const predefined = [
   { keys: ["сроки", "қашан"], ru: "СРОКИ ПРИЁМА 2025–2026:\n• Бакалавриат: 1 июня – 25 июля\n• Магистратура: 1 июня – 15 июля\n• Докторантура: 1 июня – 10 июля" },
   { keys: ["грант"], ru: "Да, есть государственные гранты. Результаты — на enbek.kz" },
@@ -138,21 +239,19 @@ function getPredefinedAnswer(text) {
   return null;
 }
 
-// === 3. Добавление сообщения ===
 function addMessage(text, type = "bot") {
   const div = document.createElement('div');
   div.className = `message ${type}`;
   if (type === "bot") {
     div.innerHTML = marked.parse(text.replace(/\n/g, '  \n'));
   } else {
-    // Для пользователя: заменяем \n на <br> и вставляем как HTML
     const formattedText = text.replace(/\n/g, '<br>');
-    div.innerHTML = formattedText;  // Теперь переносы сохранятся
+    div.innerHTML = formattedText;
   }
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
-// === 4. Отправка сообщения (ГЛАВНОЕ ИСПРАВЛЕНИЕ) ===
+
 async function sendMessage(text) {
   if (!text.trim()) return;
 
@@ -163,7 +262,7 @@ async function sendMessage(text) {
   if (predefined) {
     setTimeout(() => {
       addMessage(predefined, "bot");
-      loadQuickQuestions();  // ← обновляем кнопки и после предопределённого ответа
+      loadQuickQuestions();
     }, 600);
     return;
   }
@@ -181,7 +280,6 @@ async function sendMessage(text) {
     typingIndicator.style.display = "none";
     addMessage(data.reply, 'bot');
 
-    // КЛЮЧЕВАЯ СТРОКА: обновляем кнопки после КАЖДОГО ответа от сервера
     loadQuickQuestions();
 
   } catch (err) {
@@ -190,21 +288,19 @@ async function sendMessage(text) {
   }
 }
 
-// === 5. Форма ===
 document.getElementById('chat-form').addEventListener('submit', e => {
   e.preventDefault();
   const text = userInput.value.trim();
   if (text) {
     sendMessage(text);
     userInput.value = '';
-    userInput.style.height = 'auto'; // сбрасываем высоту после отправки
+    userInput.style.height = 'auto';
   }
 });
 
-// Добавляем обработку Enter / Shift+Enter
 userInput.addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();           // предотвращаем перенос строки
+    e.preventDefault();
     const text = userInput.value.trim();
     if (text) {
       sendMessage(text);
@@ -212,12 +308,10 @@ userInput.addEventListener('keydown', function(e) {
       userInput.style.height = 'auto';
     }
   }
-  // Авто-расширение высоты по мере набора текста
   this.style.height = 'auto';
   this.style.height = (this.scrollHeight) + 'px';
 });
 
-// === 6. Голосовой ввод (без изменений) ===
 let recognition, isRecording = false;
 if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -246,7 +340,6 @@ if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
   document.getElementById('voice-btn').style.display = 'none';
 }
 
-// === 7. Загрузка истории (без изменений) ===
 async function loadChatHistory() {
   try {
     const res = await fetch('/api/chat/history');
@@ -263,7 +356,6 @@ async function loadChatHistory() {
 }
 document.addEventListener('DOMContentLoaded', loadChatHistory);
 
-// === 8. Управление сайдбаром (без изменений) ===
 function openSidebar() { sidebar.classList.add('active'); }
 function closeSidebar() { sidebar.classList.remove('active'); }
 
@@ -281,5 +373,4 @@ document.addEventListener('keydown', e => {
 });
 
 </script>
-
 {% endblock %}
