@@ -318,7 +318,7 @@
 
   const container = document.getElementById('scoreInputs');
   container.innerHTML = '';
-    if (level === 'master') {
+        if (level === 'master') {
       // ==================== ЧИСТЫЕ ПОЛЯ ДЛЯ МАГИСТРАТУРЫ ====================
       const masterSections = [
         { name: "Тест на знание иностранного языка", max: 50 },
@@ -330,52 +330,70 @@
       masterSections.forEach(section => {
         container.innerHTML += `
           <div class="col-lg-6">
-            <label class="form-label text-white opacity-90 fw-500 master-label">
-              ${section.name} 
-             
+            <label class="form-label text-white opacity-90 fw-500 score-label">
+              ${section.name}
             </label>
             <input type="number" class="form-control form-control-lg text-center score-input" 
                    placeholder="0–${section.max}" min="0" max="${section.max}" required>
           </div>`;
       });
-    } else {
-    // ==================== СТАРАЯ ЛОГИКА (бакалавриат + докторантура) ====================
-    const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
-    const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
+    } 
+    else if (level === 'phd') {
+      // ==================== НОВЫЕ ПОЛЯ ДЛЯ ДОКТОРАНТУРЫ (100-балльная система) ====================
+      const phdSections = [
+        { name: "Собеседование с поступающим", max: 30 },
+        { name: "Эссе", max: 20 },
+        { name: "Экзамен по профилю группы образовательной программы", max: 50 }
+      ];
 
-    let maxProfile = level === 'bachelor' ? 50 : 70;
-    let maxHistory = level === 'bachelor' ? 20 : 30;
-    let maxReading = level === 'bachelor' ? 10 : 20;
-    let maxMath = level === 'bachelor' ? 10 : 20;
+      phdSections.forEach(section => {
+        container.innerHTML += `
+          <div class="col-lg-6">
+            <label class="form-label text-white opacity-90 fw-500 score-label">
+              ${section.name}
+            </label>
+            <input type="number" class="form-control form-control-lg text-center score-input" 
+                   placeholder="0–${section.max}" min="0" max="${section.max}" required>
+          </div>`;
+      });
+    } 
+    else {
+      // ==================== СТАРАЯ ЛОГИКА (только бакалавриат) ====================
+      const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
+      const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
 
-    // Профильные предметы
-    profileSubjects.forEach(sub => {
-      container.innerHTML += `
-        <div class="col-lg-6">
-          <label class="form-label text-white opacity-90 fw-500">${sub}</label>
-          <input type="number" class="form-control form-control-lg text-center score-input" 
-                 placeholder="0–${maxProfile}" min="0" max="${maxProfile}" required>
-        </div>`;
-    });
+      let maxProfile = 50;
+      let maxHistory = 20;
+      let maxReading = 10;
+      let maxMath = 10;
 
-    // Базовые предметы
-    baseSubjects.forEach(sub => {
-      let max = sub === "История Казахстана" ? maxHistory : sub === "Грамотность чтения" ? maxReading : maxMath;
-      let placeholder = `0–${max}`;
+      // Профильные предметы
+      profileSubjects.forEach(sub => {
+        container.innerHTML += `
+          <div class="col-lg-6">
+            <label class="form-label text-white opacity-90 fw-500">${sub}</label>
+            <input type="number" class="form-control form-control-lg text-center score-input" 
+                   placeholder="0–${maxProfile}" min="0" max="${maxProfile}" required>
+          </div>`;
+      });
 
-      container.innerHTML += `
-        <div class="col-lg-6">
-          <label class="form-label text-white opacity-90 fw-500">${sub}</label>
-          <input type="number" class="form-control form-control-lg text-center score-input" 
-                 placeholder="${placeholder}" min="0" max="${max}" required>
-        </div>`;
-    });
-  }
+      // Базовые предметы
+      baseSubjects.forEach(sub => {
+        let max = sub === "История Казахстана" ? maxHistory : sub === "Грамотность чтения" ? maxReading : maxMath;
+        let placeholder = `0–${max}`;
 
+        container.innerHTML += `
+          <div class="col-lg-6">
+            <label class="form-label text-white opacity-90 fw-500">${sub}</label>
+            <input type="number" class="form-control form-control-lg text-center score-input" 
+                   placeholder="${placeholder}" min="0" max="${max}" required>
+          </div>`;
+      });
+    }
+    
   document.getElementById('scoresSection').style.display = 'block';
 });
 
-  
 
   document.getElementById('calcForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -539,6 +557,18 @@
 option {
   background: #1f2d3d !important;
   color: white !important;
+}
+/* Выравнивание всех полей ввода баллов (магистратура + докторантура) */
+#scoreInputs .col-lg-6 {
+  display: flex;
+  flex-direction: column;
+}
+
+#scoreInputs .score-label {
+  min-height: 52px;
+  display: flex;
+  align-items: flex-end;
+  line-height: 1.3;
 }
 </style>
 {% endblock %}
