@@ -41,13 +41,12 @@
               </select>
             </div>
 
-            <!-- Проходной балл 2024 -->
+                       <!-- Проходной балл 2024 -->
             <div class="alert alert-info border-0 rounded-4 py-3 mb-4 glass-alert" id="thresholdInfo" style="display:none;" data-aos="fade-right">
               <strong class="text-white">Проходной балл 2024:</strong><br>
-              <span class="text-success fw-bold">Грант:</span> <span id="grantThreshold" class="fw-bold">—</span> баллов | 
-              <span class="text-warning fw-bold">Контракт:</span> <span id="contractThreshold" class="fw-bold">—</span> баллов
+              <span class="text-success fw-bold">Общий балл:</span> <span id="grantThreshold" class="fw-bold">—</span> баллов | 
+              <span class="text-warning fw-bold">Проходной балл:</span> <span id="contractThreshold" class="fw-bold">—</span> баллов
             </div>
-
             <!-- Ввод баллов -->
             <div id="scoresSection" style="display:none;" data-aos="fade-up" data-aos-delay="400">
               <hr class="border-white opacity-25 my-5">
@@ -308,12 +307,27 @@
   const faculty = document.getElementById('faculty').value;
   const program = this.value;
   hideAll();
-
   const data = programsData[level]?.[faculty]?.[program];
   if (!data) return;
 
-  document.getElementById('grantThreshold').textContent = data.grant;
-  document.getElementById('contractThreshold').textContent = data.contract;
+  // ФИКСИРОВАННЫЕ ПРОХОДНЫЕ БАЛЛЫ ПО УРОВНЮ (как ты просил)
+  let grantVal, contractVal;
+
+  if (level === 'bachelor') {
+    grantVal = 140;   // максимум = грант
+    contractVal = 50;
+  } 
+  else if (level === 'master') {
+    grantVal = 150;   // максимум = грант
+    contractVal = 75;
+  } 
+  else if (level === 'phd') {
+    grantVal = 100;   // максимум = грант
+    contractVal = 75;
+  }
+
+  document.getElementById('grantThreshold').textContent = grantVal;
+  document.getElementById('contractThreshold').textContent = contractVal;
   document.getElementById('thresholdInfo').style.display = 'block';
 
   const container = document.getElementById('scoreInputs');
@@ -395,25 +409,49 @@
 });
 
 
-  document.getElementById('calcForm').addEventListener('submit', function(e) {
+    document.getElementById('calcForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     let total = 0;
     let hasError = false;
+    let hasEmpty = false;
+    let hasHistoryError = false;
 
     document.querySelectorAll('.score-input').forEach(input => {
-      const val = parseInt(input.value) || 0;
-      const max = parseInt(input.max);
+      const valStr = input.value.trim();
+      const labelText = input.parentElement.querySelector('label').textContent;
 
-      if (val > max || val < 0) {
+      if (valStr === '') {
         input.classList.add('is-invalid');
-        hasError = true;
+        hasEmpty = true;
       } else {
-        input.classList.remove('is-invalid');
-        total += val;
+        const val = parseInt(valStr);
+        const max = parseInt(input.max);
+
+        // Специальная проверка для Истории Казахстана (только бакалавриат)
+        if (labelText.includes('История Казахстана') && val < 5) {
+          input.classList.add('is-invalid');
+          hasHistoryError = true;
+        }
+        else if (val > max || val < 0) {
+          input.classList.add('is-invalid');
+          hasError = true;
+        } else {
+          input.classList.remove('is-invalid');
+          total += val;
+        }
       }
     });
 
+    // Проверки по приоритету
+    if (hasEmpty) {
+      alert("Ошибка! Все поля должны быть заполнены!");
+      return;
+    }
+    if (hasHistoryError) {
+      alert("Недопуск к вузам! По Истории Казахстана нужно минимум 5 баллов");
+      return;
+    }
     if (hasError) {
       alert("Ошибка! Нельзя вводить больше максимального балла!");
       return;
@@ -450,7 +488,6 @@
     document.getElementById('resultSection').style.display = 'block';
     document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
   });
-
   function hideAll() {
     document.getElementById('thresholdInfo').style.display = 'none';
     document.getElementById('scoresSection').style.display = 'none';
