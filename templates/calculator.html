@@ -304,32 +304,51 @@
   });
 
   document.getElementById('program').addEventListener('change', function() {
-    const level = document.getElementById('level').value;
-    const faculty = document.getElementById('faculty').value;
-    const program = this.value;
-    hideAll();
+  const level = document.getElementById('level').value;
+  const faculty = document.getElementById('faculty').value;
+  const program = this.value;
+  hideAll();
 
-    const data = programsData[level]?.[faculty]?.[program];
-    if (!data) return;
+  const data = programsData[level]?.[faculty]?.[program];
+  if (!data) return;
 
-    document.getElementById('grantThreshold').textContent = data.grant;
-    document.getElementById('contractThreshold').textContent = data.contract;
-    document.getElementById('thresholdInfo').style.display = 'block';
+  document.getElementById('grantThreshold').textContent = data.grant;
+  document.getElementById('contractThreshold').textContent = data.contract;
+  document.getElementById('thresholdInfo').style.display = 'block';
 
-    const container = document.getElementById('scoreInputs');
-    container.innerHTML = '';
+  const container = document.getElementById('scoreInputs');
+  container.innerHTML = '';
+    if (level === 'master') {
+      // ==================== ЧИСТЫЕ ПОЛЯ ДЛЯ МАГИСТРАТУРЫ ====================
+      const masterSections = [
+        { name: "Тест на знание иностранного языка", max: 50 },
+        { name: "Тест на определение готовности", max: 30 },
+        { name: "Тест по дисциплинам группы образовательных программ (Предмет 1)", max: 30 },
+        { name: "Тест по дисциплинам группы образовательных программ (Предмет 2)", max: 40 }
+      ];
 
-    // Базовые предметы для всех уровней (адаптировано)
+      masterSections.forEach(section => {
+        container.innerHTML += `
+          <div class="col-lg-6">
+            <label class="form-label text-white opacity-90 fw-500 master-label">
+              ${section.name} 
+             
+            </label>
+            <input type="number" class="form-control form-control-lg text-center score-input" 
+                   placeholder="0–${section.max}" min="0" max="${section.max}" required>
+          </div>`;
+      });
+    } else {
+    // ==================== СТАРАЯ ЛОГИКА (бакалавриат + докторантура) ====================
     const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
     const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
 
-    // Для магистратуры/докторантуры - более высокие макс. баллы (примерно)
     let maxProfile = level === 'bachelor' ? 50 : 70;
     let maxHistory = level === 'bachelor' ? 20 : 30;
     let maxReading = level === 'bachelor' ? 10 : 20;
     let maxMath = level === 'bachelor' ? 10 : 20;
 
-    // Профильные
+    // Профильные предметы
     profileSubjects.forEach(sub => {
       container.innerHTML += `
         <div class="col-lg-6">
@@ -339,7 +358,7 @@
         </div>`;
     });
 
-    // Базовые
+    // Базовые предметы
     baseSubjects.forEach(sub => {
       let max = sub === "История Казахстана" ? maxHistory : sub === "Грамотность чтения" ? maxReading : maxMath;
       let placeholder = `0–${max}`;
@@ -351,9 +370,12 @@
                  placeholder="${placeholder}" min="0" max="${max}" required>
         </div>`;
     });
+  }
 
-    document.getElementById('scoresSection').style.display = 'block';
-  });
+  document.getElementById('scoresSection').style.display = 'block';
+});
+
+  
 
   document.getElementById('calcForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -391,7 +413,7 @@
     const advice = document.getElementById('adviceText');
 
     if (total >= grant && grant > 0) {
-      badge.textContent = "ГРАНТ ПОЧТИ В КАРМАНЕ!";
+      badge.textContent = "ГРАНТ С ВЫСОКОЙ ВЕРОЯТНОСТЬЮ!";
       badge.className = "bg-success text-white rounded-pill fs-3 px-5 py-3";
       text.textContent = `Поздравляю! Вы с высокой вероятностью получаете грант (${chancePercent}% шансов).`;
       advice.textContent = "Подайте документы timely и следите за обновлениями на сайте университета.";

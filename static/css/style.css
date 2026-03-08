@@ -2098,3 +2098,15 @@ textarea {
     left: 16px;
   }
 }
+/* Выравнивание полей ввода для магистратуры */
+#scoreInputs .col-lg-6 {
+  display: flex;
+  flex-direction: column;
+}
+
+#scoreInputs .form-label {
+  min-height: 52px;        /* чуть-чуть опускаем короткие заголовки */
+  display: flex;
+  align-items: flex-end;
+  line-height: 1.3;
+}
