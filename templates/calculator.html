@@ -5,13 +5,13 @@
 <section class="section py-5" style="min-height: calc(100vh - var(--header-h)); background: linear-gradient(135deg, #1f2d3d, #2b8cff);">
   <div class="container py-5">
     <div class="text-center mb-5">
-      <h1 class="display-5 fw-bold text-white" data-aos="fade-down">Калькулятор шансов поступления</h1>
-      <p class="lead text-white opacity-90" data-aos="fade-up" data-aos-delay="200">ЕНТ 2025 • АРГУ им. Жубанова • Все специальности • Обновлено 2026</p>
+      <h1 class="display-5 fw-bold text-white">Калькулятор шансов поступления</h1>
+      <p class="lead text-white opacity-90">ЕНТ 2025 • АРГУ им. Жубанова • Все специальности • Обновлено 2026</p>
     </div>
 
     <div class="row justify-content-center">
       <div class="col-lg-9 col-xl-8">
-        <div class="glass-card p-5 shadow-lg" data-aos="zoom-in" data-aos-delay="300">
+        <div class="glass-card p-5 shadow-lg">
           <form id="calcForm" class="needs-validation" novalidate>
 
             <!-- Уровень обучения -->
@@ -41,14 +41,15 @@
               </select>
             </div>
 
-                       <!-- Проходной балл 2024 -->
-            <div class="alert alert-info border-0 rounded-4 py-3 mb-4 glass-alert" id="thresholdInfo" style="display:none;" data-aos="fade-right">
+            <!-- Проходной балл 2024 -->
+            <div class="alert alert-info border-0 rounded-4 py-3 mb-4 glass-alert" id="thresholdInfo" style="display:none;">
               <strong class="text-white">Проходной балл 2024:</strong><br>
               <span class="text-success fw-bold">Общий балл:</span> <span id="grantThreshold" class="fw-bold">—</span> баллов | 
               <span class="text-warning fw-bold">Проходной балл:</span> <span id="contractThreshold" class="fw-bold">—</span> баллов
             </div>
+
             <!-- Ввод баллов -->
-            <div id="scoresSection" style="display:none;" data-aos="fade-up" data-aos-delay="400">
+            <div id="scoresSection" style="display:none;">
               <hr class="border-white opacity-25 my-5">
               <h5 class="text-white text-center mb-4 fw-bold">Введите ваши баллы</h5>
               <div class="row g-4" id="scoreInputs"></div>
@@ -60,7 +61,7 @@
           </form>
 
           <!-- Результат -->
-          <div id="resultSection" class="text-center mt-5 pt-4" style="display:none;" data-aos="zoom-in-up">
+          <div id="resultSection" class="text-center mt-5 pt-4" style="display:none;">
             <h2 class="text-white mb-4">Ваш результат</h2>
             <div class="progress mb-4" style="height: 20px; border-radius: 10px; background: rgba(255,255,255,0.2);">
               <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #ff4757, #ffb30f);"></div>
