@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Калькулятор шансов поступления - Талапкер{% endblock %}
+{% block title %}Калькулятор шансов поступления (Бакалавриат) - Талапкер{% endblock %}
 
 {% block content %}
 <section class="section py-5" style="min-height: calc(100vh - var(--header-h)); background: linear-gradient(135deg, #1f2d3d, #2b8cff);">
   <div class="container py-5">
     <div class="text-center mb-5">
       <h1 class="display-5 fw-bold text-white">Калькулятор шансов поступления</h1>
-      <p class="lead text-white opacity-90">ЕНТ 2025 • АРГУ им. Жубанова • Все специальности • Обновлено 2026</p>
+      <p class="lead text-white opacity-90">ЕНТ 2025 • АРГУ им. Жубанова • Бакалавриат • Все специальности • Обновлено 2026</p>
     </div>
 
     <div class="row justify-content-center">
@@ -14,22 +14,11 @@
         <div class="glass-card p-5 shadow-lg">
           <form id="calcForm" class="needs-validation" novalidate>
 
-            <!-- Уровень обучения -->
-            <div class="mb-4">
-              <label class="form-label text-white fw-bold mb-3">Уровень обучения</label>
-              <select class="form-select form-select-lg glass-select" id="level" required>
-                <option value="" disabled selected>Выберите уровень</option>
-                <option value="bachelor">Бакалавриат</option>
-                <option value="master">Магистратура</option>
-                <option value="phd">Докторантура</option>
-              </select>
-            </div>
-
             <!-- Факультет -->
             <div class="mb-4">
               <label class="form-label text-white fw-bold mb-3">Факультет</label>
-              <select class="form-select form-select-lg glass-select" id="faculty" required disabled>
-                <option value="">Сначала выберите уровень</option>
+              <select class="form-select form-select-lg glass-select" id="faculty" required>
+                <option value="">Выберите факультет</option>
               </select>
             </div>
 
@@ -84,7 +73,7 @@
 <script>
   AOS.init({ duration: 1000, once: true });
 
-  // ==================== ВСЕ ДАННЫЕ ====================
+  // ==================== ВСЕ ДАННЫЕ (только бакалавриат) ====================
   const programsData = {
     bachelor: {
       "Факультет педагогики и менеджмента в образовании": {
@@ -165,252 +154,84 @@
         "6В07108 Электроэнергетика": { grant: 118, contract: 93, subjects: ["Математика", "Физика"] },
         "6В07209 Нефтяная инженерия и энергоменеджмент": { grant: 125, contract: 100, subjects: ["Математика", "Физика"] }
       }
-    },
-    master: {
-      "Факультет педагогики и менеджмента в образовании": {
-        "7M01102 Психология и менеджмент образования": { grant: 120, contract: 90, subjects: ["Теория образования", "Психология"] },
-        "7M01201 Дошкольное обучение и воспитание": { grant: 110, contract: 80, subjects: ["Педагогика", "Методика дошкольного образования"] },
-        "7M01301 Педагогика и методика начального обучения": { grant: 115, contract: 85, subjects: ["Методика преподавания", "Психология детей"] },
-        "7M01902 Специальная педагогика": { grant: 118, contract: 88, subjects: ["Специальная психология", "Коррекционная педагогика"] },
-        "7M03101 Психология": { grant: 125, contract: 95, subjects: ["Клиническая психология", "Социальная психология"] }
-      },
-      "Исторический факультет": {
-        "7M01506 География": { grant: 112, contract: 82, subjects: ["Географические исследования", "Экология"] },
-        "7M01603 История и обществознание": { grant: 120, contract: 90, subjects: ["Историография", "Социальные науки"] },
-        "7M02201 История": { grant: 118, contract: 88, subjects: ["Архивоведение", "Исторические источники"] },
-        "7M05203 Ландшафтное проектирование": { grant: 115, contract: 85, subjects: ["Ландшафтная архитектура", "Экодизайн"] }
-      },
-      "Профессионально-творческий факультет": {
-        "7M01401 Музыкальное образование": { grant: 110, contract: 80, subjects: ["Музыкальная теория", "Педагогика музыки"] },
-        "7M01404 Физическая культура и спорт": { grant: 115, contract: 85, subjects: ["Спортивная физиология", "Методика тренировок"] },
-        "7M01406 Художественное образование": { grant: 112, contract: 82, subjects: ["Искусствоведение", "Методика преподавания искусства"] },
-        "7M02102 Дизайн": { grant: 120, contract: 90, subjects: ["Графический дизайн", "Дизайн-мышление"] }
-      },
-      "Технический факультет": {
-        "7M07106 Электроэнергетика": { grant: 125, contract: 95, subjects: ["Электротехника", "Автоматизация энергосистем"] },
-        "7M07107 Автоматизация и управление": { grant: 128, contract: 98, subjects: ["Системы управления", "Робототехника"] },
-        "7M07201 Горное дело": { grant: 120, contract: 90, subjects: ["Геомеханика", "Технологии добычи"] },
-        "7M07202 Нефтегазовое дело": { grant: 130, contract: 100, subjects: ["Нефтехимия", "Бурение скважин"] },
-        "7M07301 Строительство": { grant: 122, contract: 92, subjects: ["Строительные материалы", "Проектирование"] }
-      },
-      "Факультет естествознания": {
-        "7M05101 Биология": { grant: 118, contract: 88, subjects: ["Молекулярная биология", "Генетика"] },
-        "7M05102 Биотехнология": { grant: 125, contract: 95, subjects: ["Биоинженерия", "Микробиология"] },
-        "7M05201 Экология": { grant: 115, contract: 85, subjects: ["Экологический мониторинг", "Устойчивость"] },
-        "7M05302 Химия": { grant: 120, contract: 90, subjects: ["Органическая химия", "Аналитическая химия"] }
-      },
-      "Физико-математический факультет": {
-        "7M01501 Математика": { grant: 130, contract: 100, subjects: ["Высшая математика", "Алгебра"] },
-        "7M05301 Физика": { grant: 128, contract: 98, subjects: ["Квантовая физика", "Термодинамика"] },
-        "7M06103 Вычислительная техника и программное обеспечение": { grant: 135, contract: 105, subjects: ["Алгоритмы", "ИИ"] },
-        "7M06105 Компьютерная инженерия": { grant: 132, contract: 102, subjects: ["Компьютерные сети", "Архитектура"] }
-      },
-      "Филологический факультет": {
-        "7M01701 Казахский язык и литература": { grant: 125, contract: 95, subjects: ["Лингвистика", "Литературоведение"] },
-        "7M01702 Русский язык и литература": { grant: 120, contract: 90, subjects: ["Филология", "Семиотика"] }
-      },
-      "Факультет иностранных языков": {
-        "7M01706 Иностранный язык: два иностранных языка": { grant: 130, contract: 100, subjects: ["Лингвистика", "Перевод"] },
-        "7M02302 Переводческое дело": { grant: 128, contract: 98, subjects: ["Синхронный перевод", "Локализация"] }
-      },
-      "Факультет экономики и права": {
-        "7M04101 Экономика": { grant: 125, contract: 95, subjects: ["Макроэкономика", "Эконометрика"] },
-        "7M04102 Менеджмент": { grant: 128, contract: 98, subjects: ["Стратегический менеджмент", "HR"] },
-        "7M04104 Финансы": { grant: 130, contract: 100, subjects: ["Финансовый анализ", "Инвестиции"] },
-        "7M04201 Право": { grant: 135, contract: 105, subjects: ["Международное право", "Гражданское право"] }
-      },
-      "Heriot-Watt Campus": {
-        "7M06107 Компьютерная инженерия": { grant: 140, contract: 110, subjects: ["ИИ", "Кибербезопасность"] },
-        "7M07108 Электроэнергетика": { grant: 138, contract: 108, subjects: ["Возобновляемая энергия", "Смарт-грид"] }
-      }
-    },
-    phd: {
-      "Факультет педагогики и менеджмента в образовании": {
-        "8D01102 Психология и менеджмент образования": { grant: 140, contract: 110, subjects: ["Исследовательские методы", "Образовательная политика"] },
-        "8D01902 Специальная педагогика": { grant: 145, contract: 115, subjects: ["Инклюзивное образование", "Нейропсихология"] },
-        "8D03101 Психология": { grant: 150, contract: 120, subjects: ["Экспериментальная психология", "Когнитивная наука"] }
-      },
-      "Исторический факультет": {
-        "8D01603 История и обществознание": { grant: 142, contract: 112, subjects: ["Археология", "Этнография"] },
-        "8D02201 История": { grant: 148, contract: 118, subjects: ["Историческая антропология", "Глобальная история"] }
-      },
-      "Профессионально-творческий факультет": {
-        "8D01401 Музыкальное образование": { grant: 135, contract: 105, subjects: ["Музыковедение", "Этномузыкология"] },
-        "8D01406 Художественное образование": { grant: 140, contract: 110, subjects: ["Искусствотерапия", "Креативные индустрии"] }
-      },
-      "Технический факультет": {
-        "8D07106 Электроэнергетика": { grant: 150, contract: 120, subjects: ["Энергетическая эффективность", "AI в энергетике"] },
-        "8D07202 Нефтегазовое дело": { grant: 155, contract: 125, subjects: ["Гидравлика", "Экологическая инженерия"] },
-        "8D07301 Строительство": { grant: 145, contract: 115, subjects: ["Устойчивые материалы", "BIM-технологии"] }
-      },
-      "Факультет естествознания": {
-        "8D05101 Биология": { grant: 148, contract: 118, subjects: ["Геномика", "Эволюционная биология"] },
-        "8D05102 Биотехнология": { grant: 152, contract: 122, subjects: ["Синтетическая биология", "Биоинформатика"] },
-        "8D05302 Химия": { grant: 145, contract: 115, subjects: ["Нанохимия", "Катализ"] }
-      },
-      "Физико-математический факультет": {
-        "8D01501 Математика": { grant: 155, contract: 125, subjects: ["Теория чисел", "Математическое моделирование"] },
-        "8D05301 Физика": { grant: 150, contract: 120, subjects: ["Квантовая оптика", "Нанофизика"] },
-        "8D06103 Вычислительная техника и программное обеспечение": { grant: 160, contract: 130, subjects: ["Машинное обучение", "Большие данные"] }
-      },
-      "Филологический факультет": {
-        "8D01701 Казахский язык и литература": { grant: 145, contract: 115, subjects: ["Сравнительная филология", "Литературная критика"] }
-      },
-      "Факультет иностранных языков": {
-        "8D01706 Иностранный язык: два иностранных языка": { grant: 150, contract: 120, subjects: ["Прикладная лингвистика", "Кросс-культурные исследования"] }
-      },
-      "Факультет экономики и права": {
-        "8D04101 Экономика": { grant: 152, contract: 122, subjects: ["Экономическая теория", "Макроэкономическое моделирование"] },
-        "8D04201 Право": { grant: 155, contract: 125, subjects: ["Конституционное право", "Международные отношения"] }
-      },
-      "Heriot-Watt Campus": {
-        "8D06107 Компьютерная инженерия": { grant: 160, contract: 130, subjects: ["Квантовые вычисления", "Киберфизические системы"] }
-      }
     }
   };
 
-  const facultiesByLevel = {
-    bachelor: Object.keys(programsData.bachelor),
-    master: Object.keys(programsData.master),
-    phd: Object.keys(programsData.phd)
-  };
+  // ==================== ЛОГИКА (только бакалавриат) ====================
+  const currentLevel = 'bachelor';
 
-  // ==================== ЛОГИКА ====================
-  document.getElementById('level').addEventListener('change', function() {
-    const level = this.value;
-    const facultySelect = document.getElementById('faculty');
-    const programSelect = document.getElementById('program');
+  // Инициализация факультетов при загрузке страницы
+  const facultySelect = document.getElementById('faculty');
+  const programSelect = document.getElementById('program');
 
-    facultySelect.innerHTML = '<option value="">Выберите факультет</option>';
-    programSelect.innerHTML = '<option value="">Сначала выберите факультет</option>';
-    facultySelect.disabled = !level;
-    programSelect.disabled = true;
-    hideAll();
-
-    facultiesByLevel[level]?.forEach(f => facultySelect.add(new Option(f, f)));
-  });
+  facultySelect.innerHTML = '<option value="">Выберите факультет</option>';
+  Object.keys(programsData[currentLevel]).forEach(f => facultySelect.add(new Option(f, f)));
+  facultySelect.disabled = false;
 
   document.getElementById('faculty').addEventListener('change', function() {
-    const level = document.getElementById('level').value;
     const faculty = this.value;
-    const programSelect = document.getElementById('program');
-
     programSelect.innerHTML = '<option value="">Выберите программу</option>';
     programSelect.disabled = false;
     hideAll();
 
-    const programs = programsData[level]?.[faculty];
+    const programs = programsData[currentLevel]?.[faculty];
     if (programs) Object.keys(programs).forEach(p => programSelect.add(new Option(p, p)));
   });
 
   document.getElementById('program').addEventListener('change', function() {
-  const level = document.getElementById('level').value;
-  const faculty = document.getElementById('faculty').value;
-  const program = this.value;
-  hideAll();
-  const data = programsData[level]?.[faculty]?.[program];
-  if (!data) return;
+    const faculty = document.getElementById('faculty').value;
+    const program = this.value;
+    hideAll();
+    const data = programsData[currentLevel]?.[faculty]?.[program];
+    if (!data) return;
 
-  // ФИКСИРОВАННЫЕ ПРОХОДНЫЕ БАЛЛЫ ПО УРОВНЮ (как ты просил)
-  let grantVal, contractVal;
+    // ФИКСИРОВАННЫЕ ПРОХОДНЫЕ БАЛЛЫ (только бакалавриат)
+    let grantVal = 140;
+    let contractVal = 50;
 
-  if (level === 'bachelor') {
-    grantVal = 140;   // максимум = грант
-    contractVal = 50;
-  } 
-  else if (level === 'master') {
-    grantVal = 150;   // максимум = грант
-    contractVal = 75;
-  } 
-  else if (level === 'phd') {
-    grantVal = 100;   // максимум = грант
-    contractVal = 75;
-  }
+    document.getElementById('grantThreshold').textContent = grantVal;
+    document.getElementById('contractThreshold').textContent = contractVal;
+    document.getElementById('thresholdInfo').style.display = 'block';
 
-  document.getElementById('grantThreshold').textContent = grantVal;
-  document.getElementById('contractThreshold').textContent = contractVal;
-  document.getElementById('thresholdInfo').style.display = 'block';
+    const container = document.getElementById('scoreInputs');
+    container.innerHTML = '';
 
-  const container = document.getElementById('scoreInputs');
-  container.innerHTML = '';
-        if (level === 'master') {
-      // ==================== ЧИСТЫЕ ПОЛЯ ДЛЯ МАГИСТРАТУРЫ ====================
-      const masterSections = [
-        { name: "Тест на знание иностранного языка", max: 50 },
-        { name: "Тест на определение готовности", max: 30 },
-        { name: "Тест по дисциплинам группы образовательных программ (Предмет 1)", max: 30 },
-        { name: "Тест по дисциплинам группы образовательных программ (Предмет 2)", max: 40 }
-      ];
+    // ==================== ЛОГИКА ВВОДА БАЛЛОВ ТОЛЬКО ДЛЯ БАКАЛАВРИАТА ====================
+    const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
+    const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
 
-      masterSections.forEach(section => {
-        container.innerHTML += `
-          <div class="col-lg-6">
-            <label class="form-label text-white opacity-90 fw-500 score-label">
-              ${section.name}
-            </label>
-            <input type="number" class="form-control form-control-lg text-center score-input" 
-                   placeholder="0–${section.max}" min="0" max="${section.max}" required>
-          </div>`;
-      });
-    } 
-    else if (level === 'phd') {
-      // ==================== НОВЫЕ ПОЛЯ ДЛЯ ДОКТОРАНТУРЫ (100-балльная система) ====================
-      const phdSections = [
-        { name: "Собеседование с поступающим", max: 30 },
-        { name: "Эссе", max: 20 },
-        { name: "Экзамен по профилю группы образовательной программы", max: 50 }
-      ];
+    let maxProfile = 50;
+    let maxHistory = 20;
+    let maxReading = 10;
+    let maxMath = 10;
 
-      phdSections.forEach(section => {
-        container.innerHTML += `
-          <div class="col-lg-6">
-            <label class="form-label text-white opacity-90 fw-500 score-label">
-              ${section.name}
-            </label>
-            <input type="number" class="form-control form-control-lg text-center score-input" 
-                   placeholder="0–${section.max}" min="0" max="${section.max}" required>
-          </div>`;
-      });
-    } 
-    else {
-      // ==================== СТАРАЯ ЛОГИКА (только бакалавриат) ====================
-      const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
-      const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
+    // Профильные предметы
+    profileSubjects.forEach(sub => {
+      container.innerHTML += `
+        <div class="col-lg-6">
+          <label class="form-label text-white opacity-90 fw-500">${sub}</label>
+          <input type="number" class="form-control form-control-lg text-center score-input" 
+                 placeholder="0–${maxProfile}" min="0" max="${maxProfile}" required>
+        </div>`;
+    });
 
-      let maxProfile = 50;
-      let maxHistory = 20;
-      let maxReading = 10;
-      let maxMath = 10;
+    // Базовые предметы
+    baseSubjects.forEach(sub => {
+      let max = sub === "История Казахстана" ? maxHistory : sub === "Грамотность чтения" ? maxReading : maxMath;
+      let placeholder = `0–${max}`;
 
-      // Профильные предметы
-      profileSubjects.forEach(sub => {
-        container.innerHTML += `
-          <div class="col-lg-6">
-            <label class="form-label text-white opacity-90 fw-500">${sub}</label>
-            <input type="number" class="form-control form-control-lg text-center score-input" 
-                   placeholder="0–${maxProfile}" min="0" max="${maxProfile}" required>
-          </div>`;
-      });
-
-      // Базовые предметы
-      baseSubjects.forEach(sub => {
-        let max = sub === "История Казахстана" ? maxHistory : sub === "Грамотность чтения" ? maxReading : maxMath;
-        let placeholder = `0–${max}`;
-
-        container.innerHTML += `
-          <div class="col-lg-6">
-            <label class="form-label text-white opacity-90 fw-500">${sub}</label>
-            <input type="number" class="form-control form-control-lg text-center score-input" 
-                   placeholder="${placeholder}" min="0" max="${max}" required>
-          </div>`;
-      });
-    }
+      container.innerHTML += `
+        <div class="col-lg-6">
+          <label class="form-label text-white opacity-90 fw-500">${sub}</label>
+          <input type="number" class="form-control form-control-lg text-center score-input" 
+                 placeholder="${placeholder}" min="0" max="${max}" required>
+        </div>`;
+    });
     
-  document.getElementById('scoresSection').style.display = 'block';
-});
+    document.getElementById('scoresSection').style.display = 'block';
+  });
 
-
-    document.getElementById('calcForm').addEventListener('submit', function(e) {
+  document.getElementById('calcForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     let total = 0;
@@ -429,7 +250,7 @@
         const val = parseInt(valStr);
         const max = parseInt(input.max);
 
-        // Специальная проверка для Истории Казахстана (только бакалавриат)
+        // Специальная проверка для Истории Казахстана
         if (labelText.includes('История Казахстана') && val < 5) {
           input.classList.add('is-invalid');
           hasHistoryError = true;
@@ -489,6 +310,7 @@
     document.getElementById('resultSection').style.display = 'block';
     document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
   });
+
   function hideAll() {
     document.getElementById('thresholdInfo').style.display = 'none';
     document.getElementById('scoresSection').style.display = 'none';
@@ -596,7 +418,7 @@ option {
   background: #1f2d3d !important;
   color: white !important;
 }
-/* Выравнивание всех полей ввода баллов (магистратура + докторантура) */
+/* Выравнивание всех полей ввода баллов */
 #scoreInputs .col-lg-6 {
   display: flex;
   flex-direction: column;
