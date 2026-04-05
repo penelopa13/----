@@ -10,6 +10,29 @@ from flask_login import (
     LoginManager, login_user, logout_user,
     login_required, current_user, UserMixin
 )
+
+from functools import wraps
+
+# === ДЕКОРАТОРЫ ДЛЯ РОЛЕЙ ===
+def role_required(*roles):
+    """Проверяет, что у пользователя есть хотя бы одна из указанных ролей"""
+    def decorator(f):
+        @wraps(f)
+        @login_required
+        def decorated_function(*args, **kwargs):
+            if current_user.role not in roles and current_user.role != 'admin':
+                flash('У вас нет доступа к этой странице.', 'error')
+                return redirect(url_for('profile'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+
+# Удобные сокращения
+admin_required = role_required('admin')
+staff_required = role_required('staff', 'admin')
+applicant_required = role_required('applicant')
+
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -84,10 +107,18 @@ migrate = Migrate(app, db)
 # --- Models ---
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120))
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(200))
-    is_admin = db.Column(db.Boolean, default=False)
+    name = db.Column(db.String(120), nullable=True)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    password_hash = db.Column(db.String(200), nullable=True)
+    
+    role = db.Column(db.String(20), default='applicant', nullable=False)
+    
+    eds_serial_number = db.Column(db.String(100), unique=True, nullable=True, index=True)
+    eds_iin = db.Column(db.String(12), unique=True, nullable=True, index=True)
+    eds_full_name = db.Column(db.String(200), nullable=True)
+    eds_certificate_data = db.Column(db.JSON, nullable=True)
+    
+    is_admin = db.Column(db.Boolean, default=False)  # оставляем для совместимости
     ent_math = db.Column(db.Integer, default=0)
     ent_reading = db.Column(db.Integer, default=0)
     ent_history = db.Column(db.Integer, default=0)
@@ -101,7 +132,22 @@ class User(db.Model, UserMixin):
         self.password_hash = generate_password_hash(pw)
 
     def check_password(self, pw):
+        if not self.password_hash:
+            return False
         return check_password_hash(self.password_hash, pw)
+
+# === ИСПРАВЛЕННАЯ ЛОГИКА ===
+    @property
+    def is_admin(self):
+        """Теперь проверяем по role, а не по старому полю"""
+        return self.role == 'admin'
+
+    def is_staff(self):
+        return self.role in ['staff', 'admin']
+
+    def is_applicant(self):
+        return self.role == 'applicant'
+
 
 class FAQ(db.Model):
     __tablename__ = 'faq'
@@ -202,11 +248,14 @@ def calculate_ent_total(ent_data):
     total = sum([ent_data.get(key, 0) for key in ['math', 'reading', 'history', 'profile1', 'profile2']])
     return min(total, 140)
 
-# Добавь это один раз — где-то после моделей и before_request
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
+        # Обновляем язык из профиля пользователя
         session['lang'] = current_user.language
+        
+        # Дополнительно: можно добавить проверку на заблокированных пользователей позже
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
@@ -557,16 +606,26 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+
         if User.query.filter_by(email=email).first():
             flash('Пользователь с таким Email уже существует', 'error')
             return redirect(url_for('register'))
-        u = User(name=name, email=email, language=session.get('lang', 'ru'))
+
+        u = User(
+            name=name,
+            email=email,
+            role='applicant',      # ← явно applicant
+            is_admin=False,
+            language=session.get('lang', 'ru')
+        )
         u.set_password(password)
         db.session.add(u)
         db.session.commit()
+
         login_user(u)
-        flash('Регистрация прошла успешно', 'success')
-        return redirect(url_for('profile'))  # Всегда в профиль
+        flash('Регистрация прошла успешно!', 'success')
+        return redirect(url_for('profile'))
+
     return render_template('register.html')
 
 # === ВХОД С ПЕРЕНАПРАВЛЕНИЕМ ===
@@ -575,18 +634,86 @@ def login():
     if request.method == 'POST':
         email = request.form.get('email')
         pw = request.form.get('password')
+        
         u = User.query.filter_by(email=email).first()
+        
         if u and u.check_password(pw):
             login_user(u)
             flash(f'Добро пожаловать, {u.name or u.email}!', 'success')
-            # ПЕРЕНАПРАВЛЕНИЕ ПО РОЛИ
-            if u.is_admin:
+            
+            # Редирект в зависимости от роли
+            if u.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
+            elif u.role == 'staff':
+                return redirect(url_for('staff_dashboard'))  # будет позже
             else:
                 return redirect(url_for('profile'))
+        
         flash('Неверный логин или пароль', 'error')
-        return redirect(url_for('login'))
+    
     return render_template('login.html')
+
+# ====================== РЕГИСТРАЦИЯ И ВХОД ЧЕРЕЗ ЭЦП ======================
+
+# ====================== РЕГИСТРАЦИЯ ЧЕРЕЗ ЭЦП ======================
+@app.route('/register-eds', methods=['GET', 'POST'])
+def register_eds():
+    if request.method == 'GET':
+        return render_template('register_eds.html')
+    
+    # POST — обработка данных от NCALayer
+    data = request.get_json() or {}
+    eds_serial = data.get('eds_serial_number')
+    eds_iin = data.get('eds_iin')
+    full_name = data.get('full_name')
+
+    if not eds_serial or not eds_iin:
+        return jsonify({'status': 'error', 'message': 'Данные ЭЦП не получены'}), 400
+
+    # Проверка на дубликат ЭЦП
+    if User.query.filter_by(eds_serial_number=eds_serial).first() or \
+       User.query.filter_by(eds_iin=eds_iin).first():
+        return jsonify({'status': 'error', 'message': 'Пользователь с этим ЭЦП уже зарегистрирован'}), 400
+
+    u = User(
+        name=full_name,
+        role='applicant',
+        eds_serial_number=eds_serial,
+        eds_iin=eds_iin,
+        eds_full_name=full_name,
+        eds_certificate_data=data.get('certificate_data'),
+        language=session.get('lang', 'ru')
+    )
+    db.session.add(u)
+    db.session.commit()
+
+    login_user(u)
+    return jsonify({'status': 'ok', 'redirect': url_for('profile')})
+
+
+# ====================== ВХОД ЧЕРЕЗ ЭЦП ======================
+@app.route('/login-eds', methods=['GET', 'POST'])
+def login_eds():
+    if request.method == 'GET':
+        return render_template('login_eds.html')
+    
+    # POST — обработка данных от NCALayer
+    data = request.get_json() or {}
+    eds_iin = data.get('eds_iin')
+
+    if not eds_iin:
+        return jsonify({'status': 'error', 'message': 'Данные ЭЦП не получены'}), 400
+
+    u = User.query.filter_by(eds_iin=eds_iin).first()
+    
+    if not u:
+        return jsonify({'status': 'error', 'message': 'Пользователь с этим ЭЦП не найден. Пожалуйста, зарегистрируйтесь.'}), 404
+
+    login_user(u)
+    redirect_url = url_for('admin_dashboard') if u.role == 'admin' else url_for('profile')
+    return jsonify({'status': 'ok', 'redirect': redirect_url})
+
+
 
 @app.route('/logout')
 @login_required
@@ -747,19 +874,38 @@ def submit_test():
 
 # === ИНИЦИАЛИЗАЦИЯ АДМИНА ===
 def create_admin():
-
+    """Создаём администратора с новой системой ролей"""
+    admin = User.query.filter_by(email='admin@site.com').first()
     
-    if not User.query.filter_by(email='admin@site.com').first():
+    if not admin:
         admin = User(
             name='Администратор',
             email='admin@site.com',
+            role='admin',           # ← новая роль
             is_admin=True,
             language='ru'
         )
         admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()
-        
+        print("✅ Администратор создан (role = admin)")
+    else:
+        # Если админ уже существует — обновляем роль
+        if admin.role != 'admin':
+            admin.role = 'admin'
+            admin.is_admin = True
+            db.session.commit()
+            print("✅ Роль администратора обновлена")
+
+def fix_existing_users():
+    db.session.execute(db.text("""
+        UPDATE "user" 
+        SET role = 'applicant', 
+            is_admin = FALSE 
+        WHERE role IS NULL OR role = ''
+    """))
+    db.session.commit()
+    print("✅ Все существующие пользователи исправлены на applicant")
 
 @app.route('/api/admin/notify', methods=['POST'])
 @login_required
@@ -859,15 +1005,17 @@ with app.app_context():
     create_admin()
     load_faq_exact()
 
+# === ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ===
 with app.app_context():
     db.create_all()
-    create_admin()
+    create_admin()               # ← теперь работает
     load_faq_exact()
-    load_dialog_scenarios()   # ← ВОТ ЭТО ОБЯЗАТЕЛЬНО
-
+    load_dialog_scenarios()
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         create_admin()
+        load_faq_exact()
+        load_dialog_scenarios()
     app.run(debug=True)

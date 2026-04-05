@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Регистрация через ЭЦП{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 560px;">
+        <div class="card-body">
+            <h3 class="text-center mb-4">🔑 Регистрация через ЭЦП</h3>
+            <p class="text-center text-muted">Нажмите кнопку ниже. Программа NCALayer должна быть запущена.</p>
+            
+            <button onclick="startEDSRegistration()" class="btn btn-primary btn-lg w-100 py-3">
+                Подписать ЭЦП и зарегистрироваться
+            </button>
+
+            <div id="eds-status" class="mt-3 text-center"></div>
+
+            <a href="{{ url_for('register') }}" class="btn btn-link w-100 mt-3">
+                ← Обычная регистрация (email + пароль)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
+<script>
+// === РЕАЛЬНАЯ ИНТЕГРАЦИЯ NCALAYER ===
+const NCALAYER_URL = "ws://127.0.0.1:9090";
+
+let ws = null;
+
+function connectNCALayer(callback) {
+    ws = new WebSocket(NCALAYER_URL);
+    ws.onopen = () => callback();
+    ws.onerror = () => showStatus("❌ NCALayer не запущен. Запустите программу NCALayer.", "danger");
+    ws.onmessage = (e) => {
+        const response = JSON.parse(e.data);
+        if (response.code === "200") handleNCAResponse(response);
+    };
+}
+
+function showStatus(text, type = "info") {
+    document.getElementById("eds-status").innerHTML = 
+        `<div class="alert alert-${type}">${text}</div>`;
+}
+
+async function startEDSRegistration() {
+    showStatus("Подключение к NCALayer...");
+
+    connectNCALayer(() => {
+        // Запрашиваем список ключей
+        ws.send(JSON.stringify({
+            "module": "kz.gov.pki.ncalayer",
+            "method": "getKeys",
+            "args": ["PKCS12", "AUTH"]
+        }));
+    });
+}
+
+function handleNCAResponse(res) {
+    if (res.method === "getKeys") {
+        const key = res.response[0]; // берём первый ключ
+
+        // Получаем данные сертификата
+        ws.send(JSON.stringify({
+            "module": "kz.gov.pki.ncalayer",
+            "method": "getCertificateInfo",
+            "args": [key]
+        }));
+    } 
+    else if (res.method === "getCertificateInfo") {
+        const cert = res.response;
+        
+        const payload = {
+            eds_serial_number: cert.serialNumber,
+            eds_iin: cert.iin || cert.bin,
+            full_name: cert.subjectName || cert.commonName,
+            certificate_data: cert
+        };
+
+        // Отправляем на сервер
+        axios.post('/register-eds', payload, {
+            headers: {'Content-Type': 'application/json'}
+        })
+        .then(r => {
+            if (r.data.status === 'ok') {
+                window.location.href = r.data.redirect;
+            } else {
+                showStatus(r.data.message, "danger");
+            }
+        })
+        .catch(() => showStatus("Ошибка отправки данных на сервер", "danger"));
+    }
+}
+</script>
+{% endblock %}
