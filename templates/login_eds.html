@@ -3,15 +3,19 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card mx-auto" style="max-width: 560px;">
+    <div class="card mx-auto" style="max-width: 620px;">
         <div class="card-body">
             <h3 class="text-center mb-4">🔑 Вход через ЭЦП</h3>
-            
-            <button onclick="startEDSLogin()" class="btn btn-success btn-lg w-100 py-3">
-                Войти с помощью ЭЦП
+            <p class="text-center text-muted">
+                Убедитесь, что программа <strong>NCALayer</strong> запущена.
+            </p>
+
+            <button onclick="startEDSLogin()" class="btn btn-success btn-lg w-100 py-3 mb-3">
+                Выбрать ключ ЭЦП и войти
             </button>
 
-            <div id="eds-status" class="mt-3 text-center"></div>
+            <div id="eds-status" class="mt-3"></div>
+            <div id="key-list" class="mt-3"></div>
 
             <a href="{{ url_for('login') }}" class="btn btn-link w-100 mt-3">
                 ← Обычный вход (email + пароль)
@@ -23,86 +27,145 @@
 
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
-<script>
-const NCALAYER_URL = "ws://127.0.0.1:9090";
 
-function showStatus(text, type = "info") {
-    document.getElementById("eds-status").innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+<script>
+const NCALAYER_URL = "wss://127.0.0.1:13579";
+let ws = null;
+let keysList = [];
+
+function showStatus(html, type = "info") {
+    document.getElementById("eds-status").innerHTML = 
+        `<div class="alert alert-${type}">${html}</div>`;
 }
 
-async function startEDSLogin() {
-    showStatus("Подключение к NCALayer...");
-
-    const ws = new WebSocket(NCALAYER_URL);
+function showKeyList(keys) {
+    let html = `<h5 class="mt-3">Выберите ключ ЭЦП:</h5><div class="list-group">`;
     
+    keys.forEach((key, index) => {
+        const name = key.commonName || key.subjectCn || key.subjectName || `Ключ ${index + 1}`;
+        const iin = key.iin || '—';
+        
+        html += `
+            <button class="list-group-item list-group-item-action" 
+                    onclick="selectKey(${index})">
+                <strong>${name}</strong><br>
+                <small>ИИН: ${iin} | Серийный: ${key.serialNumber || key.serial || '—'}</small>
+            </button>`;
+    });
+    
+    html += `</div>`;
+    document.getElementById("key-list").innerHTML = html;
+}
+
+function selectKey(index) {
+    const key = keysList[index];
+    if (!key) return;
+
+    document.getElementById("key-list").innerHTML = '';
+    showStatus(`Выбран ключ: <strong>${key.commonName || 'Ключ'}</strong><br>Читаем сертификат...`, "info");
+
+    ws.send(JSON.stringify({
+        "module": "kz.gov.pki.ncalayer",
+        "method": "getCertificateInfo",
+        "args": [key]
+    }));
+}
+
+function startEDSLogin() {
+    document.getElementById("key-list").innerHTML = '';
+    showStatus("Подключение к NCALayer...", "info");
+
+    ws = new WebSocket(NCALAYER_URL);
+
     ws.onopen = () => {
-        // Шаг 1: Запрашиваем список ключей (только AUTH)
+        console.log("✅ NCALayer подключён");
+        showStatus("Подключено. Запрашиваем список ключей...", "info");
+
         ws.send(JSON.stringify({
             "module": "kz.gov.pki.ncalayer",
             "method": "getKeys",
-            "args": ["PKCS12", "AUTH"]
+            "args": ["AUTH", ""]
         }));
     };
 
     ws.onmessage = (e) => {
-        const res = JSON.parse(e.data);
-        
-        // Проверка на ошибку со стороны NCALayer
-        if (res.status !== "0") {
-            showStatus("Ошибка: " + (res.message || "Действие отменено"), "danger");
-            ws.close();
-            return;
-        }
+        try {
+            const res = JSON.parse(e.data);
+            console.log("Ответ от NCALayer:", res);
 
-        if (res.method === "getKeys") {
-            // Шаг 2: Получаем alias выбранного ключа
-            const keys = res.result.split(',');
-            const keyAlias = keys.length ? keys[0] : null;            if (!keyAlias) {
-                showStatus("Ключ не выбран", "warning");
+            if (res.code !== "200") {
+                showStatus("Ошибка: " + (res.message || "Действие отменено пользователем"), "danger");
+                if (ws) ws.close();
                 return;
             }
 
-            // Шаг 3: Получаем информацию о сертификате (ИИН)
-            ws.send(JSON.stringify({
-                "module": "kz.gov.pki.ncalayer",
-                "method": "getCertificateInfo",
-                "args": [keyAlias]
-            }));
-        } 
-        else if (res.method === "getCertificateInfo") {
-            // Шаг 4: Парсим данные сертификата
-            // Данные приходят строкой, где значения разделены новой строкой \n
-            const info = res.result;
-            const iinMatch = info.match(/IIN=(\d+)/) || info.match(/BIN=(\d+)/);
-            
-            if (iinMatch && iinMatch[1]) {
-                const iin = iinMatch[1];
-                sendToServer(iin);
-            } else {
-                showStatus("Не удалось извлечь ИИН из сертификата", "danger");
+            // Получили список ключей
+            if (res.method === "getKeys") {
+                keysList = res.response || [];
+                
+                if (keysList.length === 0) {
+                    showStatus("❌ Не найдено ключей ЭЦП", "warning");
+                    return;
+                }
+
+                if (keysList.length === 1) {
+                    // Если только один ключ — сразу используем его
+                    showStatus("Найден один ключ. Читаем сертификат...", "info");
+                    selectKey(0);
+                } else {
+                    // Показываем список для выбора
+                    showStatus(`Найдено ключей: ${keysList.length}. Выберите ниже:`, "info");
+                    showKeyList(keysList);
+                }
             }
-            ws.close();
+
+            // Получили информацию о сертификате
+            else if (res.method === "getCertificateInfo") {
+                const cert = res.response;
+                
+                let iin = cert.iin;
+                if (!iin && cert.subjectDn) {
+                    const match = cert.subjectDn.match(/IIN=(\d{12})/i);
+                    if (match) iin = match[1];
+                }
+
+                if (!iin) {
+                    showStatus("❌ Не удалось извлечь ИИН из сертификата", "danger");
+                    if (ws) ws.close();
+                    return;
+                }
+
+                showStatus(`ИИН найден: <strong>${iin}</strong><br>Выполняем вход...`, "info");
+
+                axios.post('/login-eds', { eds_iin: iin })
+                    .then(r => {
+                        if (r.data.status === 'ok') {
+                            showStatus("✅ Вход выполнен успешно! Перенаправление...", "success");
+                            setTimeout(() => {
+                                window.location.href = r.data.redirect || '/profile';
+                            }, 1000);
+                        } else {
+                            showStatus(r.data.message || "Пользователь не найден", "danger");
+                        }
+                    })
+                    .catch(() => showStatus("Ошибка связи с сервером", "danger"))
+                    .finally(() => { if (ws) ws.close(); });
+            }
+        } catch (err) {
+            console.error(err);
         }
     };
 
     ws.onerror = () => {
-        showStatus("❌ NCALayer не запущен или заблокирован. Запустите программу и обновите страницу.", "danger");
+        showStatus(`
+            ❌ Не удалось подключиться к NCALayer.<br><br>
+            • Запустите NCALayer<br>
+            • Перезапустите программу NCALayer<br>
+            • Попробуйте браузер Chrome / Edge
+        `, "danger");
     };
-}
 
-function sendToServer(iin) {
-    showStatus("Авторизация на сервере...");
-    
-    axios.post('/login-eds', { eds_iin: iin })
-    .then(r => {
-        if (r.data.status === 'ok') {
-            showStatus("Успешно! Перенаправление...", "success");
-            window.location.href = r.data.redirect;
-        } else {
-            showStatus(r.data.message || "Пользователь с таким ИИН не найден", "danger");
-        }
-    })
-
+    ws.onclose = () => console.log("Соединение закрыто");
 }
 </script>
 {% endblock %}
