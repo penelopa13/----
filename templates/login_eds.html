@@ -7,11 +7,11 @@
         <div class="card-body">
             <h3 class="text-center mb-4">🔑 Вход через ЭЦП</h3>
             
-            <button onclick="startEDSLogin()" class="btn btn-success btn-lg w-100 py-3">
+            <button id="eds-button" onclick="startEDSLogin()" class="btn btn-success btn-lg w-100 py-3 mb-3">
                 Войти с помощью ЭЦП
             </button>
 
-            <div id="eds-status" class="mt-3 text-center"></div>
+            <div id="eds-status" class="mt-2 text-center"></div>
 
             <a href="{{ url_for('login') }}" class="btn btn-link w-100 mt-3">
                 ← Обычный вход (email + пароль)
@@ -24,19 +24,23 @@
 {% block scripts %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
 <script>
-const NCALAYER_URL = "ws://127.0.0.1:9090";
+// === ПРЯМОЕ ПОДКЛЮЧЕНИЕ К NCALAYER (самый надёжный способ) ===
+const NCALAYER_WS = "ws://127.0.0.1:9090";
 
 function showStatus(text, type = "info") {
-    document.getElementById("eds-status").innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+    const div = document.getElementById("eds-status");
+    div.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
 }
 
 async function startEDSLogin() {
-    showStatus("Подключение к NCALayer...");
+    const btn = document.getElementById("eds-button");
+    btn.disabled = true;
+    showStatus("Подключение к NCALayer...", "info");
 
-    const ws = new WebSocket(NCALAYER_URL);
-    
+    const ws = new WebSocket(NCALAYER_WS);
+
     ws.onopen = () => {
-        // Шаг 1: Запрашиваем список ключей (только AUTH)
+        // Запрашиваем список ключей
         ws.send(JSON.stringify({
             "module": "kz.gov.pki.ncalayer",
             "method": "getKeys",
@@ -44,65 +48,74 @@ async function startEDSLogin() {
         }));
     };
 
-    ws.onmessage = (e) => {
-        const res = JSON.parse(e.data);
-        
-        // Проверка на ошибку со стороны NCALayer
-        if (res.status !== "0") {
-            showStatus("Ошибка: " + (res.message || "Действие отменено"), "danger");
-            ws.close();
-            return;
-        }
+    ws.onmessage = (event) => {
+        const response = JSON.parse(event.data);
 
-        if (res.method === "getKeys") {
-            // Шаг 2: Получаем alias выбранного ключа
-            const keys = res.result.split(',');
-            const keyAlias = keys.length ? keys[0] : null;            if (!keyAlias) {
-                showStatus("Ключ не выбран", "warning");
+        if (response.method === "getKeys") {
+            if (!response.response || response.response.length === 0) {
+                showStatus("Ключи не найдены. Вставьте ЭЦП.", "warning");
+                btn.disabled = false;
+                ws.close();
                 return;
             }
 
-            // Шаг 3: Получаем информацию о сертификате (ИИН)
+            // Берём первый ключ
+            const key = response.response[0];
+
+            // Запрашиваем информацию о сертификате
             ws.send(JSON.stringify({
                 "module": "kz.gov.pki.ncalayer",
                 "method": "getCertificateInfo",
-                "args": [keyAlias]
+                "args": [key]
             }));
-        } 
-        else if (res.method === "getCertificateInfo") {
-            // Шаг 4: Парсим данные сертификата
-            // Данные приходят строкой, где значения разделены новой строкой \n
-            const info = res.result;
-            const iinMatch = info.match(/IIN=(\d+)/) || info.match(/BIN=(\d+)/);
-            
-            if (iinMatch && iinMatch[1]) {
-                const iin = iinMatch[1];
+        }
+        else if (response.method === "getCertificateInfo") {
+            const cert = response.response;
+            let iin = null;
+
+            // Ищем ИИН
+            if (cert.iin) iin = cert.iin;
+            else if (cert.subjectDN) {
+                const match = cert.subjectDN.match(/IIN=(\d{12})/);
+                if (match) iin = match[1];
+            }
+
+            if (iin) {
                 sendToServer(iin);
             } else {
-                showStatus("Не удалось извлечь ИИН из сертификата", "danger");
+                showStatus("Не удалось получить ИИН из сертификата", "danger");
+                btn.disabled = false;
             }
             ws.close();
         }
     };
 
     ws.onerror = () => {
-        showStatus("❌ NCALayer не запущен или заблокирован. Запустите программу и обновите страницу.", "danger");
+        showStatus("❌ NCALayer не запущен.<br>Запустите программу NCALayer от имени администратора.", "danger");
+        btn.disabled = false;
     };
+
+    ws.onclose = () => {};
 }
 
 function sendToServer(iin) {
-    showStatus("Авторизация на сервере...");
-    
-    axios.post('/login-eds', { eds_iin: iin })
-    .then(r => {
-        if (r.data.status === 'ok') {
-            showStatus("Успешно! Перенаправление...", "success");
-            window.location.href = r.data.redirect;
+    showStatus(`Авторизация... ИИН: ${iin}`, "info");
+
+    axios.post('/login-eds', { eds_iin: iin }, {
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => {
+        if (response.data.status === 'ok') {
+            window.location.href = response.data.redirect;
         } else {
-            showStatus(r.data.message || "Пользователь с таким ИИН не найден", "danger");
+            showStatus(response.data.message, "danger");
+            document.getElementById("eds-button").disabled = false;
         }
     })
-
+    .catch(() => {
+        showStatus("Ошибка связи с сервером", "danger");
+        document.getElementById("eds-button").disabled = false;
+    });
 }
 </script>
 {% endblock %}
