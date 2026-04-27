@@ -1,134 +1,175 @@
 {% extends "base.html" %}
-{% block title %}{{ t('Personality Test') }}{% endblock %}
+{% block title %}{{ t('Результаты теста личности') }}{% endblock %}
 
 {% block content %}
 <section class="profile-section">
-  <div class="profile-card wide" style="max-width: 760px;">
-    <h2 class="center" style="color: var(--accent-color); margin-bottom: 16px;">
-      {{ t('Personality Test') }}
+  <div class="profile-card wide" style="max-width: 900px; margin: 30px auto;">
+    
+    <h2 class="center" style="color: var(--accent-color); margin-bottom: 30px;">
+      {{ t('Ваш результат теста личности') }}
     </h2>
 
-    <!-- Контейнер теста -->
-    <div id="test-container">
-      <div id="question-box" class="fade-in">
-        <h3 id="question-text" class="question-text"></h3>
-        <div id="options" class="options"></div>
-      </div>
-
-      <div id="progress" class="progress-text mt-3"></div>
-
-      <div class="mt-4 buttons center">
-        <button id="prev-btn" class="btn small" disabled>{{ t('Back') }}</button>
-      </div>
-    </div>
-
-    <!-- Контейнер результата -->
-    <div id="result-box" style="display:none;">
-      <h2 class="center" style="color: var(--accent-color); margin-bottom: 20px;">
-        {{ t('Test completed!') }}
-      </h2>
-
-      <div id="loading-text" class="center" style="color:#fff; font-size:1.1rem;">
-        {{ t('Analyzing results...') }}
-      </div>
-
-      <div id="final-result" class="mt-4" style="display:none;">
+    {% if result %}
+      <div id="final-result">
 
         <!-- Тип личности -->
-        <h3 class="center" style="color:#fff; margin-bottom: 8px;">{{ t('Your personality type:') }}</h3>
-        <p id="mbti-type" class="center mbti-type"></p>
+        <div class="mbti-result-card">
+          <h3>{{ t('Ваш тип личности:') }}</h3>
+          <div class="mbti-type-big">{{ result.mbti_type }}</div>
+          <p id="description" class="result-description">
+            {{ result.recommended_programs.description | safe }}
+          </p>
+        </div>
 
-        <!-- Описание -->
-        <p id="description" class="center mt-4 text-safe" style="font-size:1.15rem; max-width: 720px; margin: 0 auto; line-height: 1.6;"></p>
+        <!-- Радарная диаграмма -->
+        <div class="result-section">
+          <h4 class="section-title">{{ t('Ваш профиль личности') }}</h4>
+          <div class="radar-container">
+            <canvas id="radarChart" width="400" height="400"></canvas>
+          </div>
+        </div>
 
         <!-- Сильные стороны -->
-        <div class="center mt-4">
-          <h4 style="color:var(--accent-color); margin-bottom: 8px;">{{ t('Your strengths') }}</h4>
-          <p id="strengths" class="text-safe" style="font-size:1.05rem;"></p>
+        <div class="result-section">
+          <h4 class="section-title">{{ t('Ваши сильные стороны') }}</h4>
+          <div id="strengths" class="strengths-list">
+            {{ result.recommended_programs.strengths | safe }}
+          </div>
         </div>
 
-        <!-- Радар-диаграмма -->
-        <div class="center mt-5">
-          <canvas id="radarChart" width="340" height="340"></canvas>
+        <!-- Рекомендуемые специальности -->
+        <div class="result-section">
+          <h4 class="section-title">{{ t('Рекомендуемые направления') }}</h4>
+          <div id="professions-grid" class="professions-grid">
+            {% for prof in result.recommended_programs.professions %}
+              <div class="profession-card">
+                <h5>{{ prof }}</h5>
+              </div>
+            {% endfor %}
+          </div>
         </div>
 
-        <!-- Профессии -->
-        <h4 class="center mt-5" style="color:var(--accent-color);">
-          {{ t('Recommended professions & fields') }}
-        </h4>
-        <div id="professions-grid" class="professions-grid"></div>
+        <div class="center mt-4" style="color: rgba(255,255,255,0.7);">
+          {{ t('Пройден:') }} {{ result.created_at.strftime('%d.%m.%Y в %H:%M') }}
+        </div>
 
-        <!-- Кнопки -->
-        <div class="center mt-5">
-          <a href="/profile" class="btn orange big">{{ t('Save to profile') }}</a>
-          <a href="/test_psy" class="btn small ml-3">{{ t('Retake test') }}</a>
+        <div class="center mt-5 buttons-group">
+          <a href="/profile" class="btn orange big">{{ t('Вернуться в профиль') }}</a>
+          <a href="/test_psy" class="btn small ml-3">{{ t('Пройти тест заново') }}</a>
+        </div>
+
+      </div>
+
+    {% else %}
+      <!-- Контейнер самого теста (остаётся без изменений) -->
+      <div id="test-container">
+        <div id="question-box" class="fade-in">
+          <h3 id="question-text" class="question-text"></h3>
+          <div id="options" class="options"></div>
+        </div>
+        <div id="progress" class="progress-text mt-3"></div>
+        <div class="mt-4 buttons center">
+          <button id="prev-btn" class="btn small" disabled>{{ t('Назад') }}</button>
         </div>
       </div>
-    </div>
+    {% endif %}
+
   </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/test_psy.js') }}?v=9"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/test_psy.js') }}?v=11"></script>
 
 <style>
-  .question-text { font-size: 1.35rem; color: #fff; margin-bottom: 20px; text-align: center; }
-  .options { display: flex; flex-direction: column; gap: 12px; }
-  .options button {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    font-weight: 500;
-    border-radius: 12px;
-    padding: 14px 18px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    text-align: left;
+  .mbti-result-card {
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 40px 30px;
+    margin-bottom: 40px;
+    border: 1px solid rgba(255,179,15,0.3);
   }
-  .options button:hover { background: rgba(255,179,15,0.25); border-color: var(--accent-color); transform: translateY(-2px); }
-  .options button.selected { background: var(--accent-color); box-shadow: 0 4px 15px rgba(255,179,15,0.4); }
 
-  .progress-text { text-align: center; color: rgba(255,255,255,0.85); font-size: 1rem; }
-
-  .mbti-type {
+  .mbti-type-big {
     font-family: monospace;
-    background: rgba(255,179,15,0.15);
-    border: 1px solid rgba(255,179,15,0.4);
-    padding: 8px 16px;
-    border-radius: 10px;
-    display: inline-block;
+    font-size: 3.5rem;
+    font-weight: 900;
     color: var(--accent-color);
-    font-size: 1.7rem;
-    font-weight: bold;
+    background: rgba(255,179,15,0.15);
+    border: 3px solid var(--accent-color);
+    padding: 15px 50px;
+    border-radius: 20px;
+    display: inline-block;
+    margin: 20px 0 25px;
+    letter-spacing: 6px;
+  }
+
+  .result-description {
+    font-size: 1.2rem;
+    line-height: 1.75;
+    color: #ddd;
+    max-width: 740px;
+    margin: 0 auto;
+  }
+
+  .radar-container {
+    max-width: 420px;
+    margin: 30px auto;
+    background: rgba(0,0,0,0.2);
+    border-radius: 20px;
+    padding: 25px;
+  }
+
+  .result-section {
+    margin-bottom: 50px;
+  }
+
+  .section-title {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  .strengths-list {
+    background: rgba(255,255,255,0.08);
+    padding: 28px;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #eee;
   }
 
   .professions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 16px;
-    margin: 24px auto;
-    max-width: 900px;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 18px;
   }
+
   .profession-card {
     background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 14px;
-    padding: 18px;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 16px;
+    padding: 22px;
     transition: all 0.4s ease;
-    backdrop-filter: blur(10px);
   }
+
   .profession-card:hover {
-    background: rgba(255,179,15,0.2);
+    background: rgba(255,179,15,0.25);
     transform: translateY(-6px);
     border-color: var(--accent-color);
   }
-  .profession-card h5 {
-    margin: 0 0 6px 0;
-    color: var(--accent-color);
-    font-size: 1.15rem;
+
+  .buttons-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
   }
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-  .fade-in { animation: fadeIn 0.6s ease; }
+  @media (max-width: 768px) {
+    .mbti-type-big { font-size: 2.8rem; padding: 12px 30px; }
+    .radar-container { max-width: 340px; padding: 15px; }
+  }
 </style>
 {% endblock %}

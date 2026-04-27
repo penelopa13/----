@@ -14,56 +14,77 @@
     <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15,23,36,0.7), rgba(43,140,255,0.4)); z-index: 1;"></div>
     
     <!-- Красивый текст над фото (как в оригинальном: с градиентом, анимацией float и shine) -->
-    <h1 class="hero-title" style="position: relative; z-index: 2; font-size: 4.5rem; font-weight: 900; margin-bottom: 2rem; background: linear-gradient(45deg, #fff, #e0e0e0, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; animation: titleFloat 3s ease-in-out infinite, textShine 3s linear infinite; background-size: 200% auto;">{{ t('ИИ-консультант для абитуриентов') }}</h1>
+    <h1 class="hero-title" style="position: relative; z-index: 2; font-size: 4.5rem; font-weight: 900; margin-bottom: 2rem; background: linear-gradient(45deg, #fff, #e0e0e0, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; animation: titleFloat 3s ease-in-out infinite, textShine 3s linear infinite; background-size: 200% auto;">
+      {{ t('ИИ-консультант для абитуриентов') }}
+    </h1>
     
     <!-- Текст с пульсацией в овале (как hero-badge в оригинальном сайте) -->
-    <div class="hero-badge" style="position: relative; z-index: 2;">{{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}</div>
+    <div class="hero-badge" style="position: relative; z-index: 2;">
+      {{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}
+    </div>
     
-    <!-- Улучшенная кнопка "Узнать больше" (с градиентом, hover-эффектом подъёма, тенью, shine и плавным переходом, как в оригинальном .btn-primary) -->
-    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;">{{ t('Узнать больше') }}</a>
+    <!-- Улучшенная кнопка "Узнать больше" -->
+    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;">
+      {{ t('Узнать больше') }}
+    </a>
   </div>
 </section>
 
 <section id="chat-section" class="section container">
   <h2>{{ t('Чат с консультантом') }}</h2>
 
-  <!-- НОВЫЙ ДВУХКОЛОНОЧНЫЙ ЧАТ (без изменений) -->
-  <div class="chat-layout">
-    <div class="chat-sidebar" id="chat-sidebar">
-      <div class="sidebar-header">
-        <i class="fas fa-bolt"></i> {{t('Частые вопросы')}}
-        <button class="sidebar-close" id="sidebar-close">×</button>
+  {% if current_user.is_authenticated %}
+    <!-- ==================== ЧАТ ДЛЯ АВТОРИЗОВАННЫХ ==================== -->
+    <div class="chat-layout">
+      <div class="chat-sidebar" id="chat-sidebar">
+        <div class="sidebar-header">
+          <i class="fas fa-bolt"></i> {{t('Частые вопросы')}}
+          <button class="sidebar-close" id="sidebar-close">×</button>
+        </div>
+        <div class="sidebar-content" id="quick-questions"></div>
       </div>
-      <div class="sidebar-content" id="quick-questions"></div>
-    </div>
 
-    <div class="chat-main">
-      <div id="chat-box" class="chat-box">
-        <div class="messages" id="messages">
-          <div class="message bot">
-            <div class="bubble" style="background:linear-gradient(135deg,var(--secondary-color),var(--primary-color)); color:#fff; border-radius:18px; padding:18px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
-              {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
-              {{ t('Задайте любой вопрос или выберите один из частых') }}
+      <div class="chat-main">
+        <div id="chat-box" class="chat-box">
+          <div class="messages" id="messages">
+            <div class="message bot">
+              <div class="bubble" style="background:linear-gradient(135deg,var(--secondary-color),var(--primary-color)); color:#fff; border-radius:18px; padding:18px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
+                {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
+                {{ t('Задайте любой вопрос или выберите один из частых') }}
+              </div>
             </div>
           </div>
-        </div>
-        <button class="sidebar-toggle" id="sidebar-toggle">
-          <i class="fas fa-chevron-right"></i>
-        </button>
-        <div id="typing-indicator" style="display:none;" class="message bot">
-          <div class="bubble typing"><span></span><span></span><span></span></div>
-        </div>
-
-        <form id="chat-form" class="chat-form">
-          <textarea id="user-input" placeholder="{{ t('Сұрағыңызды жазыңыз...') }}" rows="1" autocomplete="off"></textarea>
-          <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
-            <i class="fas fa-microphone"></i>
+          <button class="sidebar-toggle" id="sidebar-toggle">
+            <i class="fas fa-chevron-right"></i>
           </button>
-          <button type="submit"><i class="fas fa-paper-plane"></i></button>
-        </form>
+          <div id="typing-indicator" style="display:none;" class="message bot">
+            <div class="bubble typing"><span></span><span></span><span></span></div>
+          </div>
+
+          <form id="chat-form" class="chat-form">
+            <textarea id="user-input" placeholder="{{ t('Сұрағыңызды жазыңыз...') }}" rows="1" autocomplete="off"></textarea>
+            <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
+
+  {% else %}
+    <!-- ==================== БЛОК ДЛЯ НЕЗАРЕГИСТРИРОВАННЫХ ==================== -->
+    <div class="login-required-box">
+      <i class="fas fa-lock"></i>
+      <h3>{{ t('Для использования чата необходимо войти') }}</h3>
+      <p>{{ t('Зарегистрируйтесь или войдите в аккаунт, чтобы общаться с ИИ-консультантом Талапкер.') }}</p>
+      
+      <div class="auth-buttons">
+        <a href="{{ url_for('login') }}" class="btn btn-primary">{{ t('Войти') }}</a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline">{{ t('Зарегистрироваться') }}</a>
+      </div>
+    </div>
+  {% endif %}
 </section>
 {% endblock %}
 
@@ -87,7 +108,7 @@
     100% { background-position: 0% 50%; }
   }
 
-  /* Частицы (particles) для эффекта (как в оригинальном, но теперь синие и крупнее) */
+  /* Частицы (particles) для эффекта */
   .particles {
     position: fixed;
     width: 100%;
@@ -98,9 +119,9 @@
   }
   .particle {
     position: absolute;
-    width: 8px; /* Увеличен размер с 4px до 8px */
-    height: 8px; /* Увеличен размер с 4px до 8px */
-    background: rgba(102, 126, 234, 0.6); /* Синий цвет (#667eea с прозрачностью) */
+    width: 8px;
+    height: 8px;
+    background: rgba(102, 126, 234, 0.6);
     border-radius: 50%;
     animation: particleFloat 20s infinite linear;
   }
@@ -111,7 +132,7 @@
     100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
   }
 
-  /* Пульсация для hero-badge (как в оригинальном сайте) */
+  /* Пульсация для hero-badge */
   .hero-badge {
     display: inline-block;
     padding: 1rem 2.5rem;
@@ -133,7 +154,7 @@
     50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
   }
 
-  /* Улучшенные стили для кнопки (как .btn-primary в оригинальном: градиент, hover с подъёмом, тенью, shine и плавным переходом) */
+  /* Улучшенные стили для кнопки */
   .btn-primary {
     padding: 1.2rem 3rem;
     border-radius: 50px;
@@ -144,20 +165,19 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff7e5f); /* Оранжевый градиент с shine-эффектом */
-    background-size: 200% auto; /* Для shine */
+    background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff7e5f);
+    background-size: 200% auto;
     color: #fff;
     border: 2px solid transparent;
-    box-shadow: 0 10px 30px rgba(255, 126, 95, 0.4); /* Тень в оранжевых тонах */
-    animation: textShine 3s linear infinite; /* Добавлен shine-эффект, как у текста */
+    box-shadow: 0 10px 30px rgba(255, 126, 95, 0.4);
+    animation: textShine 3s linear infinite;
   }
   .btn-primary:hover {
-    transform: translateY(-5px); /* Подъём вверх на hover */
-    box-shadow: 0 15px 40px rgba(255, 126, 95, 0.6); /* Усиленная тень */
-    animation: textShine 1.5s linear infinite; /* Ускоренный shine на hover для динамики */
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(255, 126, 95, 0.6);
+    animation: textShine 1.5s linear infinite;
   }
 
-  /* Анимации для текста (как в оригинальном: float и shine) */
   @keyframes titleFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
@@ -166,7 +186,7 @@
     to { background-position: 200% center; }
   }
 
-  /* Адаптив для мобильных (как в оригинальном, базово) */
+  /* Адаптив для мобильных */
   @media (max-width: 768px) {
     .hero-title {
       font-size: 2.8rem !important;
@@ -176,7 +196,7 @@
       padding: 0.8rem 1.5rem;
     }
     .btn-primary {
-      width: 100%; /* Полная ширина на мобильных */
+      width: 100%;
       max-width: 280px;
       text-align: center;
     }
@@ -189,6 +209,59 @@
       font-size: 1rem;
       padding: 0.8rem 1.5rem;
     }
+  }
+
+  /* === СТИЛИ ДЛЯ БЛОКА "НЕОБХОДИМО ВОЙТИ" === */
+  .login-required-box {
+    text-align: center;
+    padding: 80px 40px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    border: 2px dashed #ff7e5f;
+    max-width: 700px;
+    margin: 40px auto;
+  }
+
+  .login-required-box i {
+    font-size: 5rem;
+    color: #ff7e5f;
+    margin-bottom: 25px;
+    opacity: 0.9;
+  }
+
+  .login-required-box h3 {
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+  }
+
+  .login-required-box p {
+    max-width: 520px;
+    margin: 0 auto 35px;
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+
+  .auth-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline:hover {
+    background: #fff;
+    color: #333;
   }
 </style>
 
@@ -207,7 +280,9 @@ function createParticles() {
 }
 createParticles();
 
-// Остальной ваш скрипт без изменений
+{% if current_user.is_authenticated %}
+// ==================== СКРИПТ ЧАТА (только для авторизованных) ====================
+
 const lang = "{{ session.get('lang', 'ru') }}";
 const userInput = document.getElementById('user-input');
 const messages = document.getElementById('messages');
@@ -401,6 +476,11 @@ document.querySelector('.chat-layout')?.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
 });
+
+{% else %}
+// Чат доступен только после входа в систему
+console.log("Чат доступен только после входа в аккаунт");
+{% endif %}
 
 </script>
 {% endblock %}

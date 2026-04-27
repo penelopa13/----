@@ -299,7 +299,28 @@ def contact():
 @app.route('/test_psy')
 @login_required
 def test_psy():
-    lang = session.get('lang', current_user.language)
+    lang = session.get('lang', current_user.language or 'ru')
+    
+    # Получаем последний результат пользователя
+    result = TestResult.query.filter_by(user_id=current_user.id)\
+                            .order_by(TestResult.created_at.desc())\
+                            .first()
+
+    if result:
+        # Если результат есть — передаём его в шаблон
+        try:
+            recommended = json.loads(result.recommended_programs) if isinstance(result.recommended_programs, str) else result.recommended_programs
+        except:
+            recommended = {}
+            
+        result_data = {
+            'mbti_type': result.mbti_type,
+            'recommended_programs': recommended,
+            'created_at': result.created_at
+        }
+        return render_template('test_psy.html', result=result_data)
+    
+    # Если результата нет — показываем тест
     questions = load_questions(lang)
     return render_template('test_psy.html', questions=questions, lang=lang)
 
@@ -382,6 +403,7 @@ def chat_options():
 # === ЗАМЕНИ ВЕСЬ МАРШРУТ /api/chat НА ЭТОТ ===
 @app.route('/api/chat', methods=['POST'])
 @login_required
+
 def api_chat():
     init_chat_state()  # ← важно!
     data = request.get_json() or {}
@@ -481,25 +503,37 @@ def api_chat():
                 db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=answer))
                 db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
-
-    # === Gemini (если ничего не подошло) ===
+# === Gemini (Қатаң нұсқаулықпен жаңартылған) ===
     try:
-        prompt = f"""Ты — ИИ-консультант по поступлению в АРУ имени К. Жубанова.Тебя зовут Талапкер. И на каждом ответе используй свое имя. Название универа К.Жубанова, а не А.Жубанова.А на казахском будет Қ.Жұбанов атындағы АӨУ. ЗАпомни!
-Отвечай ТОЛЬКО на языке вопроса ({lang.upper()}).
-Вопрос: {user_message}
+        context_text = ""
+        if FAQ_DATA:
+            msg_lower = user_message.lower()
+            for item in FAQ_DATA:
+                keywords = [k.lower() for k in item.get("keywords", [])]
+                if any(kw in msg_lower for kw in keywords):
+                    context_text = item.get(f"answer_{lang}") or item.get("answer_ru", "")
+                    break 
 
-Правила:
-- Кратко, по делу
-- Используй Markdown
-- Только про поступление, гранты, документы, общежитие и т.д.
-- Если вопрос не по теме — скажи: "Я помогаю только с вопросами о поступлении."
+        prompt = f"""Ты — ИИ-консультант Талапкер в АРУ имени К. Жубанова.
+Язык: {lang.upper()}
 
+МЫНА ДЕРЕКТЕРДІ ҚОЛДАН (Бұл өте маңызды!):
+{context_text}
+
+НҰСҚАУЛЫҚ:
+1. Жауапты "Сәлем! Мен Талапкермін." деп баста.
+2. Егер жоғарыдағы мәтінде "Математика (пед): Ақылы — 85" деп тұрса, демек 85 балл деп нақты айт. "Мәлімет жоқ" немесе "75 балл" деп жалпылама жауап берме!
+3. Тек пайдаланушы сұраған мамандық туралы ғана жаз (Математика мұғалімі).
+4. Басқа мамандықтарды (физика, IT) тізімдеп жазба.
+5. "Қалай түсем?" дегенге: Математика + Физика таңдау пәні екенін айт.
+
+Сұрақ: {user_message}
 Ответ:"""
 
         model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(prompt)
-        reply = response.text.strip() if response.text else "Извините, не смог ответить."
-
+        reply = response.text.strip()
+        
         db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=reply))
         db.session.commit()
         
@@ -509,12 +543,10 @@ def api_chat():
         print("Gemini error:", e)
         fallback = {
             'ru': "Сервис временно недоступен. Попробуйте позже.",
-            'kk': "Қызмет уақытша қолжетімсіз.",
-            'en': "Service temporarily unavailable."
+            'kk': "Қызмет уақытша қолжетімсіз. Кейінірек қайталап көріңіз.",
+            'en': "Service temporarily unavailable. Please try again later."
         }
         return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
-
-
 @app.route('/api/chat/history')
 @login_required
 def chat_history():
