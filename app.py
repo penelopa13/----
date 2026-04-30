@@ -462,15 +462,22 @@ def api_chat():
 
     # === Подменю (например, "После 11 класса") ===
     submenu_map = {
-        "после 11 класса": "bachelor_after_school",
+"после 11 класса": "bachelor_after_school",
         "после колледжа": "bachelor_after_college",
+        "после армии": "bachelor_after_army",
+        "әскерден кейін": "bachelor_after_army",      # ← добавил
+        "армиядан кейін": "bachelor_after_army",
+
         "after school": "bachelor_after_school",
         "after college": "bachelor_after_college",
+        "after army": "bachelor_after_army",
+
         "творческие программы": "bachelor_creative",
-        "шығармашылық бағдарламалар": "bachelor_creative",  # ← kk
+        "шығармашылық бағдарламалар": "bachelor_creative",
         "creative programs": "bachelor_creative",
+
         "обычные программы": "bachelor_regular",
-        "қарапайым бағдарламалар": "bachelor_regular",  # ← kk
+        "қарапайым бағдарламалар": "bachelor_regular",
         "regular programs": "bachelor_regular",
         "программы": "master_programs",  # Для master
         "бағдарламалар": "master_programs",  # ← kk
