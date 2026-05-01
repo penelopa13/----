@@ -17,13 +17,13 @@
     position: fixed;
     top: 0;
     right: -350px;
-    width: 320px; /* ← чуть шире для лучшего вида */
+    width: 320px;
     height: 100vh;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 248, 255, 0.75)); /* ← градиент для современного вида */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 248, 255, 0.75));
     box-shadow: -6px 0 20px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(12px); /* ← усиленное размытие */
+    backdrop-filter: blur(12px);
     padding: 1.5rem 1.25rem;
-    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* ← smoother анимация */
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     z-index: 10001;
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
@@ -48,8 +48,8 @@
     font-size: 1.4rem;
     color: #2c3e50;
     font-weight: 600;
-    flex-grow: 1; /* ← Добавлено для центрирования */
-    text-align: center; /* ← Центрируем заголовок */
+    flex-grow: 1;
+    text-align: center;
   }
 
   #notifPanel ul {
@@ -79,7 +79,7 @@
 
   #notifPanel li strong {
     font-weight: 600;
-    color: #1a73e8; /* ← акцентный цвет для заголовка */
+    color: #1a73e8;
   }
 
   #notifPanel li small {
@@ -109,7 +109,7 @@
     position: absolute;
     top: -6px;
     right: -10px;
-    background: linear-gradient(135deg, #ff6b6b, #ff4757); /* ← градиент для бейджа */
+    background: linear-gradient(135deg, #ff6b6b, #ff4757);
     color: #fff;
     border-radius: 50%;
     font-size: 0.75rem;
@@ -117,7 +117,7 @@
     min-width: 18px;
     text-align: center;
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    display: none; /* ← скрываем, если 0 */
+    display: none;
   }
 
   .notif-badge.show {
@@ -126,7 +126,7 @@
 
   /* Кнопка закрытия панели */
   .notif-close {
-    font-size: 2rem; /* ← Увеличен размер */
+    font-size: 2rem;
     color: #95a5a6;
     cursor: pointer;
     transition: color 0.2s ease, transform 0.2s ease;
@@ -134,7 +134,7 @@
 
   .notif-close:hover {
     color: #34495e;
-    transform: rotate(90deg); /* ← анимация поворота для современности */
+    transform: rotate(90deg);
   }
 
   /* === Затемнение фона === */
@@ -207,8 +207,8 @@
               <li><a class="dropdown-item" href="{{ url_for('set_language', lang='en') }}">English</a></li>
             </ul>
           </div>
-          
-          <!-- Кнопка уведомлений (добавлена) -->
+
+          <!-- Кнопка уведомлений -->
           <a class="nav-link" href="#" id="notifBtn" aria-label="{{ t('Уведомления') }}">
             <i class="fas fa-bell"></i>
             <span class="notif-badge" id="notifBadge">0</span>
@@ -224,7 +224,7 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>© 2026 Барлық құқықтар қорғалған | Қ.Жұбанов атындағы Ақтөбе өңірлік университеті</p>
+      <p>© 2026 {{ t('Все права защищены.') }} | {{ t('Университет имени К. Жубанова') }}</p>
     </div>
   </footer>
 
@@ -236,7 +236,7 @@
   <!-- Затемнение -->
   <div id="overlay"></div>
 
-  <!-- Панель уведомлений (обновлённая структура) -->
+  <!-- Панель уведомлений -->
   <div id="notifPanel">
     <div class="header">
       <h4>{{ t('Уведомления') }}</h4>
@@ -253,7 +253,7 @@
     const notifBadge = document.getElementById("notifBadge");
 
     const openPanel = async () => {
-      await loadNotifications(); // ← загружаем перед открытием для свежести
+      await loadNotifications();
       notifPanel.classList.add("active");
       overlay.classList.add("active");
     };

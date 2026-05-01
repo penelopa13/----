@@ -6,10 +6,10 @@
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
             <h1 class="mb-2">{{ t('Админ-панель') }}</h1>
-            <p class="text-muted mb-0">Добро пожаловать, <strong>{{ current_user.name or current_user.email }}</strong></p>
+            <p class="text-muted mb-0">{{ t('Добро пожаловать,') }} <strong>{{ current_user.name or current_user.email }}</strong></p>
         </div>
         <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-lg px-5 shadow-sm d-flex align-items-center gap-2">
-            <i class="fas fa-sign-out-alt"></i> Выйти
+            <i class="fas fa-sign-out-alt"></i> {{ t('Выйти') }}
         </a>
     </div>
 
@@ -23,7 +23,7 @@
                         <i class="fas fa-users fa-2x"></i>
                     </div>
                     <div>
-                        <h5 class="mb-1 fw-semibold opacity-90">Пользователей</h5>
+                        <h5 class="mb-1 fw-semibold opacity-90">{{ t('Пользователей') }}</h5>
                         <h2 class="mb-0 display-5 fw-bold">{{ users|length }}</h2>
                     </div>
                 </div>
@@ -39,7 +39,7 @@
                         <i class="fas fa-check-circle fa-2x"></i>
                     </div>
                     <div>
-                        <h5 class="mb-1 fw-semibold opacity-90">Тестов пройдено</h5>
+                        <h5 class="mb-1 fw-semibold opacity-90">{{ t('Тестов пройдено') }}</h5>
                         <h2 class="mb-0 display-5 fw-bold">{{ results|length }}</h2>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                         <i class="fas fa-bell fa-2x"></i>
                     </div>
                     <div>
-                        <h5 class="mb-1 fw-semibold opacity-90">Уведомлений</h5>
+                        <h5 class="mb-1 fw-semibold opacity-90">{{ t('Уведомлений') }}</h5>
                         <h2 class="mb-0 display-5 fw-bold">{{ notifications|length }}</h2>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                         <i class="fas fa-file-alt fa-2x"></i>
                     </div>
                     <div>
-                        <h5 class="mb-1 fw-semibold opacity-90">Заявок</h5>
+                        <h5 class="mb-1 fw-semibold opacity-90">{{ t('Заявок') }}</h5>
                         <h2 class="mb-0 display-5 fw-bold">{{ applications|length }}</h2>
                     </div>
                 </div>
@@ -86,20 +86,20 @@
         <!-- Пользователи -->
         <div id="usersTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3><i class="fas fa-users me-2 text-primary"></i> Пользователи</h3>
+                <h3><i class="fas fa-users me-2 text-primary"></i> {{ t('Пользователи') }}</h3>
                 <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
-                    <i class="fas fa-eye-slash"></i> Скрыть
+                    <i class="fas fa-eye-slash"></i> {{ t('Скрыть') }}
                 </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Имя</th>
-                            <th>Email</th>
-                            <th>Роль</th>
-                            <th>Действия</th>
+                            <th>{{ t('ID') }}</th>
+                            <th>{{ t('Имя') }}</th>
+                            <th>{{ t('Email') }}</th>
+                            <th>{{ t('Роль') }}</th>
+                            <th>{{ t('Действия') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -110,9 +110,9 @@
                             <td>{{ u.email }}</td>
                             <td>
                                 {% if u.is_admin %}
-                                    <span class="badge bg-danger">Admin</span>
+                                    <span class="badge bg-danger">{{ t('Admin') }}</span>
                                 {% else %}
-                                    <span class="badge bg-secondary">User</span>
+                                    <span class="badge bg-secondary">{{ t('User') }}</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -130,21 +130,21 @@
         <!-- Результаты тестов -->
         <div id="resultsTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3><i class="fas fa-check-circle me-2 text-success"></i> Результаты теста</h3>
+                <h3><i class="fas fa-check-circle me-2 text-success"></i> {{ t('Результаты теста') }}</h3>
                 <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
-                    <i class="fas fa-eye-slash"></i> Скрыть
+                    <i class="fas fa-eye-slash"></i> {{ t('Скрыть') }}
                 </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Пользователь</th>
-                            <th>Email</th>
-                            <th>MBTI</th>
-                            <th>Дата</th>
-                            <th>Действия</th>
+                            <th>{{ t('ID') }}</th>
+                            <th>{{ t('Пользователь') }}</th>
+                            <th>{{ t('Email') }}</th>
+                            <th>{{ t('MBTI') }}</th>
+                            <th>{{ t('Дата') }}</th>
+                            <th>{{ t('Действия') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -170,13 +170,13 @@
         <!-- Уведомления -->
         <div id="notificationsTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3><i class="fas fa-bell me-2 text-danger"></i> Уведомления</h3>
+                <h3><i class="fas fa-bell me-2 text-danger"></i> {{ t('Уведомления') }}</h3>
                 <div>
                     <button class="btn btn-secondary btn-sm me-2" onclick="hideBlock()">
-                        <i class="fas fa-eye-slash"></i> Скрыть
+                        <i class="fas fa-eye-slash"></i> {{ t('Скрыть') }}
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="deleteAll('notifications')">
-                        <i class="fas fa-trash"></i> Удалить все
+                        <i class="fas fa-trash"></i> {{ t('Удалить все') }}
                     </button>
                 </div>
             </div>
@@ -184,14 +184,14 @@
                 <table class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Заголовок</th>
-                            <th>Сообщение</th>
-                            <th>Тип</th>
-                            <th>Получатель</th>
-                            <th>Дата</th>
-                            <th>Прочитано</th>
-                            <th>Действия</th>
+                            <th>{{ t('ID') }}</th>
+                            <th>{{ t('Заголовок') }}</th>
+                            <th>{{ t('Сообщение') }}</th>
+                            <th>{{ t('Тип уведомления') }}</th>
+                            <th>{{ t('Получатель') }}</th>
+                            <th>{{ t('Дата') }}</th>
+                            <th>{{ t('Прочитано') }}</th>
+                            <th>{{ t('Действия') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -205,7 +205,7 @@
                                 {% if n.recipient %}
                                     {{ n.recipient.name or n.recipient.email }} (ID: {{ n.recipient_id }})
                                 {% else %}
-                                    <span class="badge bg-secondary">Всем</span>
+                                    <span class="badge bg-secondary">{{ t('Всем') }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ n.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
@@ -231,25 +231,25 @@
         <!-- Заявки на поступление -->
         <div id="applicationsTable" class="data-block card shadow-lg p-4 mb-4" style="display:none;">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3><i class="fas fa-file-alt me-2 text-danger"></i> Заявки на поступление</h3>
+                <h3><i class="fas fa-file-alt me-2 text-danger"></i> {{ t('Заявки на поступление') }}</h3>
                 <button class="btn btn-secondary btn-sm" onclick="hideBlock()">
-                    <i class="fas fa-eye-slash"></i> Скрыть
+                    <i class="fas fa-eye-slash"></i> {{ t('Скрыть') }}
                 </button>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Имя Фамилия</th>
-                            <th>Телефон</th>
-                            <th>Email</th>
-                            <th>Образование</th>
-                            <th>Специальность</th>
-                            <th>Форма</th>
-                            <th>Комментарий</th>
-                            <th>Дата</th>
-                            <th>Действия</th>
+                            <th>{{ t('ID') }}</th>
+                            <th>{{ t('Имя Фамилия') }}</th>
+                            <th>{{ t('Телефон') }}</th>
+                            <th>{{ t('Email') }}</th>
+                            <th>{{ t('Образование') }}</th>
+                            <th>{{ t('Специальность') }}</th>
+                            <th>{{ t('Форма') }}</th>
+                            <th>{{ t('Комментарий') }}</th>
+                            <th>{{ t('Дата') }}</th>
+                            <th>{{ t('Действия') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -282,46 +282,46 @@
 
     </div>
 
-    <!-- Форма отправки уведомления (оставляем как было) -->
+    <!-- Форма отправки уведомления -->
     <div class="card border-0 shadow-lg mt-5" data-aos="fade-up">
         <div class="card-header bg-gradient text-white text-center py-4">
-            <h3 class="mb-0"><i class="fas fa-bell me-2"></i> Отправить уведомление</h3>
+            <h3 class="mb-0"><i class="fas fa-bell me-2"></i> {{ t('Отправить уведомление') }}</h3>
         </div>
         <div class="card-body p-5">
             <form id="notificationForm">
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label fw-bold">Заголовок</label>
-                        <input type="text" class="form-control form-control-lg" id="notifTitle" placeholder="Важное обновление" required>
+                        <label class="form-label fw-bold">{{ t('Заголовок') }}</label>
+                        <input type="text" class="form-control form-control-lg" id="notifTitle" placeholder="{{ t('Важное обновление') }}" required>
                     </div>
                     <div class="col-12">
-                        <label class="form-label fw-bold">Сообщение</label>
+                        <label class="form-label fw-bold">{{ t('Сообщение') }}</label>
                         <textarea class="form-control" id="notifMessage" rows="4" required></textarea>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">Тип уведомления</label>
+                        <label class="form-label fw-bold">{{ t('Тип уведомления') }}</label>
                         <select class="form-select form-select-lg" id="notifType">
-                            <option value="info">Информация</option>
-                            <option value="success">Успех</option>
-                            <option value="warning">Важно</option>
-                            <option value="urgent">Срочно</option>
+                            <option value="info">{{ t('Информация') }}</option>
+                            <option value="success">{{ t('Успех') }}</option>
+                            <option value="warning">{{ t('Важно') }}</option>
+                            <option value="urgent">{{ t('Срочно') }}</option>
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold">Кому</label>
+                        <label class="form-label fw-bold">{{ t('Кому') }}</label>
                         <div class="d-flex flex-column gap-2">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="recipient" value="all" checked>
-                                <label class="form-check-label">Всем пользователям</label>
+                                <label class="form-check-label">{{ t('Всем пользователям') }}</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="recipient" value="specific">
-                                <label class="form-check-label">Конкретному</label>
+                                <label class="form-check-label">{{ t('Конкретному') }}</label>
                             </div>
                         </div>
                         <div id="userSelectWrapper" class="mt-2" style="display:none;">
                             <select class="form-select mt-2" id="specificUserSelect">
-                                <option value="">— Выберите пользователя —</option>
+                                <option value="">{{ t('— Выберите пользователя —') }}</option>
                                 {% for user in users %}
                                 <option value="{{ user.id }}">{{ user.name or user.email }}</option>
                                 {% endfor %}
@@ -330,9 +330,9 @@
                     </div>
                 </div>
                 <div class="text-end mt-4">
-                    <button type="button" class="btn btn-outline-secondary btn-lg me-3" onclick="clearForm()">Очистить</button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg me-3" onclick="clearForm()">{{ t('Очистить') }}</button>
                     <button type="submit" class="btn btn-orange btn-lg px-5 shadow">
-                        <i class="fas fa-paper-plane"></i> Отправить
+                        <i class="fas fa-paper-plane"></i> {{ t('Отправить') }}
                     </button>
                 </div>
             </form>
@@ -371,7 +371,7 @@
         $(block).find('table').DataTable({
             destroy: true,
             pageLength: 10,
-            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Все"]],
+            lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "{{ t('Все') }}"]],
             language: { url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ru.json" }
         });
         window.scrollTo({ top: block.offsetTop - 100, behavior: 'smooth' });
@@ -382,36 +382,36 @@
     }
 
     function deleteRow(id, table) {
-        if (!confirm('Удалить запись? Действие нельзя отменить.')) return;
+        if (!confirm('{{ t('Удалить запись? Это действие нельзя отменить.') }}')) return;
         fetch(`/api/admin/delete/${table}/${id}`, { method: 'DELETE' })
             .then(r => r.json())
             .then(d => {
                 if (d.status === 'ok') {
-                    alert('Запись удалена');
+                    alert('{{ t('Запись удалена') }}');
                     updateCardCount(table);
                     const row = document.querySelector(`#${table}Table tr td:first-child:has(textContent='${id}')`).closest('tr');
                     if (row) row.remove();
                 } else {
-                    alert('Ошибка: ' + (d.message || 'Не удалось удалить'));
+                    alert('{{ t('Ошибка:') }} ' + (d.message || '{{ t('Не удалось удалить') }}'));
                 }
             })
-            .catch(() => alert('Ошибка сети'));
+            .catch(() => alert('{{ t('Ошибка сети') }}'));
     }
 
     function deleteAll(table) {
-        if (!confirm('Удалить все записи? Действие нельзя отменить.')) return;
+        if (!confirm('{{ t('Удалить все записи? Действие нельзя отменить.') }}')) return;
         fetch(`/api/admin/delete/${table}/all`, { method: 'DELETE' })
             .then(r => r.json())
             .then(d => {
                 if (d.status === 'ok') {
-                    alert('Все записи удалены');
+                    alert('{{ t('Все записи удалены') }}');
                     updateCardCount(table, 0);
                     document.querySelector(`#${table}Table tbody`).innerHTML = '';
                 } else {
-                    alert('Ошибка: ' + (d.message || 'Не удалось удалить'));
+                    alert('{{ t('Ошибка:') }} ' + (d.message || '{{ t('Не удалось удалить') }}'));
                 }
             })
-            .catch(() => alert('Ошибка сети'));
+            .catch(() => alert('{{ t('Ошибка сети') }}'));
     }
 
     function updateCardCount(table, newCount = null) {
@@ -459,12 +459,12 @@
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            alert(data.message || 'Уведомление отправлено!');
+            alert(data.message || '{{ t('Уведомление отправлено!') }}');
             e.target.reset();
             document.getElementById('userSelectWrapper').style.display = 'none';
             updateCardCount('notifications');
         } catch {
-            alert('Ошибка отправки');
+            alert('{{ t('Ошибка отправки') }}');
         }
     });
 </script>

@@ -12,9 +12,9 @@
         <h2>{{ user.name }}</h2>
         <p class="subtitle">{{ user.email }}</p>
       </div>
-<a href="{{ url_for('logout') }}" class="logout-btn" title="{{ t('Выйти') }}">
-  <i class="fas fa-sign-out-alt"></i>
-</a>
+      <a href="{{ url_for('logout') }}" class="logout-btn" title="{{ t('Выйти') }}">
+        <i class="fas fa-sign-out-alt"></i>
+      </a>
     </div>
 
     <div class="profile-grid">
@@ -22,7 +22,7 @@
       <div class="profile-info">
         <div class="info-item">
           <span class="label">{{ t('Роль:') }}</span>
-          <span class="value">{{ user.is_admin and t('Админ') or t('Пользователь') }}</span>
+          <span class="value">{{ t('Админ') if user.is_admin else t('Пользователь') }}</span>
         </div>
 
         <div class="info-item">
@@ -39,8 +39,8 @@
         <!-- Прогресс-бар -->
         <div class="progress-container">
           <div class="progress-label">
-  {{ t('Порог поступления:') }} <strong>70</strong> / 140
-</div>
+            {{ t('Порог поступления:') }} <strong>70</strong> / 140
+          </div>
           <div class="progress-bar">
             <div class="progress-fill" style="width: {{ (user.ent_total / 140 * 100)|round(0) }}%"></div>
           </div>
@@ -68,7 +68,7 @@
         {% else %}
         <div class="no-result">
           <p>{{ t('Вы ещё не проходили психологический тест.') }}</p>
-<a href="{{ url_for('test_psy') }}" class="btn orange">{{ t('Пройти тест') }}</a>
+          <a href="{{ url_for('test_psy') }}" class="btn orange">{{ t('Пройти тест') }}</a>
         </div>
         {% endif %}
 
@@ -79,13 +79,11 @@
           </a>
           <a href="{{ url_for('status') }}" class="action-card">
             <i class="fas fa-file-alt"></i>
-           <span>{{ t('Статус заявки') }}</span>
+            <span>{{ t('Статус заявки') }}</span>
           </a>
         </div>
       </div>
     </div>
   </div>
 </section>
-
-
 {% endblock %}
