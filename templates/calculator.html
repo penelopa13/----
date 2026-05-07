@@ -1,66 +1,60 @@
 {% extends "base.html" %}
-{% block title %}Калькулятор шансов поступления (Бакалавриат) - Талапкер{% endblock %}
+{% block title %}{{ t('Калькулятор шансов поступления') }} - Талапкер{% endblock %}
 
 {% block content %}
 <section class="section py-5" style="min-height: calc(100vh - var(--header-h)); background: linear-gradient(135deg, #1f2d3d, #2b8cff);">
   <div class="container py-5">
     <div class="text-center mb-5">
-      <h1 class="display-5 fw-bold text-white">Калькулятор шансов поступления</h1>
-      <p class="lead text-white opacity-90">ЕНТ 2025 • АРГУ им. Жубанова • Бакалавриат • Все специальности • Обновлено 2026</p>
+      <h1 class="display-5 fw-bold text-white">{{ t('Калькулятор шансов поступления') }}</h1>
+      <p class="lead text-white opacity-90">{{ t('ЕНТ 2025 • АРГУ им. Жубанова • Бакалавриат • Все специальности • Обновлено 2026') }}</p>
     </div>
 
     <div class="row justify-content-center">
       <div class="col-lg-9 col-xl-8">
         <div class="glass-card p-5 shadow-lg">
           <form id="calcForm" class="needs-validation" novalidate>
-
-            <!-- Факультет -->
             <div class="mb-4">
-              <label class="form-label text-white fw-bold mb-3">Факультет</label>
+              <label class="form-label text-white fw-bold mb-3">{{ t('Факультет') }}</label>
               <select class="form-select form-select-lg glass-select" id="faculty" required>
-                <option value="">Выберите факультет</option>
+                <option value="">{{ t('Выберите факультет') }}</option>
               </select>
             </div>
-
-            <!-- Программа -->
             <div class="mb-4">
-              <label class="form-label text-white fw-bold mb-3">Образовательная программа</label>
+              <label class="form-label text-white fw-bold mb-3">{{ t('Образовательная программа') }}</label>
               <select class="form-select form-select-lg glass-select" id="program" required disabled>
-                <option value="">Сначала выберите факультет</option>
+                <option value="">{{ t('Сначала выберите факультет') }}</option>
               </select>
             </div>
-
-            <!-- Проходной балл 2024 -->
             <div class="alert alert-info border-0 rounded-4 py-3 mb-4 glass-alert" id="thresholdInfo" style="display:none;">
-              <strong class="text-white">Проходной балл 2024:</strong><br>
-              <span class="text-success fw-bold">Общий балл:</span> <span id="grantThreshold" class="fw-bold">—</span> баллов | 
-              <span class="text-warning fw-bold">Проходной балл:</span> <span id="contractThreshold" class="fw-bold">—</span> баллов
+              <strong class="text-white">{{ t('Пороговый балл ЕНТ 2025:') }}</strong><br>
+              <span class="text-success fw-bold">{{ t('Грант:') }}</span> <span id="grantThreshold" class="fw-bold">—</span> {{ t('баллов') }} | 
+              <span class="text-warning fw-bold">{{ t('Платное:') }}</span> <span id="contractThreshold" class="fw-bold">—</span> {{ t('баллов') }}
             </div>
-
-            <!-- Ввод баллов -->
             <div id="scoresSection" style="display:none;">
               <hr class="border-white opacity-25 my-5">
-              <h5 class="text-white text-center mb-4 fw-bold">Введите ваши баллы</h5>
+              <h5 class="text-white text-center mb-4 fw-bold">{{ t('Введите ваши баллы') }}</h5>
               <div class="row g-4" id="scoreInputs"></div>
-
               <div class="text-center mt-5">
-                <button type="submit" class="btn orange btn-lg px-5 shadow-lg">Рассчитать шансы</button>
+                <button type="submit" class="btn orange btn-lg px-5 shadow-lg">{{ t('Рассчитать шансы') }}</button>
               </div>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
 
-          <!-- Результат -->
-          <div id="resultSection" class="text-center mt-5 pt-4" style="display:none;">
-            <h2 class="text-white mb-4">Ваш результат</h2>
-            <div class="progress mb-4" style="height: 20px; border-radius: 10px; background: rgba(255,255,255,0.2);">
-              <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #ff4757, #ffb30f);"></div>
-            </div>
-            <h1 class="display-3 fw-bold text-warning" id="totalScore">0</h1>
-            <div id="chanceBadge" class="d-inline-block px-5 py-3 rounded-pill fs-3 fw-bold mb-4"></div>
-            <p class="lead text-white opacity-90" id="chanceText"></p>
-            <p class="text-white opacity-70 mb-4" id="adviceText"></p>
-            <button class="btn btn-outline-light mt-4 px-5" onclick="location.reload()">Новый расчёт</button>
+    <div class="row justify-content-center mt-4" id="resultSection" style="display:none;">
+      <div class="col-lg-9 col-xl-8">
+        <div class="glass-card p-5 shadow-lg text-center">
+          <h2 class="text-white mb-4">{{ t('Ваш результат') }}</h2>
+          <div class="progress mb-4" style="height: 20px; border-radius: 10px; background: rgba(255,255,255,0.2);">
+            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%; background: linear-gradient(90deg, #ff4757, #ffb30f);"></div>
           </div>
+          <h1 class="display-3 fw-bold text-warning" id="totalScore">0</h1>
+          <div id="chanceBadge" class="d-inline-block px-5 py-3 rounded-pill fs-3 fw-bold mb-4"></div>
+          <p class="lead text-white opacity-90" id="chanceText"></p>
+          <p class="text-white opacity-70 mb-4" id="adviceText"></p>
+          <button class="btn btn-outline-light mt-4 px-5" onclick="location.reload()">{{ t('Новый расчёт') }}</button>
         </div>
       </div>
     </div>
@@ -69,113 +63,228 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
-  AOS.init({ duration: 1000, once: true });
+  const TRANSLATIONS = {
+    errorEmpty:        "{{ t('Ошибка! Все поля должны быть заполнены!') }}",
+    errorHistory:      "{{ t('Недопуск к вузам! По Истории Казахстана нужно минимум 5 баллов') }}",
+    errorMax:          "{{ t('Ошибка! Нельзя вводить больше максимального балла!') }}",
+    grantBadge:        "{{ t('ГРАНТ С ВЫСОКОЙ ВЕРОЯТНОСТЬЮ!') }}",
+    grantText:         "{{ t('Поздравляю! Вы с высокой вероятностью получаете грант.') }}",
+    grantAdvice:       "{{ t('Подайте документы вовремя и следите за обновлениями на сайте университета.') }}",
+    contractBadge:     "{{ t('ПРОХОДИТЕ НА КОНТРАКТ') }}",
+    contractText:      "{{ t('Вы проходите на платное обучение.') }}",
+    contractAdvice:    "{{ t('Рассмотрите альтернативные гранты или стипендии. Подготовьтесь к конкурсу.') }}",
+    lowBadge:          "{{ t('ШАНСЫ НИЗКИЕ') }}",
+    lowText:           "{{ t('Нужно минимум %s баллов для платного обучения.') }}",
+    lowAdvice:         "{{ t('Подтяните слабые предметы. Рассмотрите репетиторов или дополнительные курсы.') }}",
+    selectProgram:     "{{ t('Выберите программу') }}",
+    selectFaculty:     "{{ t('Выберите факультет') }}"
+  };
 
-  // ==================== ВСЕ ДАННЫЕ (только бакалавриат) ====================
+  const LABELS = {
+    faculties: {
+      "Факультет педагогики и менеджмента в образовании": "{{ t('Факультет педагогики и менеджмента в образовании') }}",
+      "Профессионально-творческий факультет":             "{{ t('Профессионально-творческий факультет') }}",
+      "Технический факультет":                            "{{ t('Технический факультет') }}",
+      "Физико-математический факультет":                  "{{ t('Физико-математический факультет') }}",
+      "Факультет естествознания":                         "{{ t('Факультет естествознания') }}",
+      "Исторический факультет":                           "{{ t('Исторический факультет') }}",
+      "Филологический факультет":                         "{{ t('Филологический факультет') }}",
+      "Факультет иностранных языков":                     "{{ t('Факультет иностранных языков') }}",
+      "Факультет экономики и права":                      "{{ t('Факультет экономики и права') }}",
+      "Факультет туризма и сервиса":                      "{{ t('Факультет туризма и сервиса') }}",
+      "Heriot-Watt Campus (KZ-UK)":                       "Heriot-Watt Campus (KZ-UK)"
+    },
+    programs: {
+      "6В01102 Психология и менеджмент образования":      "{{ t('6В01102 Психология и менеджмент образования') }}",
+      "6В01201 Дошкольное обучение и воспитание":         "{{ t('6В01201 Дошкольное обучение и воспитание') }}",
+      "6В01301 Педагогика и методика начального обучения":"{{ t('6В01301 Педагогика и методика начального обучения') }}",
+      "6В01902 Специальная педагогика":                   "{{ t('6В01902 Специальная педагогика') }}",
+      "6В03101 Психология":                               "{{ t('6В03101 Психология') }}",
+      "6В03102 Клиническая психология":                   "{{ t('6В03102 Клиническая психология') }}",
+      "6В05201 Экология":                                 "{{ t('6В05201 Экология') }}",
+      "6В01404 Физическая культура и спорт":              "{{ t('6В01404 Физическая культура и спорт') }}",
+      "6В01401 Музыкальное образование":                  "{{ t('6В01401 Музыкальное образование') }}",
+      "6В01406 Художественное образование":               "{{ t('6В01406 Художественное образование') }}",
+      "6В01407 Трудовое обучение и основы предпринимательства": "{{ t('6В01407 Трудовое обучение и основы предпринимательства') }}",
+      "6В02101 Хореография":                              "{{ t('6В02101 Хореография') }}",
+      "6В02102 Дизайн":                                   "{{ t('6В02102 Дизайн') }}",
+      "6В11102 Культурно-досуговая работа":               "{{ t('6В11102 Культурно-досуговая работа') }}",
+      "6В01501 Математика":                               "{{ t('6В01501 Математика') }}",
+      "6В01512 Физика":                                   "{{ t('6В01512 Физика') }}",
+      "6В05301 Физика":                                   "{{ t('6В05301 Физика') }}",
+      "6В05401 Математика":                               "{{ t('6В05401 Математика') }}",
+      "6В07106 Электроэнергетика":                        "{{ t('6В07106 Электроэнергетика') }}",
+      "6В07107 Автоматизация и управление":               "{{ t('6В07107 Автоматизация и управление') }}",
+      "6В07101 Транспорт, транспортная техника и технологии": "{{ t('6В07101 Транспорт, транспортная техника и технологии') }}",
+      "6В07207 Технология и конструирование изделий лёгкой промышленности": "{{ t('6В07207 Технология и конструирование изделий лёгкой промышленности') }}",
+      "6В07201 Горное дело":                              "{{ t('6В07201 Горное дело') }}",
+      "6В07202 Нефтегазовое дело":                        "{{ t('6В07202 Нефтегазовое дело') }}",
+      "6В07210 Металлургия":                              "{{ t('6В07210 Металлургия') }}",
+      "6В07301 Строительство":                            "{{ t('6В07301 Строительство') }}",
+      "6В01503 Информатика":                              "{{ t('6В01503 Информатика') }}",
+      "6В06103 Вычислительная техника и программное обеспечение": "{{ t('6В06103 Вычислительная техника и программное обеспечение') }}",
+      "6В06105 Компьютерная инженерия":                   "{{ t('6В06105 Компьютерная инженерия') }}",
+      "6В06106 IT-медицина":                              "{{ t('6В06106 IT-медицина') }}",
+      "6В01514 Химия":                                    "{{ t('6В01514 Химия') }}",
+      "6В01513 Биология":                                 "{{ t('6В01513 Биология') }}",
+      "6В05101 Биология":                                 "{{ t('6В05101 Биология') }}",
+      "6В05102 Биотехнология":                            "{{ t('6В05102 Биотехнология') }}",
+      "6В05302 Химия":                                    "{{ t('6В05302 Химия') }}",
+      "6В07206 Технология продовольственных продуктов":   "{{ t('6В07206 Технология продовольственных продуктов') }}",
+      "6В01506 География":                                "{{ t('6В01506 География') }}",
+      "6В01603 История и обществознание":                 "{{ t('6В01603 История и обществознание') }}",
+      "6В02201 История":                                  "{{ t('6В02201 История') }}",
+      "6В01701 Казахский язык и литература":              "{{ t('6В01701 Казахский язык и литература') }}",
+      "6В02304 Филология: казахская филология":           "{{ t('6В02304 Филология: казахская филология') }}",
+      "6В01702 Русский язык и литература":                "{{ t('6В01702 Русский язык и литература') }}",
+      "6В01708 Английский язык":                          "{{ t('6В01708 Английский язык') }}",
+      "6В02302 Переводческое дело":                       "{{ t('6В02302 Переводческое дело') }}",
+      "6В02303 Иностранная филология":                    "{{ t('6В02303 Иностранная филология') }}",
+      "6В04102 Менеджмент":                               "{{ t('6В04102 Менеджмент') }}",
+      "6В04105 Государственное и местное управление":     "{{ t('6В04105 Государственное и местное управление') }}",
+      "6В04103 Учет и аудит":                             "{{ t('6В04103 Учет и аудит') }}",
+      "6В04101 Экономика":                                "{{ t('6В04101 Экономика') }}",
+      "6В04104 Финансы":                                  "{{ t('6В04104 Финансы') }}",
+      "6В05203 Ландшафтное проектирование":               "{{ t('6В05203 Ландшафтное проектирование') }}",
+      "6В11301 Организация перевозок, движения и эксплуатация транспорта": "{{ t('6В11301 Организация перевозок, движения и эксплуатация транспорта') }}",
+      "6В04201 Юриспруденция":                            "{{ t('6В04201 Юриспруденция') }}",
+      "6В11101 Туризм":                                   "{{ t('6В11101 Туризм') }}",
+      "6В07108 Электроэнергетика (KZ-UK)":                "{{ t('6В07108 Электроэнергетика (KZ-UK)') }}",
+      "6В07209 Нефтяная инженерия и энергоменеджмент (KZ-UK)": "{{ t('6В07209 Нефтяная инженерия и энергоменеджмент (KZ-UK)') }}",
+      "6В06107 Компьютерная инженерия (KZ-UK)":           "{{ t('6В06107 Компьютерная инженерия (KZ-UK)') }}"
+    },
+    subjects: {
+      "Биология":                   "{{ t('Биология') }}",
+      "География":                  "{{ t('География') }}",
+      "Математика":                 "{{ t('Математика') }}",
+      "Физика":                     "{{ t('Физика') }}",
+      "Информатика":                "{{ t('Информатика') }}",
+      "Химия":                      "{{ t('Химия') }}",
+      "Всемирная история":          "{{ t('Всемирная история') }}",
+      "История Казахстана":         "{{ t('История Казахстана') }}",
+      "Казахский язык":             "{{ t('Казахский язык') }}",
+      "Казахская литература":       "{{ t('Казахская литература') }}",
+      "Русский язык":               "{{ t('Русский язык') }}",
+      "Русская литература":         "{{ t('Русская литература') }}",
+      "Иностранный язык":           "{{ t('Иностранный язык') }}",
+      "Основы права":               "{{ t('Основы права') }}",
+      "Творческий экзамен":         "{{ t('Творческий экзамен') }}",
+      "Физическая подготовка":      "{{ t('Физическая подготовка') }}",
+      "Музыка":                     "{{ t('Музыка') }}",
+      "Рисунок":                    "{{ t('Рисунок') }}",
+      "Черчение":                   "{{ t('Черчение') }}",
+      "Танец":                      "{{ t('Танец') }}",
+      "Грамотность чтения":         "{{ t('Грамотность чтения') }}",
+      "Математическая грамотность": "{{ t('Математическая грамотность') }}"
+    }
+  };
+
   const programsData = {
     bachelor: {
       "Факультет педагогики и менеджмента в образовании": {
-        "6В01102 Психология и менеджмент образования": { grant: 98, contract: 75, subjects: ["Математика", "Биология"] },
-        "6В01201 Дошкольное обучение и воспитание": { grant: 85, contract: 65, subjects: ["Казахский язык", "Русский язык"] },
-        "6В01301 Педагогика и методика начального обучения": { grant: 90, contract: 70, subjects: ["Математика", "Казахский язык"] },
-        "6В01902 Специальная педагогика": { grant: 92, contract: 68, subjects: ["Биология", "География"] },
-        "6В03101 Психология": { grant: 105, contract: 80, subjects: ["Биология", "География"] },
-        "6В03102 Клиническая психология": { grant: 110, contract: 85, subjects: ["Биология", "Химия"] }
-      },
-      "Исторический факультет": {
-        "6В01506 География": { grant: 88, contract: 65, subjects: ["География", "История Казахстана"] },
-        "6В01603 История и обществознание": { grant: 95, contract: 70, subjects: ["Всемирная история", "История Казахстана"] },
-        "6В02201 История": { grant: 95, contract: 70, subjects: ["Всемирная история", "История Казахстана"] },
-        "6В05203 Ландшафтное проектирование": { grant: 90, contract: 68, subjects: ["География", "Математика"] },
-        "6В11101 Туризм": { grant: 92, contract: 70, subjects: ["География", "Иностранный язык"] }
+        "6В01102 Психология и менеджмент образования":      { grant: 75,  contract: 75,  subjects: ["Биология", "География"] },
+        "6В01201 Дошкольное обучение и воспитание":         { grant: 75,  contract: 75,  subjects: ["Биология", "География"] },
+        "6В01301 Педагогика и методика начального обучения":{ grant: 75,  contract: 75,  subjects: ["Биология", "География"] },
+        "6В01902 Специальная педагогика":                   { grant: 75,  contract: 75,  subjects: ["Биология", "География"] },
+        "6В03101 Психология":                               { grant: 60,  contract: 70,  subjects: ["Биология", "География"] },
+        "6В03102 Клиническая психология":                   { grant: 60,  contract: 70,  subjects: ["Биология", "География"] },
+        "6В05201 Экология":                                 { grant: 60,  contract: 70,  subjects: ["Биология", "География"] }
       },
       "Профессионально-творческий факультет": {
-        "6В01401 Музыкальное образование": { grant: 90, contract: 68, subjects: ["Музыка", "Казахский язык"] },
-        "6В01404 Физическая культура и спорт": { grant: 85, contract: 65, subjects: ["Биология", "Физическая подготовка"] },
-        "6В01406 Художественное образование": { grant: 92, contract: 70, subjects: ["Рисунок", "Композиция"] },
-        "6В02101 Хореография": { grant: 88, contract: 66, subjects: ["Танец", "Казахский язык"] },
-        "6В02102 Дизайн": { grant: 100, contract: 75, subjects: ["Рисунок", "Композиция"] },
-        "6В07207 Технология и конструирование изделий легкой промышленности": { grant: 90, contract: 68, subjects: ["Рисунок", "Черчение"] },
-        "6В11102 Культурно-досуговая работа": { grant: 88, contract: 66, subjects: ["История", "Человек. Общество. Право"] },
-        "6В01407 Трудовое обучение и основы предпринимательства": { grant: 87, contract: 65, subjects: ["Математика", "Физика"] }
+        "6В01404 Физическая культура и спорт":              { grant: 90,  contract: 100, subjects: ["Творческий экзамен", "Физическая подготовка"] },
+        "6В01401 Музыкальное образование":                  { grant: 75,  contract: 75,  subjects: ["Творческий экзамен", "Музыка"] },
+        "6В01406 Художественное образование":               { grant: 75,  contract: 75,  subjects: ["Творческий экзамен", "Рисунок"] },
+        "6В01407 Трудовое обучение и основы предпринимательства": { grant: 75, contract: 75, subjects: ["Творческий экзамен", "Черчение"] },
+        "6В02101 Хореография":                              { grant: 60,  contract: 100, subjects: ["Творческий экзамен", "Танец"] },
+        "6В02102 Дизайн":                                   { grant: 60,  contract: 100, subjects: ["Творческий экзамен", "Рисунок"] },
+        "6В11102 Культурно-досуговая работа":               { grant: 60,  contract: 70,  subjects: ["Творческий экзамен", "История Казахстана"] }
       },
       "Технический факультет": {
-        "6В07106 Электроэнергетика": { grant: 95, contract: 70, subjects: ["Математика", "Физика"] },
-        "6В07107 Автоматизация и управление": { grant: 100, contract: 75, subjects: ["Математика", "Физика"] },
-        "6В07201 Горное дело": { grant: 92, contract: 68, subjects: ["Математика", "Физика"] },
-        "6В07202 Нефтегазовое дело": { grant: 105, contract: 80, subjects: ["Математика", "Физика"] },
-        "6В07203 Металлургия": { grant: 94, contract: 70, subjects: ["Химия", "Физика"] },
-        "6В07301 Строительство": { grant: 98, contract: 72, subjects: ["Математика", "Физика"] },
-        "6В11301 Организация перевозок, движения и эксплуатация транспорта": { grant: 90, contract: 68, subjects: ["Математика", "Физика"] },
-        "6В07101 Транспорт, транспортная техника и технологии": { grant: 93, contract: 70, subjects: ["Математика", "Физика"] }
-      },
-      "Факультет естествознания": {
-        "6В01513 Биология": { grant: 90, contract: 68, subjects: ["Биология", "Химия"] },
-        "6В05101 Биология": { grant: 92, contract: 68, subjects: ["Биология", "Химия"] },
-        "6В05102 Биотехнология": { grant: 98, contract: 74, subjects: ["Биология", "Химия"] },
-        "6В05201 Экология": { grant: 88, contract: 65, subjects: ["География", "Биология"] },
-        "6В05302 Химия": { grant: 90, contract: 67, subjects: ["Химия", "Биология"] },
-        "6В01514 Химия": { grant: 89, contract: 66, subjects: ["Химия", "Математика"] },
-        "6В07206 Технология продовольственных продуктов": { grant: 90, contract: 68, subjects: ["Химия", "Биология"] }
+        "6В01501 Математика":                               { grant: 80,  contract: 85,  subjects: ["Математика", "Физика"] },
+        "6В01512 Физика":                                   { grant: 80,  contract: 85,  subjects: ["Физика", "Математика"] },
+        "6В05301 Физика":                                   { grant: 65,  contract: 75,  subjects: ["Физика", "Математика"] },
+        "6В05401 Математика":                               { grant: 65,  contract: 75,  subjects: ["Математика", "Физика"] },
+        "6В07106 Электроэнергетика":                        { grant: 70,  contract: 70,  subjects: ["Математика", "Физика"] },
+        "6В07107 Автоматизация и управление":               { grant: 65,  contract: 70,  subjects: ["Математика", "Физика"] },
+        "6В07101 Транспорт, транспортная техника и технологии": { grant: 60, contract: 70, subjects: ["Математика", "Физика"] },
+        "6В07207 Технология и конструирование изделий лёгкой промышленности": { grant: 60, contract: 70, subjects: ["Математика", "Физика"] },
+        "6В07201 Горное дело":                              { grant: 60,  contract: 70,  subjects: ["Математика", "Физика"] },
+        "6В07202 Нефтегазовое дело":                        { grant: 60,  contract: 70,  subjects: ["Математика", "Физика"] },
+        "6В07210 Металлургия":                              { grant: 60,  contract: 70,  subjects: ["Математика", "Физика"] },
+        "6В07301 Строительство":                            { grant: 60,  contract: 70,  subjects: ["Математика", "Физика"] }
       },
       "Физико-математический факультет": {
-        "6В01501 Математика": { grant: 105, contract: 80, subjects: ["Математика", "Физика"] },
-        "6В05301 Физика": { grant: 102, contract: 78, subjects: ["Физика", "Математика"] },
-        "6В05401 Математика": { grant: 108, contract: 82, subjects: ["Математика", "Физика"] },
-        "6В06103 Вычислительная техника и программное обеспечение": { grant: 110, contract: 85, subjects: ["Математика", "Физика"] },
-        "6В01503 Информатика": { grant: 108, contract: 83, subjects: ["Математика", "Физика"] },
-        "6В06105 Компьютерная инженерия": { grant: 112, contract: 88, subjects: ["Математика", "Физика"] },
-        "6В06102 IT-медицина": { grant: 115, contract: 90, subjects: ["Математика", "Физика"] },
-        "6B01512 Физика": { grant: 100, contract: 76, subjects: ["Физика", "Математика"] }
+        "6В01503 Информатика":                              { grant: 75,  contract: 75,  subjects: ["Математика", "Информатика"] },
+        "6В06103 Вычислительная техника и программное обеспечение": { grant: 60, contract: 70, subjects: ["Математика", "Информатика"] },
+        "6В06105 Компьютерная инженерия":                   { grant: 60,  contract: 70,  subjects: ["Математика", "Информатика"] },
+        "6В06106 IT-медицина":                              { grant: 60,  contract: 70,  subjects: ["Математика", "Информатика"] }
+      },
+      "Факультет естествознания": {
+        "6В01514 Химия":                                    { grant: 75,  contract: 80,  subjects: ["Химия", "Биология"] },
+        "6В01513 Биология":                                 { grant: 75,  contract: 80,  subjects: ["Биология", "Химия"] },
+        "6В05101 Биология":                                 { grant: 60,  contract: 70,  subjects: ["Биология", "Химия"] },
+        "6В05102 Биотехнология":                            { grant: 60,  contract: 70,  subjects: ["Биология", "Химия"] },
+        "6В05302 Химия":                                    { grant: 60,  contract: 70,  subjects: ["Химия", "Биология"] },
+        "6В07206 Технология продовольственных продуктов":   { grant: 65,  contract: 70,  subjects: ["Химия", "Биология"] }
+      },
+      "Исторический факультет": {
+        "6В01506 География":                                { grant: 75,  contract: 80,  subjects: ["География", "Всемирная история"] },
+        "6В01603 История и обществознание":                 { grant: 75,  contract: 80,  subjects: ["Всемирная история", "История Казахстана"] },
+        "6В02201 История":                                  { grant: 60,  contract: 75,  subjects: ["Всемирная история", "История Казахстана"] }
       },
       "Филологический факультет": {
-        "6В01701 Казахский язык и литература": { grant: 110, contract: 85, subjects: ["Казахский язык", "Казахская литература"] },
-        "6В01702 Русский язык и литература": { grant: 100, contract: 78, subjects: ["Русский язык", "Русская литература"] },
-        "6В02304 Филология: казахская филология": { grant: 112, contract: 87, subjects: ["Казахский язык", "Казахская литература"] }
+        "6В01701 Казахский язык и литература":              { grant: 75,  contract: 100, subjects: ["Казахский язык", "Казахская литература"] },
+        "6В02304 Филология: казахская филология":           { grant: 60,  contract: 75,  subjects: ["Казахский язык", "Казахская литература"] },
+        "6В01702 Русский язык и литература":                { grant: 75,  contract: 75,  subjects: ["Русский язык", "Русская литература"] }
       },
       "Факультет иностранных языков": {
-        "6В01706 Иностранный язык: два иностранных языка": { grant: 118, contract: 92, subjects: ["Иностранный язык", "Всемирная история"] },
-        "6В02302 Переводческое дело": { grant: 115, contract: 90, subjects: ["Иностранный язык", "Казахский язык"] },
-        "6В02303 Иностранная филология": { grant: 120, contract: 94, subjects: ["Иностранный язык", "История Казахстана"] },
-        "6В01708 Английский язык": { grant: 115, contract: 88, subjects: ["Иностранный язык", "История Казахстана"] }
+        "6В01708 Английский язык":                          { grant: 90,  contract: 100, subjects: ["Иностранный язык", "Всемирная история"] },
+        "6В02302 Переводческое дело":                       { grant: 65,  contract: 75,  subjects: ["Иностранный язык", "Всемирная история"] },
+        "6В02303 Иностранная филология":                    { grant: 65,  contract: 75,  subjects: ["Иностранный язык", "Всемирная история"] }
       },
       "Факультет экономики и права": {
-        "6В04101 Экономика": { grant: 105, contract: 80, subjects: ["Математика", "География"] },
-        "6В04102 Менеджмент": { grant: 108, contract: 82, subjects: ["Математика", "География"] },
-        "6В04103 Учет и аудит": { grant: 102, contract: 78, subjects: ["Математика", "География"] },
-        "6В04104 Финансы": { grant: 110, contract: 85, subjects: ["Математика", "География"] },
-        "6В04105 Государственное и местное управление": { grant: 100, contract: 78, subjects: ["Математика", "География"] },
-        "6В04201 Право": { grant: 115, contract: 90, subjects: ["История", "Человек. Общество. Право"] }
+        "6В04102 Менеджмент":                               { grant: 60,  contract: 60,  subjects: ["Математика", "География"] },
+        "6В04105 Государственное и местное управление":     { grant: 60,  contract: 60,  subjects: ["Математика", "География"] },
+        "6В04103 Учет и аудит":                             { grant: 60,  contract: 60,  subjects: ["Математика", "География"] },
+        "6В04101 Экономика":                                { grant: 60,  contract: 60,  subjects: ["Математика", "География"] },
+        "6В04104 Финансы":                                  { grant: 60,  contract: 60,  subjects: ["Математика", "География"] },
+        "6В05203 Ландшафтное проектирование":               { grant: 70,  contract: 70,  subjects: ["Математика", "География"] },
+        "6В11301 Организация перевозок, движения и эксплуатация транспорта": { grant: 60, contract: 60, subjects: ["Математика", "География"] },
+        "6В04201 Юриспруденция":                            { grant: 75,  contract: 90,  subjects: ["Всемирная история", "Основы права"] }
       },
-      "Heriot-Watt Campus": {
-        "6В06107 Компьютерная инженерия": { grant: 120, contract: 95, subjects: ["Математика", "Физика"] },
-        "6В07108 Электроэнергетика": { grant: 118, contract: 93, subjects: ["Математика", "Физика"] },
-        "6В07209 Нефтяная инженерия и энергоменеджмент": { grant: 125, contract: 100, subjects: ["Математика", "Физика"] }
+      "Факультет туризма и сервиса": {
+        "6В11101 Туризм":                                   { grant: 60,  contract: 70,  subjects: ["География", "Иностранный язык"] }
+      },
+      "Heriot-Watt Campus (KZ-UK)": {
+        "6В07108 Электроэнергетика (KZ-UK)":                { grant: 65,  contract: 50,  subjects: ["Математика", "Физика"] },
+        "6В07209 Нефтяная инженерия и энергоменеджмент (KZ-UK)": { grant: 65, contract: 50, subjects: ["Математика", "Физика"] },
+        "6В06107 Компьютерная инженерия (KZ-UK)":           { grant: 65,  contract: 50,  subjects: ["Математика", "Информатика"] }
       }
     }
   };
 
-  // ==================== ЛОГИКА (только бакалавриат) ====================
   const currentLevel = 'bachelor';
-
-  // Инициализация факультетов при загрузке страницы
   const facultySelect = document.getElementById('faculty');
   const programSelect = document.getElementById('program');
 
-  facultySelect.innerHTML = '<option value="">Выберите факультет</option>';
-  Object.keys(programsData[currentLevel]).forEach(f => facultySelect.add(new Option(f, f)));
+  facultySelect.innerHTML = `<option value="">${TRANSLATIONS.selectFaculty}</option>`;
+  Object.keys(programsData[currentLevel]).forEach(f => {
+    facultySelect.add(new Option(LABELS.faculties[f] || f, f));
+  });
   facultySelect.disabled = false;
 
   document.getElementById('faculty').addEventListener('change', function() {
     const faculty = this.value;
-    programSelect.innerHTML = '<option value="">Выберите программу</option>';
+    programSelect.innerHTML = `<option value="">${TRANSLATIONS.selectProgram}</option>`;
     programSelect.disabled = false;
     hideAll();
-
     const programs = programsData[currentLevel]?.[faculty];
-    if (programs) Object.keys(programs).forEach(p => programSelect.add(new Option(p, p)));
+    if (programs) {
+      Object.keys(programs).forEach(p => {
+        programSelect.add(new Option(LABELS.programs[p] || p, p));
+      });
+    }
   });
 
   document.getElementById('program').addEventListener('change', function() {
@@ -185,130 +294,95 @@
     const data = programsData[currentLevel]?.[faculty]?.[program];
     if (!data) return;
 
-    // ФИКСИРОВАННЫЕ ПРОХОДНЫЕ БАЛЛЫ (только бакалавриат)
-    let grantVal = 140;
-    let contractVal = 50;
-
-    document.getElementById('grantThreshold').textContent = grantVal;
-    document.getElementById('contractThreshold').textContent = contractVal;
+    document.getElementById('grantThreshold').textContent = data.grant;
+    document.getElementById('contractThreshold').textContent = data.contract;
     document.getElementById('thresholdInfo').style.display = 'block';
 
     const container = document.getElementById('scoreInputs');
     container.innerHTML = '';
 
-    // ==================== ЛОГИКА ВВОДА БАЛЛОВ ТОЛЬКО ДЛЯ БАКАЛАВРИАТА ====================
     const baseSubjects = ["История Казахстана", "Грамотность чтения", "Математическая грамотность"];
     const profileSubjects = data.subjects || ["Профильный предмет 1", "Профильный предмет 2"];
 
-    let maxProfile = 50;
-    let maxHistory = 20;
-    let maxReading = 10;
-    let maxMath = 10;
-
-    // Профильные предметы
     profileSubjects.forEach(sub => {
+      const label = LABELS.subjects[sub] || sub;
       container.innerHTML += `
         <div class="col-lg-6">
-          <label class="form-label text-white opacity-90 fw-500">${sub}</label>
-          <input type="number" class="form-control form-control-lg text-center score-input" 
-                 placeholder="0–${maxProfile}" min="0" max="${maxProfile}" required>
+          <label class="form-label text-white opacity-90 fw-500" data-key="${sub}">${label}</label>
+          <input type="number" class="form-control form-control-lg text-center score-input"
+                 placeholder="0–50" min="0" max="50" required>
         </div>`;
     });
 
-    // Базовые предметы
+    const baseLimits = { "История Казахстана": 20, "Грамотность чтения": 10, "Математическая грамотность": 10 };
     baseSubjects.forEach(sub => {
-      let max = sub === "История Казахстана" ? maxHistory : sub === "Грамотность чтения" ? maxReading : maxMath;
-      let placeholder = `0–${max}`;
-
+      const max = baseLimits[sub];
+      const label = LABELS.subjects[sub] || sub;
       container.innerHTML += `
         <div class="col-lg-6">
-          <label class="form-label text-white opacity-90 fw-500">${sub}</label>
-          <input type="number" class="form-control form-control-lg text-center score-input" 
-                 placeholder="${placeholder}" min="0" max="${max}" required>
+          <label class="form-label text-white opacity-90 fw-500" data-key="${sub}">${label}</label>
+          <input type="number" class="form-control form-control-lg text-center score-input"
+                 placeholder="0–${max}" min="0" max="${max}" required>
         </div>`;
     });
-    
+
     document.getElementById('scoresSection').style.display = 'block';
   });
 
   document.getElementById('calcForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
-    let total = 0;
-    let hasError = false;
-    let hasEmpty = false;
-    let hasHistoryError = false;
+    let total = 0, hasError = false, hasEmpty = false, hasHistoryError = false;
 
     document.querySelectorAll('.score-input').forEach(input => {
       const valStr = input.value.trim();
-      const labelText = input.parentElement.querySelector('label').textContent;
-
+      const labelKey = input.parentElement.querySelector('label').getAttribute('data-key') || '';
       if (valStr === '') {
-        input.classList.add('is-invalid');
-        hasEmpty = true;
+        input.classList.add('is-invalid'); hasEmpty = true;
       } else {
-        const val = parseInt(valStr);
-        const max = parseInt(input.max);
-
-        // Специальная проверка для Истории Казахстана
-        if (labelText.includes('История Казахстана') && val < 5) {
-          input.classList.add('is-invalid');
-          hasHistoryError = true;
-        }
-        else if (val > max || val < 0) {
-          input.classList.add('is-invalid');
-          hasError = true;
+        const val = parseInt(valStr), max = parseInt(input.max);
+        if (labelKey === 'История Казахстана' && val < 5) {
+          input.classList.add('is-invalid'); hasHistoryError = true;
+        } else if (val > max || val < 0) {
+          input.classList.add('is-invalid'); hasError = true;
         } else {
-          input.classList.remove('is-invalid');
-          total += val;
+          input.classList.remove('is-invalid'); total += val;
         }
       }
     });
 
-    // Проверки по приоритету
-    if (hasEmpty) {
-      alert("Ошибка! Все поля должны быть заполнены!");
-      return;
-    }
-    if (hasHistoryError) {
-      alert("Недопуск к вузам! По Истории Казахстана нужно минимум 5 баллов");
-      return;
-    }
-    if (hasError) {
-      alert("Ошибка! Нельзя вводить больше максимального балла!");
-      return;
-    }
+    if (hasEmpty)        { alert(TRANSLATIONS.errorEmpty);   return; }
+    if (hasHistoryError) { alert(TRANSLATIONS.errorHistory); return; }
+    if (hasError)        { alert(TRANSLATIONS.errorMax);     return; }
 
-    const grant = parseInt(document.getElementById('grantThreshold').textContent) || 0;
+    const grant    = parseInt(document.getElementById('grantThreshold').textContent) || 0;
     const contract = parseInt(document.getElementById('contractThreshold').textContent) || 0;
-
-    const chancePercent = Math.min(100, Math.max(0, ((total - contract) / (grant - contract)) * 100));
+    const chancePercent = Math.min(100, Math.max(0, ((total - contract) / (grant - contract + 0.001)) * 100));
     document.getElementById('progressBar').style.width = `${chancePercent}%`;
     document.getElementById('totalScore').textContent = total;
 
     const badge = document.getElementById('chanceBadge');
-    const text = document.getElementById('chanceText');
-    const advice = document.getElementById('adviceText');
+    const text  = document.getElementById('chanceText');
+    const advice= document.getElementById('adviceText');
 
     if (total >= grant && grant > 0) {
-      badge.textContent = "ГРАНТ С ВЫСОКОЙ ВЕРОЯТНОСТЬЮ!";
+      badge.textContent = TRANSLATIONS.grantBadge;
       badge.className = "bg-success text-white rounded-pill fs-3 px-5 py-3";
-      text.textContent = `Поздравляю! Вы с высокой вероятностью получаете грант (${chancePercent}% шансов).`;
-      advice.textContent = "Подайте документы timely и следите за обновлениями на сайте университета.";
+      text.textContent = TRANSLATIONS.grantText;
+      advice.textContent = TRANSLATIONS.grantAdvice;
     } else if (total >= contract) {
-      badge.textContent = "ПРОХОДИТЕ НА КОНТРАКТ";
+      badge.textContent = TRANSLATIONS.contractBadge;
       badge.className = "bg-warning text-dark rounded-pill fs-3 px-5 py-3";
-      text.textContent = `Вы проходите на платное (${chancePercent}% шансов на грант при недоборе).`;
-      advice.textContent = "Рассмотрите альтернативные гранты или стипендии. Подготовьтесь к конкурсу.";
+      text.textContent = TRANSLATIONS.contractText;
+      advice.textContent = TRANSLATIONS.contractAdvice;
     } else {
-      badge.textContent = "ШАНСЫ НИЗКИЕ";
+      badge.textContent = TRANSLATIONS.lowBadge;
       badge.className = "bg-danger text-white rounded-pill fs-3 px-5 py-3";
-      text.textContent = `Нужно минимум ${contract} баллов для контракта (${chancePercent}% шансов).`;
-      advice.textContent = "Подтяните слабые предметы. Рассмотрите репетиторов или дополнительные курсы.";
+      text.textContent = TRANSLATIONS.lowText.replace('%s', contract);
+      advice.textContent = TRANSLATIONS.lowAdvice;
     }
 
-    document.getElementById('resultSection').style.display = 'block';
-    document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
+    document.getElementById('resultSection').style.display = 'flex';
+    setTimeout(() => document.getElementById('resultSection').scrollIntoView({behavior: 'smooth', block: 'start'}), 50);
   });
 
   function hideAll() {
@@ -318,7 +392,6 @@
   }
 </script>
 
-<!-- СТИЛИ — УЛУЧШЕННЫЕ: более современные, с градиентами, тенями, анимациями -->
 <style>
 .glass-card {
   background: rgba(255,255,255,0.1);
@@ -329,8 +402,10 @@
   border: 1px solid rgba(255,255,255,0.18);
   position: relative;
   overflow: hidden;
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
-
 .glass-card::before {
   content: '';
   position: absolute;
@@ -340,95 +415,50 @@
   transition: all 0.6s ease;
   opacity: 0;
 }
-
-.glass-card:hover::before {
-  animation: shine 1.2s ease-in-out;
-}
-
+.glass-card:hover::before { animation: shine 1.2s ease-in-out; }
 @keyframes shine {
   0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
   100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
-
 .glass-select, .form-control {
   background: rgba(255,255,255,0.15) !important;
   border: 1px solid rgba(255,255,255,0.3) !important;
   color: white !important;
   border-radius: 12px;
-  backdrop-filter: blur(8px);
   transition: all 0.3s ease;
 }
-
 .glass-select:focus, .form-control:focus {
   border-color: var(--accent-color) !important;
   box-shadow: 0 0 0 0.25rem rgba(255,179,15,0.3) !important;
   background: rgba(255,255,255,0.22) !important;
   transform: scale(1.02);
 }
-
 .glass-alert {
   background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(8px);
   border: 1px solid rgba(255,255,255,0.2);
   transition: all 0.3s ease;
 }
-
-.glass-alert:hover {
-  background: rgba(255,255,255,0.18);
-  transform: translateY(-2px);
-}
-
+.glass-alert:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
 .btn-orange {
   background: linear-gradient(135deg, var(--accent-color), #e09e0c);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 14px 32px;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  color: white; border: none; border-radius: 12px;
+  padding: 14px 32px; font-weight: 600; transition: all 0.3s ease;
 }
-
-.btn-orange:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(255,179,15,0.4);
-}
-
-.is-invalid {
-  border-color: #dc3545 !important;
-  background-image: none !important;
-  animation: shake 0.5s;
-}
-
+.btn-orange:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,179,15,0.4); }
+.is-invalid { border-color: #dc3545 !important; background-image: none !important; animation: shake 0.5s; }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
   50% { transform: translateX(5px); }
   75% { transform: translateX(-5px); }
 }
-
-/* Стрелочка у селектов */
 .glass-select {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3e%3cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 12px;
 }
-
-option {
-  background: #1f2d3d !important;
-  color: white !important;
-}
-/* Выравнивание всех полей ввода баллов */
-#scoreInputs .col-lg-6 {
-  display: flex;
-  flex-direction: column;
-}
-
-#scoreInputs .score-label {
-  min-height: 52px;
-  display: flex;
-  align-items: flex-end;
-  line-height: 1.3;
-}
+option { background: #1f2d3d !important; color: white !important; }
+#scoreInputs .col-lg-6 { display: flex; flex-direction: column; }
 </style>
 {% endblock %}
