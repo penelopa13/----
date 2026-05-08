@@ -2,30 +2,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // === ЭЛЕМЕНТЫ ===
   const testContainer = document.getElementById("test-container");
-  const finalResult = document.getElementById("final-result");
+  const finalResult   = document.getElementById("final-result");
 
-  const mbtiTypeEl = document.getElementById("mbti-type");
+  const mbtiTypeEl    = document.getElementById("mbti-type");
   const descriptionEl = document.getElementById("description");
-  const strengthsEl = document.getElementById("strengths");
+  const strengthsEl   = document.getElementById("strengths");
   const professionsGrid = document.getElementById("professions-grid");
 
-  let questions = [];
+  let questions    = [];
   let currentIndex = 0;
-  let answers = [];
-  let radarChart = null;
+  let answers      = [];
+  let radarChart   = null;
 
-  // Если результат уже есть (от бэкенда)
+  // Строки для перевода — берём из переменных, которые передаём из Jinja
+  // (добавляем в test_psy.html перед подключением этого скрипта)
+  const T = window.TEST_STRINGS || {
+    question:     "Вопрос",
+    of:           "из",
+    yourLevel:    "Ваш уровень",
+    extraversion: "Экстраверсия (E)",
+    intuition:    "Интуиция (N)",
+    thinking:     "Мышление (T)",
+    planning:     "Планирование (J)"
+  };
+
+  // Если результат уже есть (от бэкенда — после перезагрузки страницы)
   if (finalResult && finalResult.style.display !== "none") {
     initImprovedRadarChart();
     return;
   }
 
   // === ЗАПУСК ТЕСТА ===
+  // lang уже в сессии на сервере, бэкенд сам выбирает нужный файл вопросов
   fetch("/api/test/questions")
     .then(res => res.json())
     .then(data => {
       questions = data;
-      answers = new Array(questions.length).fill(null);
+      answers   = new Array(questions.length).fill(null);
       showQuestion();
     })
     .catch(err => console.error("Ошибка загрузки вопросов:", err));
@@ -60,7 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
       optionsDiv.appendChild(btn);
     });
 
-    document.getElementById("progress").textContent = `Вопрос ${currentIndex + 1} из ${questions.length}`;
+    // ← ИСПРАВЛЕНО: используем T вместо жёстких русских строк
+    document.getElementById("progress").textContent =
+      `${T.question} ${currentIndex + 1} ${T.of} ${questions.length}`;
+
     document.getElementById("prev-btn").disabled = currentIndex === 0;
   }
 
@@ -76,17 +92,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (finalResult) finalResult.style.display = "block";
 
     fetch("/api/test/submit", {
-      method: "POST",
+      method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers })
+      body:    JSON.stringify({ answers })
     })
     .then(res => res.json())
     .then(data => {
       const rec = data.recommendations || {};
 
-      if (mbtiTypeEl) mbtiTypeEl.textContent = rec.title || data.mbti || "—";
+      if (mbtiTypeEl)    mbtiTypeEl.textContent  = rec.title       || data.mbti || "—";
       if (descriptionEl) descriptionEl.textContent = rec.description || "";
-      if (strengthsEl) strengthsEl.innerHTML = rec.strengths || "—";
+      if (strengthsEl)   strengthsEl.innerHTML   = rec.strengths   || "—";
 
       // Профессии
       if (professionsGrid) {
@@ -99,54 +115,52 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // ← УЛУЧШЕННЫЙ РАДАР
+      // Радар с результатами
       initImprovedRadarChart(rec.percentages || {});
-
     })
     .catch(err => console.error("Ошибка отправки теста:", err));
   }
 
-  // ====================== УЛУЧШЕННАЯ РАДАРНАЯ ДИАГРАММА ======================
+  // ====================== РАДАРНАЯ ДИАГРАММА ======================
   function initImprovedRadarChart(percentages = {}) {
     const canvas = document.getElementById("radarChart");
     if (!canvas) return;
 
     if (radarChart) radarChart.destroy();
 
-    // Подготовка данных (E/I, S/N, T/F, J/P)
-    const data = {
+    const chartData = {
+      // ← ИСПРАВЛЕНО: подписи из T вместо жёстких русских строк
       labels: [
-        "Экстраверсия (E)", 
-        "Интуиция (N)", 
-        "Мышление (T)", 
-        "Планирование (J)"
+        T.extraversion,
+        T.intuition,
+        T.thinking,
+        T.planning
       ],
       datasets: [{
-        label: "Ваш уровень",
+        label: T.yourLevel,  // ← ИСПРАВЛЕНО
         data: [
           percentages.E || 50,
           percentages.N || 50,
           percentages.T || 50,
           percentages.J || 50
         ],
-        backgroundColor: "rgba(255, 179, 15, 0.28)",
-        borderColor: "#ffb30f",
-        borderWidth: 4,
+        backgroundColor:    "rgba(255, 179, 15, 0.28)",
+        borderColor:        "#ffb30f",
+        borderWidth:        4,
         pointBackgroundColor: "#ffffff",
-        pointBorderColor: "#ffb30f",
-        pointBorderWidth: 2,
-        pointHoverRadius: 8,
+        pointBorderColor:   "#ffb30f",
+        pointBorderWidth:   2,
+        pointHoverRadius:   8,
         pointHoverBorderWidth: 3
       }]
     };
 
     radarChart = new Chart(canvas, {
       type: "radar",
-      data: data,
+      data: chartData,
       options: {
         maintainAspectRatio: true,
         aspectRatio: 1.1,
-
         scales: {
           r: {
             min: 0,
@@ -157,44 +171,33 @@ document.addEventListener("DOMContentLoaded", () => {
               font: { size: 12 },
               backdropColor: "transparent"
             },
-            grid: {
-              color: "rgba(255, 255, 255, 0.15)"
-            },
-            angleLines: {
-              color: "rgba(255, 255, 255, 0.18)"
-            },
+            grid:       { color: "rgba(255, 255, 255, 0.15)" },
+            angleLines: { color: "rgba(255, 255, 255, 0.18)" },
             pointLabels: {
               color: "#eeeeee",
-              font: {
-                size: 14,
-                weight: "500"
-              },
+              font: { size: 14, weight: "500" },
               padding: 15
             }
           }
         },
-
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
             backgroundColor: "rgba(15, 23, 42, 0.95)",
-            titleColor: "#ffb30f",
-            bodyColor: "#ddd",
+            titleColor:  "#ffb30f",
+            bodyColor:   "#ddd",
             borderColor: "#ffb30f",
             borderWidth: 1,
-            padding: 12,
+            padding:     12,
             displayColors: false,
             callbacks: {
               label: (context) => ` ${context.raw}%`
             }
           }
         },
-
         animation: {
           duration: 1200,
-          easing: "easeOutQuart"
+          easing:   "easeOutQuart"
         }
       }
     });

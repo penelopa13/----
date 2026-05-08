@@ -252,10 +252,10 @@ def calculate_ent_total(ent_data):
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        # Обновляем язык из профиля пользователя
-        session['lang'] = current_user.language
-        
-        # Дополнительно: можно добавить проверку на заблокированных пользователей позже
+        # Берём язык из профиля ТОЛЬКО если сессия ещё не задана
+        # Это позволяет смене языка через /set_language работать корректно
+        if 'lang' not in session:
+            session['lang'] = current_user.language or 'ru'
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
@@ -301,22 +301,29 @@ def contact():
 def test_psy():
     lang = session.get('lang', current_user.language or 'ru')
     
-    # Получаем последний результат пользователя
     result = TestResult.query.filter_by(user_id=current_user.id)\
                             .order_by(TestResult.created_at.desc())\
                             .first()
 
     if result:
-        # Если результат есть — передаём его в шаблон
-        try:
-            recommended = json.loads(result.recommended_programs) if isinstance(result.recommended_programs, str) else result.recommended_programs
-        except:
-            recommended = {}
-            
+        # ← ИСПРАВЛЕНИЕ: берём данные из mbti.json по текущему языку
+        mbti_data = load_mbti_data()
+        mbti_type = result.mbti_type
+        result_info = mbti_data.get(mbti_type, {})
+
+        # Формируем recommended НА ТЕКУЩЕМ ЯЗЫКЕ, а не из БД
+        recommended = {
+            'title':       (result_info.get('title') or {}).get(lang, mbti_type),
+            'description': (result_info.get('description') or {}).get(lang, ''),
+            'strengths':   (result_info.get('strengths') or {}).get(lang, '—'),
+            'percentages': result_info.get('percentages', {}),
+            'professions': (result_info.get('professions') or {}).get(lang, []),
+        }
+
         result_data = {
-            'mbti_type': result.mbti_type,
-            'recommended_programs': recommended,
-            'created_at': result.created_at
+            'mbti_type':             result.mbti_type,
+            'recommended_programs':  recommended,  # ← теперь на нужном языке
+            'created_at':            result.created_at
         }
         return render_template('test_psy.html', result=result_data)
     
@@ -412,11 +419,22 @@ def api_chat():
         return jsonify({"reply": "Пустое сообщение."})
 
     msg = user_message.lower()
-    lang = session.get('lang', 'ru')
+    lang = session.get('lang') or detect_language(user_message)
     print(f"Получено сообщение: {user_message}, lang: {lang}")
-    print(f"Текущий state перед: {session.get('chat_state')}")
-    # После push_state или pop_state
-    print(f"Новый state: {session.get('chat_state')}")
+
+    # === Кнопка "Задать свой вопрос" — показать приглашение написать вопрос ===
+    free_question_variants = [
+        "задать свой вопрос", "өз сұрауыңызды жіберіңіз",
+        "өз сұрағыңызды қою", "ask your question"
+    ]
+    if msg.strip() in free_question_variants:
+        hint = {
+            "ru": "💬 Напишите ваш вопрос — я отвечу!",
+            "kk": "💬 Сұрағыңызды жазыңыз — жауап беремін!",
+            "en": "💬 Write your question — I'll answer it!"
+        }
+        return jsonify({"reply": hint.get(lang, hint["ru"]), "options": [], "markdown": False})
+
     # === НАВИГАЦИЯ: Назад ===
     if msg in ["назад", "артқа", "back", "◀ назад", "◀"]:
         current_state = pop_state()
@@ -582,8 +600,34 @@ def chat_history():
 def profile():
     if current_user.is_admin:
         return redirect(url_for('admin_dashboard'))
-    result = TestResult.query.filter_by(user_id=current_user.id).order_by(TestResult.created_at.desc()).first()
-    return render_template('profile.html', user=current_user, result=result)
+    
+    lang = session.get('lang', current_user.language or 'ru')
+    
+    result = TestResult.query.filter_by(user_id=current_user.id)\
+                            .order_by(TestResult.created_at.desc())\
+                            .first()
+
+    result_data = None
+    if result:
+        # ← Берём из mbti.json на текущем языке, а не из БД
+        mbti_data = load_mbti_data()
+        result_info = mbti_data.get(result.mbti_type, {})
+
+        recommended = {
+            'title':       (result_info.get('title') or {}).get(lang, result.mbti_type),
+            'description': (result_info.get('description') or {}).get(lang, ''),
+            'strengths':   (result_info.get('strengths') or {}).get(lang, '—'),
+            'percentages': result_info.get('percentages', {}),
+            'professions': (result_info.get('professions') or {}).get(lang, []),
+        }
+
+        result_data = {
+            'mbti_type':            result.mbti_type,
+            'recommended_programs': recommended,
+            'created_at':           result.created_at
+        }
+
+    return render_template('profile.html', user=current_user, result=result_data)
 
 # === АДМИН-ПАНЕЛЬ ===
 @app.route('/admin')

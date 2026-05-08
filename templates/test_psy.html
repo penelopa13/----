@@ -61,7 +61,7 @@
       </div>
 
     {% else %}
-      <!-- Контейнер самого теста (остаётся без изменений) -->
+      <!-- Контейнер самого теста -->
       <div id="test-container">
         <div id="question-box" class="fade-in">
           <h3 id="question-text" class="question-text"></h3>
@@ -78,7 +78,21 @@
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="{{ url_for('static', filename='js/test_psy.js') }}?v=11"></script>
+
+<!-- Переводы для test_psy.js — должны быть ДО подключения скрипта -->
+<script>
+  window.TEST_STRINGS = {
+    question:     "{{ t('Вопрос') }}",
+    of:           "{{ t('из') }}",
+    yourLevel:    "{{ t('Ваш уровень') }}",
+    extraversion: "{{ t('Экстраверсия (E)') }}",
+    intuition:    "{{ t('Интуиция (N)') }}",
+    thinking:     "{{ t('Мышление (T)') }}",
+    planning:     "{{ t('Планирование (J)') }}"
+  };
+</script>
+
+<script src="{{ url_for('static', filename='js/test_psy.js') }}?v=12"></script>
 
 <style>
   .mbti-result-card {

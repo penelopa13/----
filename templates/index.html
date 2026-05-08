@@ -39,7 +39,6 @@
       <div class="chat-sidebar" id="chat-sidebar">
         <div class="sidebar-header">
           <i class="fas fa-bolt"></i> {{ t('Частые вопросы') }}
-          <button class="sidebar-close" id="sidebar-close">×</button>
         </div>
         <div class="sidebar-content" id="quick-questions"></div>
       </div>
@@ -54,9 +53,7 @@
               </div>
             </div>
           </div>
-          <button class="sidebar-toggle" id="sidebar-toggle">
-            <i class="fas fa-chevron-right"></i>
-          </button>
+
           <div id="typing-indicator" style="display:none;" class="message bot">
             <div class="bubble typing"><span></span><span></span><span></span></div>
           </div>
@@ -287,8 +284,8 @@ const lang = "{{ session.get('lang', 'ru') }}";
 const userInput = document.getElementById('user-input');
 const messages = document.getElementById('messages');
 const sidebar = document.getElementById('chat-sidebar');
-const toggleBtn = document.getElementById('sidebar-toggle');
-const closeBtn = document.getElementById('sidebar-close');
+// Sidebar всегда открыта — принудительно добавляем класс active
+if (sidebar) sidebar.classList.add('active');
 const typingIndicator = document.getElementById('typing-indicator');
 const quickBox = document.getElementById('quick-questions');
 
@@ -298,18 +295,34 @@ async function loadQuickQuestions() {
     const data = await res.json();
     quickBox.innerHTML = "";
 
+    // Варианты кнопки "Задать свой вопрос" на всех языках
+    const ASK_OWN_VARIANTS = [
+      'задать свой вопрос', 'өз сұрауыңызды жіберіңіз',
+      'өз сұрағыңызды қою', 'ask your question'
+    ];
+
     data.options.forEach(q => {
       const btn = document.createElement('button');
       btn.className = 'quick-btn';
 
+      // Кнопка "Назад"
       if (q.includes('Назад') || q.includes('Артқа') || q.includes('Back') || q.includes('назад')) {
         btn.classList.add('back');
         btn.innerHTML = q;
-      } else {
+        btn.onclick = () => sendMessage(q);
+      }
+      // Кнопка "Задать свой вопрос" — показать приглашение написать вопрос
+      else if (ASK_OWN_VARIANTS.includes(q.toLowerCase())) {
+        btn.classList.add('special');
         btn.textContent = q;
+        btn.onclick = () => sendMessage(q);
+      }
+      // Обычные кнопки
+      else {
+        btn.textContent = q;
+        btn.onclick = () => sendMessage(q);
       }
 
-      btn.onclick = () => sendMessage(q);
       quickBox.appendChild(btn);
     });
 
@@ -319,7 +332,7 @@ async function loadQuickQuestions() {
       <p style="opacity:0.7; margin-bottom:6px;">${t("Не нашли нужный вопрос?")}</p>
       <button class="quick-btn special">${t("Задать свой вопрос")}</button>
     `;
-    ask.querySelector("button").onclick = () => userInput.focus();
+    ask.querySelector("button").onclick = () => sendMessage(t("Задать свой вопрос"));
     quickBox.appendChild(ask);
 
   } catch (err) {
@@ -465,21 +478,7 @@ async function loadChatHistory() {
 }
 document.addEventListener('DOMContentLoaded', loadChatHistory);
 
-function openSidebar() { sidebar.classList.add('active'); }
-function closeSidebar() { sidebar.classList.remove('active'); }
 
-toggleBtn?.addEventListener('click', e => { e.stopPropagation(); openSidebar(); });
-closeBtn?.addEventListener('click', e => { e.stopPropagation(); closeSidebar(); });
-
-document.querySelector('.chat-layout')?.addEventListener('click', e => {
-  if (!e.target.closest('.chat-sidebar') && sidebar.classList.contains('active')) {
-    closeSidebar();
-  }
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
-});
 
 {% else %}
 // Чат доступен только после входа в систему

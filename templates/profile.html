@@ -54,13 +54,13 @@
         <div class="recommendations">
           <h4>{{ t('Рекомендации') }}</h4>
 
-          {% set rec = result.recommended_programs | safe | from_json %}
-          <p class="suggestions">{{ rec.description }}</p>
+          <!-- ← ИСПРАВЛЕНО: result.recommended_programs уже dict, не нужен from_json -->
+          <p class="suggestions">{{ result.recommended_programs.description }}</p>
 
-          {% if rec.programs %}
+          {% if result.recommended_programs.professions %}
           <ul class="recommended-list">
-            {% for prog in rec.programs %}
-            <li>📘 {{ prog }}</li>
+            {% for prof in result.recommended_programs.professions %}
+            <li>📘 {{ prof }}</li>
             {% endfor %}
           </ul>
           {% endif %}
