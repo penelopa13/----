@@ -57,9 +57,7 @@ def t(key):
     return TRANS.get(key, {}).get(lang, key)
 
 app = Flask(__name__)
-# Добавь в начало app.py (после импортов)
 FAQ_DATA = None
-# Делаем функцию t() и текущий язык доступными во всех шаблонах
 app.jinja_env.globals['t'] = t
 app.jinja_env.globals['lang'] = lambda: session.get('lang', current_user.language if current_user.is_authenticated else 'ru')
 
@@ -82,12 +80,11 @@ def load_dialog_scenarios():
         with open(path, 'r', encoding='utf-8') as f:
             DIALOG_SCENARIOS = json.load(f)
     else:
-        DIALOG_SCENARIOS = {}  # Fallback to empty or hardcoded defaults
+        DIALOG_SCENARIOS = {}
 
 # --- Custom Jinja filter ---
 @app.template_filter('from_json')
 def from_json_filter(s):
-    """Преобразует JSON-строку в объект Python (dict/list)"""
     try:
         return json.loads(s)
     except Exception:
@@ -117,8 +114,7 @@ class User(db.Model, UserMixin):
     eds_iin = db.Column(db.String(12), unique=True, nullable=True, index=True)
     eds_full_name = db.Column(db.String(200), nullable=True)
     eds_certificate_data = db.Column(db.JSON, nullable=True)
-    
-    is_admin = db.Column(db.Boolean, default=False)  # оставляем для совместимости
+
     ent_math = db.Column(db.Integer, default=0)
     ent_reading = db.Column(db.Integer, default=0)
     ent_history = db.Column(db.Integer, default=0)
@@ -128,6 +124,17 @@ class User(db.Model, UserMixin):
     ent_total = db.Column(db.Integer, default=0)
     language = db.Column(db.String(10), default='ru')
 
+    # Personal profile fields
+    first_name = db.Column(db.String(100), nullable=True)
+    last_name = db.Column(db.String(100), nullable=True)
+    middle_name = db.Column(db.String(100), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    birth_date = db.Column(db.Date, nullable=True)
+    iin = db.Column(db.String(12), nullable=True)
+    address = db.Column(db.String(300), nullable=True)
+    school_name = db.Column(db.String(200), nullable=True)
+    graduation_year = db.Column(db.Integer, nullable=True)
+
     def set_password(self, pw):
         self.password_hash = generate_password_hash(pw)
 
@@ -136,10 +143,8 @@ class User(db.Model, UserMixin):
             return False
         return check_password_hash(self.password_hash, pw)
 
-# === ИСПРАВЛЕННАЯ ЛОГИКА ===
     @property
     def is_admin(self):
-        """Теперь проверяем по role, а не по старому полю"""
         return self.role == 'admin'
 
     def is_staff(self):
@@ -197,26 +202,50 @@ class Notification(db.Model):
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-
-    # Добавляем связь
     recipient = db.relationship('User', foreign_keys=[recipient_id], lazy='joined')
 
 class Application(db.Model):
     __tablename__ = 'applications'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     first_name = db.Column(db.String(120), nullable=False)
     last_name = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), nullable=False)
     education = db.Column(db.String(200), nullable=False)
     specialty = db.Column(db.String(200), nullable=False)
-    grant_or_paid = db.Column(
-            db.String(50),
-            nullable=False,
-            server_default='paid'          # или 'unknown', 'не указано' и т.п.
-        )    
+    education_level = db.Column(db.String(50), nullable=True)
+    grant_or_paid = db.Column(db.String(50), nullable=False, server_default='paid')
     comment = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    user = db.relationship('User', foreign_keys=[user_id], lazy='joined')
+
+
+DOC_TYPES = {
+    'iin_scan':            'Удостоверение личности (ИИН)',
+    'photo_3x4':           'Фото 3×4',
+    'school_certificate':  'Аттестат / Диплом',
+    'transcript':          'Табель успеваемости',
+    'medical_certificate': 'Медицинская справка (форма 075)',
+    'other':               'Другой документ',
+}
+
+ALLOWED_MIMES = {'application/pdf', 'image/jpeg', 'image/png', 'image/jpg'}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
+class UserDocument(db.Model):
+    __tablename__ = 'user_documents'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    doc_type = db.Column(db.String(50), nullable=False)
+    display_name = db.Column(db.String(200), nullable=True)
+    filename = db.Column(db.String(200), nullable=False)
+    file_data = db.Column(db.LargeBinary, nullable=False)
+    mime_type = db.Column(db.String(100), nullable=False)
+    file_size = db.Column(db.Integer, nullable=True)
+    uploaded_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    user = db.relationship('User', backref='documents', lazy=True)
 
 
 # --- User loader ---
@@ -231,7 +260,6 @@ def load_mbti_data():
     with open(file_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
-# --- Utilities ---
 def load_questions(lang='ru'):
     file_path = os.path.join('data', f'questions_{lang}.json')
     if not os.path.exists(file_path):
@@ -252,8 +280,6 @@ def calculate_ent_total(ent_data):
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
-        # Берём язык из профиля ТОЛЬКО если сессия ещё не задана
-        # Это позволяет смене языка через /set_language работать корректно
         if 'lang' not in session:
             session['lang'] = current_user.language or 'ru'
 
@@ -267,12 +293,10 @@ def set_language(lang):
         db.session.commit()
     return redirect(flask_request.referrer or url_for('home'))
 
-# --- Routes ---
-# === В home() добавь инициализацию при заходе ===
 @app.route('/')
 def home():
     if current_user.is_authenticated:
-        init_chat_state()  # ← вот это важно!
+        init_chat_state()
     return render_template('index.html')
 
 @app.route('/university')
@@ -280,8 +304,17 @@ def university():
     return render_template('university.html')
 
 @app.route('/status')
+@login_required
 def status():
-    return render_template('status.html')
+    docs = UserDocument.query.filter_by(user_id=current_user.id).all()
+    docs_by_type = {d.doc_type: d for d in docs}
+    u = current_user
+    profile_complete = all([u.first_name, u.last_name, u.phone, u.iin, u.school_name])
+    return render_template('status.html',
+                           user=u,
+                           doc_types=DOC_TYPES,
+                           docs_by_type=docs_by_type,
+                           profile_complete=profile_complete)
 
 @app.route('/programs')
 def programs():
@@ -300,18 +333,12 @@ def contact():
 @login_required
 def test_psy():
     lang = session.get('lang', current_user.language or 'ru')
-    
     result = TestResult.query.filter_by(user_id=current_user.id)\
-                            .order_by(TestResult.created_at.desc())\
-                            .first()
-
+                            .order_by(TestResult.created_at.desc()).first()
     if result:
-        # ← ИСПРАВЛЕНИЕ: берём данные из mbti.json по текущему языку
         mbti_data = load_mbti_data()
         mbti_type = result.mbti_type
         result_info = mbti_data.get(mbti_type, {})
-
-        # Формируем recommended НА ТЕКУЩЕМ ЯЗЫКЕ, а не из БД
         recommended = {
             'title':       (result_info.get('title') or {}).get(lang, mbti_type),
             'description': (result_info.get('description') or {}).get(lang, ''),
@@ -319,15 +346,12 @@ def test_psy():
             'percentages': result_info.get('percentages', {}),
             'professions': (result_info.get('professions') or {}).get(lang, []),
         }
-
         result_data = {
-            'mbti_type':             result.mbti_type,
-            'recommended_programs':  recommended,  # ← теперь на нужном языке
-            'created_at':            result.created_at
+            'mbti_type':            result.mbti_type,
+            'recommended_programs': recommended,
+            'created_at':           result.created_at
         }
         return render_template('test_psy.html', result=result_data)
-    
-    # Если результата нет — показываем тест
     questions = load_questions(lang)
     return render_template('test_psy.html', questions=questions, lang=lang)
 
@@ -339,20 +363,6 @@ def is_admission_question(text: str) -> bool:
     ]
     text = text.lower()
     return any(k in text for k in keywords)
-
-
-def detect_language(text):
-    # Определяем язык по кириллице и характерным буквам
-    text = text.lower()
-    kazakh_chars = 'әғқңөұүһі'
-    russian_chars = 'ыэё'
-    if any(c in text for c in kazakh_chars):
-        return 'kk'
-    if any(c in text for c in russian_chars):
-        return 'ru'
-    if re.search(r'[a-z]', text) and not re.search(r'[а-яё]', text):
-        return 'en'
-    return 'ru'  # по умолчанию
 
 def detect_language(text):
     text = text.lower()
@@ -366,9 +376,7 @@ def detect_language(text):
         return 'en'
     return 'ru'
 
-# === ДОБАВЬ ЭТИ ФУНКЦИИ ПОСЛЕ DIALOG_SCENARIOS ===
 def init_chat_state():
-    """Инициализация состояния чата при первом заходе"""
     if "chat_history" not in session:
         session["chat_history"] = ["level_select"]
         session["chat_state"] = "level_select"
@@ -389,7 +397,6 @@ def pop_state():
     return session["chat_state"]
 
 
-# === Обнови /api/chat/options ===
 @app.route('/api/chat/options')
 @login_required
 def chat_options():
@@ -397,22 +404,17 @@ def chat_options():
     state = session.get("chat_state", "level_select")
     lang = session.get('lang', 'ru')
     options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
-
-    # Добавляем "Назад", если не на главном экране
     history = session.get("chat_history", [])
     if len(history) > 1:
         back_text = {"ru": "Назад", "kk": "Артқа", "en": "Back"}[lang]
         options = [f"{back_text}"] + options
-
     return jsonify({"options": options})
 
 
-# === ЗАМЕНИ ВЕСЬ МАРШРУТ /api/chat НА ЭТОТ ===
 @app.route('/api/chat', methods=['POST'])
 @login_required
-
 def api_chat():
-    init_chat_state()  # ← важно!
+    init_chat_state()
     data = request.get_json() or {}
     user_message = data.get("message", "").strip()
     if not user_message:
@@ -420,9 +422,7 @@ def api_chat():
 
     msg = user_message.lower()
     lang = session.get('lang') or detect_language(user_message)
-    print(f"Получено сообщение: {user_message}, lang: {lang}")
 
-    # === Кнопка "Задать свой вопрос" — показать приглашение написать вопрос ===
     free_question_variants = [
         "задать свой вопрос", "өз сұрауыңызды жіберіңіз",
         "өз сұрағыңызды қою", "ask your question"
@@ -435,42 +435,29 @@ def api_chat():
         }
         return jsonify({"reply": hint.get(lang, hint["ru"]), "options": [], "markdown": False})
 
-    # === НАВИГАЦИЯ: Назад ===
     if msg in ["назад", "артқа", "back", "◀ назад", "◀"]:
         current_state = pop_state()
         reply = t("Вы вернулись назад.")
         options = DIALOG_SCENARIOS.get(current_state, {}).get(lang, [])
         return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
 
-    # === НАВИГАЦИЯ: Выбор уровня ===
     level_map = {
         "бакалавриат": "bachelor_menu",
         "магистратура": "master_menu",
-        "докторантура": "doctorate_menu",  # ← ИСПРАВЛЕНО: "doctorate_menu" вместо "phd_menu"
+        "докторантура": "doctorate_menu",
         "bachelor": "bachelor_menu",
         "master": "master_menu",
-        "phd": "doctorate_menu",  # ← ИСПРАВЛЕНО
-        "doctorate": "doctorate_menu",  # ← Добавьте для en
+        "phd": "doctorate_menu",
+        "doctorate": "doctorate_menu",
         "бакалавр": "bachelor_menu",
-        # Добавьте kk варианты (если слова отличаются, но здесь они похожи)
-        "бакалавриат (kk)": "bachelor_menu",  # Если нужно, но в JSON слова те же
-        "магистратура (kk)": "master_menu",
-        "докторантура (kk)": "doctorate_menu"
     }
     msg_clean = msg.strip().lower()
-
     for keyword, state in level_map.items():
         if keyword == msg_clean:
             push_state(state)
             reply = t("Отлично! Вы выбрали раздел.") + "\n\n" + t("Выберите тему:")
             options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
-            return jsonify({
-                "reply": reply,
-                "options": options,
-                "update_options": True,
-                "markdown": True
-            })
-
+            return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
     for keyword, state in level_map.items():
         if keyword in msg:
             push_state(state)
@@ -478,37 +465,32 @@ def api_chat():
             options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
             return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
 
-    # === Подменю (например, "После 11 класса") ===
     submenu_map = {
-"после 11 класса": "bachelor_after_school",
+        "после 11 класса": "bachelor_after_school",
         "после колледжа": "bachelor_after_college",
         "после армии": "bachelor_after_army",
-        "әскерден кейін": "bachelor_after_army",      # ← добавил
+        "әскерден кейін": "bachelor_after_army",
         "армиядан кейін": "bachelor_after_army",
-
         "after school": "bachelor_after_school",
         "after college": "bachelor_after_college",
         "after army": "bachelor_after_army",
-
         "творческие программы": "bachelor_creative",
         "шығармашылық бағдарламалар": "bachelor_creative",
         "creative programs": "bachelor_creative",
-
         "обычные программы": "bachelor_regular",
         "қарапайым бағдарламалар": "bachelor_regular",
         "regular programs": "bachelor_regular",
-        "программы": "master_programs",  # Для master
-        "бағдарламалар": "master_programs",  # ← kk
+        "программы": "master_programs",
+        "бағдарламалар": "master_programs",
         "programs": "master_programs",
         "гранты": "master_grants",
-        "гранттар": "master_grants",  # ← kk
+        "гранттар": "master_grants",
         "grants": "master_grants",
-        "требования": "doctorate_requirements",  # Для doctorate
-        "талаптар": "doctorate_requirements",  # ← kk
+        "требования": "doctorate_requirements",
+        "талаптар": "doctorate_requirements",
         "requirements": "doctorate_requirements",
-        # Добавьте другие подменю, если есть (например, из JSON: "doctorate_programs")
         "список программ докторантуры": "doctorate_programs",
-        "докторантура бағдарламаларының тізімі": "doctorate_programs",  # ← kk
+        "докторантура бағдарламаларының тізімі": "doctorate_programs",
         "list of doctorate programs": "doctorate_programs"
     }
     for keyword, state in submenu_map.items():
@@ -518,7 +500,6 @@ def api_chat():
             options = DIALOG_SCENARIOS.get(state, {}).get(lang, [])
             return jsonify({"reply": reply, "options": options, "update_options": True, "markdown": True})
 
-    # === Проверка точных ответов из faq_exact.json ===
     if FAQ_DATA:
         msg_lower = user_message.lower()
         for item in FAQ_DATA:
@@ -528,21 +509,17 @@ def api_chat():
                 db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=answer))
                 db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
-# === Gemini (с контекстом из вашего JSON) ===
+
     try:
-        # 1. Сначала ищем, есть ли в FAQ_DATA информация по запросу пользователя
         context_text = ""
         if FAQ_DATA:
             msg_lower = user_message.lower()
             for item in FAQ_DATA:
-                # Проверяем, есть ли ключевые слова из JSON в сообщении пользователя
                 keywords = [k.lower() for k in item.get("keywords", [])]
                 if any(kw in msg_lower for kw in keywords):
-                    # Берем ответ на нужном языке (или ru по умолчанию)
                     context_text = item.get(f"answer_{lang}") or item.get("answer_ru", "")
-                    break 
+                    break
 
-        # 2. Формируем системный промпт с учетом найденного контекста
         prompt = f"""Ты — ИИ-консультант Талапкер в университете Қ.Жұбанов атындағы АӨУ (АРУ имени К. Жубанова).
 Отвечай ТОЛЬКО на языке вопроса ({lang.upper()}).
 
@@ -551,26 +528,18 @@ def api_chat():
 
 ПРАВИЛА ОТВЕТА:
 - Всегда начинай с фразы: "Сәлем! Мен Талапкермін." (или "Привет! Я Талапкер.")
-- Если в ДАННЫХ выше есть конкретные баллы (например, "Платно — 70"), пиши ТОЛЬКО ИХ. Не выдумывай "50 баллов", если в базе стоит 70.
-- Не копируй весь список специальностей! Выбери только ту, о которой спросил пользователь.
-- Кратко опиши суть программы, если это уместно.
-- Если информации в базе нет, скажи, что точные баллы лучше уточнить в приемной комиссии.
+- Если в ДАННЫХ выше есть конкретные баллы, пиши ТОЛЬКО ИХ.
+- Не копируй весь список специальностей!
+- Если информации в базе нет, скажи уточнить в приемной комиссии.
 - Используй Markdown для оформления.
-2. Егер жоғарыдағы мәтінде "Математика (пед): Ақылы — 85" деп тұрса, демек 85 балл деп нақты айт. "Мәлімет жоқ" немесе "75 балл" деп жалпылама жауап берме!
-3. Тек пайдаланушы сұраған мамандық туралы ғана жаз (Математика мұғалімі).
-4. Басқа мамандықтарды (физика, IT) тізімдеп жазба.
-5. "Қалай түсем?" дегенге: Математика + Физика таңдау пәні екенін айт.
 Вопрос: {user_message}
 Ответ:"""
 
         model = genai.GenerativeModel('gemini-flash-latest')
         response = model.generate_content(prompt)
         reply = response.text.strip() if response.text else "Извините, не смог сформировать ответ."
-
-        # Сохранение в базу
         db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=reply))
         db.session.commit()
-        
         return jsonify({"reply": reply, "options": [], "markdown": True})
 
     except Exception as e:
@@ -581,38 +550,30 @@ def api_chat():
             'en': "Service temporarily unavailable. Please try again later."
         }
         return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
+
 @app.route('/api/chat/history')
 @login_required
 def chat_history():
     history = ChatHistory.query.filter_by(user_id=current_user.id).order_by(ChatHistory.timestamp).all()
     return jsonify([
-        {
-            "message": h.message,
-            "response": h.response,
-            "timestamp": h.timestamp.strftime('%d.%m.%Y %H:%M')
-        } for h in history
+        {"message": h.message, "response": h.response, "timestamp": h.timestamp.strftime('%d.%m.%Y %H:%M')}
+        for h in history
     ])
 
 
-# === ЛИЧНЫЙ КАБИНЕТ ПОЛЬЗОВАТЕЛЯ ===
+# === ЛИЧНЫЙ КАБИНЕТ ===
 @app.route('/profile')
 @login_required
 def profile():
     if current_user.is_admin:
         return redirect(url_for('admin_dashboard'))
-    
     lang = session.get('lang', current_user.language or 'ru')
-    
     result = TestResult.query.filter_by(user_id=current_user.id)\
-                            .order_by(TestResult.created_at.desc())\
-                            .first()
-
+                            .order_by(TestResult.created_at.desc()).first()
     result_data = None
     if result:
-        # ← Берём из mbti.json на текущем языке, а не из БД
         mbti_data = load_mbti_data()
         result_info = mbti_data.get(result.mbti_type, {})
-
         recommended = {
             'title':       (result_info.get('title') or {}).get(lang, result.mbti_type),
             'description': (result_info.get('description') or {}).get(lang, ''),
@@ -620,14 +581,109 @@ def profile():
             'percentages': result_info.get('percentages', {}),
             'professions': (result_info.get('professions') or {}).get(lang, []),
         }
-
         result_data = {
             'mbti_type':            result.mbti_type,
             'recommended_programs': recommended,
             'created_at':           result.created_at
         }
+    docs = UserDocument.query.filter_by(user_id=current_user.id).all()
+    docs_by_type = {d.doc_type: d for d in docs}
+    return render_template('profile.html',
+                           user=current_user,
+                           result=result_data,
+                           doc_types=DOC_TYPES,
+                           docs_by_type=docs_by_type)
 
-    return render_template('profile.html', user=current_user, result=result_data)
+
+@app.route('/profile/edit', methods=['POST'])
+@login_required
+def profile_edit():
+    u = current_user
+    u.first_name   = request.form.get('first_name',   '').strip() or None
+    u.last_name    = request.form.get('last_name',    '').strip() or None
+    u.middle_name  = request.form.get('middle_name',  '').strip() or None
+    u.phone        = request.form.get('phone',        '').strip() or None
+    u.iin          = request.form.get('iin',          '').strip() or None
+    u.address      = request.form.get('address',      '').strip() or None
+    u.school_name  = request.form.get('school_name',  '').strip() or None
+    birth_str = request.form.get('birth_date', '').strip()
+    if birth_str:
+        try:
+            import datetime as _dt
+            u.birth_date = _dt.datetime.strptime(birth_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+    grad_str = request.form.get('graduation_year', '').strip()
+    if grad_str.isdigit():
+        u.graduation_year = int(grad_str)
+    db.session.commit()
+    flash('Профиль обновлён!', 'success')
+    return redirect(url_for('profile'))
+
+
+@app.route('/profile/documents/upload', methods=['POST'])
+@login_required
+def upload_document():
+    doc_type = request.form.get('doc_type')
+    file = request.files.get('file')
+    if not doc_type or doc_type not in DOC_TYPES:
+        flash('Неверный тип документа', 'error')
+        return redirect(url_for('profile'))
+    if not file or file.filename == '':
+        flash('Файл не выбран', 'error')
+        return redirect(url_for('profile'))
+    if file.mimetype not in ALLOWED_MIMES:
+        flash('Разрешены только PDF, JPG и PNG файлы', 'error')
+        return redirect(url_for('profile'))
+    file_data = file.read()
+    if len(file_data) > MAX_FILE_SIZE:
+        flash('Файл слишком большой (максимум 10 МБ)', 'error')
+        return redirect(url_for('profile'))
+    existing = UserDocument.query.filter_by(user_id=current_user.id, doc_type=doc_type).first()
+    if existing:
+        db.session.delete(existing)
+    doc = UserDocument(
+        user_id=current_user.id,
+        doc_type=doc_type,
+        display_name=DOC_TYPES[doc_type],
+        filename=file.filename,
+        file_data=file_data,
+        mime_type=file.mimetype,
+        file_size=len(file_data),
+    )
+    db.session.add(doc)
+    db.session.commit()
+    flash(f'Документ «{DOC_TYPES[doc_type]}» успешно загружен', 'success')
+    return redirect(url_for('profile') + '#documents')
+
+
+@app.route('/profile/documents/<int:doc_id>')
+@login_required
+def serve_document(doc_id):
+    from flask import Response
+    doc = UserDocument.query.get_or_404(doc_id)
+    if doc.user_id != current_user.id and not current_user.is_admin:
+        return jsonify({'error': 'forbidden'}), 403
+    return Response(
+        doc.file_data,
+        mimetype=doc.mime_type,
+        headers={
+            'Content-Disposition': f'inline; filename="{doc.filename}"',
+            'Content-Length': str(doc.file_size or len(doc.file_data))
+        }
+    )
+
+
+@app.route('/profile/documents/<int:doc_id>/delete', methods=['POST'])
+@login_required
+def delete_document(doc_id):
+    doc = UserDocument.query.get_or_404(doc_id)
+    if doc.user_id != current_user.id:
+        return jsonify({'error': 'forbidden'}), 403
+    db.session.delete(doc)
+    db.session.commit()
+    flash('Документ удалён', 'info')
+    return redirect(url_for('profile') + '#documents')
 
 # === АДМИН-ПАНЕЛЬ ===
 @app.route('/admin')
@@ -636,32 +692,19 @@ def admin_dashboard():
     if not current_user.is_admin:
         flash('Доступ запрещён. Только для администраторов.', 'error')
         return redirect(url_for('profile'))
-
     users = User.query.all()
     results = TestResult.query.join(User, TestResult.user_id == User.id)\
                       .add_columns(
-                          TestResult.id,
-                          TestResult.mbti_type,
-                          TestResult.created_at,
-                          User.id.label('user_id'),
-                          User.name.label('user_name'),
-                          User.email.label('user_email')
-                      )\
-                      .order_by(TestResult.created_at.desc())\
-                      .limit(50).all()   # увеличил лимит
-
+                          TestResult.id, TestResult.mbti_type, TestResult.created_at,
+                          User.id.label('user_id'), User.name.label('user_name'), User.email.label('user_email')
+                      ).order_by(TestResult.created_at.desc()).limit(50).all()
     contact_messages = ContactMessage.query.order_by(ContactMessage.id.desc()).all()
-    
-    # Новые данные
     notifications = Notification.query.order_by(Notification.created_at.desc()).limit(100).all()
     applications = Application.query.order_by(Application.created_at.desc()).limit(100).all()
-
     return render_template('admin/dashboard.html',
-                           users=users,
-                           results=results,
+                           users=users, results=results,
                            contact_messages=contact_messages,
-                           notifications=notifications,
-                           applications=applications)
+                           notifications=notifications, applications=applications)
 
 
 @app.route('/api/admin/delete/<string:table>/<int:item_id>', methods=['DELETE'])
@@ -669,26 +712,18 @@ def admin_dashboard():
 def admin_delete(table, item_id):
     if not current_user.is_admin:
         return jsonify({'status': 'error', 'message': 'forbidden'}), 403
-
     models = {
-        'users': User,
-        'results': TestResult,
-        'messages': ContactMessage,
-        'notifications': Notification,     # ← новое
-        'applications': Application        # ← новое
+        'users': User, 'results': TestResult, 'messages': ContactMessage,
+        'notifications': Notification, 'applications': Application
     }
-
     model = models.get(table)
     if not model:
         return jsonify({'status': 'error', 'message': 'bad table'}), 400
-
     obj = model.query.get(item_id)
     if not obj:
         return jsonify({'status': 'error', 'message': 'not found'}), 404
-
     db.session.delete(obj)
     db.session.commit()
-
     return jsonify({'status': 'ok'})
 
 # === РЕГИСТРАЦИЯ ===
@@ -698,114 +733,72 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-
         if User.query.filter_by(email=email).first():
             flash('Пользователь с таким Email уже существует', 'error')
             return redirect(url_for('register'))
-
-        u = User(
-            name=name,
-            email=email,
-            role='applicant',      # ← явно applicant
-            is_admin=False,
-            language=session.get('lang', 'ru')
-        )
+        u = User(name=name, email=email, role='applicant', language=session.get('lang', 'ru'))
         u.set_password(password)
         db.session.add(u)
         db.session.commit()
-
         login_user(u)
         flash('Регистрация прошла успешно!', 'success')
         return redirect(url_for('profile'))
-
     return render_template('register.html')
 
-# === ВХОД С ПЕРЕНАПРАВЛЕНИЕМ ===
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
         pw = request.form.get('password')
-        
         u = User.query.filter_by(email=email).first()
-        
         if u and u.check_password(pw):
             login_user(u)
             flash(f'Добро пожаловать, {u.name or u.email}!', 'success')
-            
-            # Редирект в зависимости от роли
             if u.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             elif u.role == 'staff':
-                return redirect(url_for('staff_dashboard'))  # будет позже
+                return redirect(url_for('staff_dashboard'))
             else:
                 return redirect(url_for('profile'))
-        
         flash('Неверный логин или пароль', 'error')
-    
     return render_template('login.html')
 
-# ====================== РЕГИСТРАЦИЯ И ВХОД ЧЕРЕЗ ЭЦП ======================
-
-# ====================== РЕГИСТРАЦИЯ ЧЕРЕЗ ЭЦП ======================
 @app.route('/register-eds', methods=['GET', 'POST'])
 def register_eds():
     if request.method == 'GET':
         return render_template('register_eds.html')
-    
-    # POST — обработка данных от NCALayer
     data = request.get_json() or {}
     eds_serial = data.get('eds_serial_number')
     eds_iin = data.get('eds_iin')
     full_name = data.get('full_name')
-
     if not eds_serial or not eds_iin:
         return jsonify({'status': 'error', 'message': 'Данные ЭЦП не получены'}), 400
-
-    # Проверка на дубликат ЭЦП
     if User.query.filter_by(eds_serial_number=eds_serial).first() or \
        User.query.filter_by(eds_iin=eds_iin).first():
         return jsonify({'status': 'error', 'message': 'Пользователь с этим ЭЦП уже зарегистрирован'}), 400
-
-    u = User(
-        name=full_name,
-        role='applicant',
-        eds_serial_number=eds_serial,
-        eds_iin=eds_iin,
-        eds_full_name=full_name,
-        eds_certificate_data=data.get('certificate_data'),
-        language=session.get('lang', 'ru')
-    )
+    u = User(name=full_name, role='applicant', eds_serial_number=eds_serial,
+             eds_iin=eds_iin, eds_full_name=full_name,
+             eds_certificate_data=data.get('certificate_data'),
+             language=session.get('lang', 'ru'))
     db.session.add(u)
     db.session.commit()
-
     login_user(u)
     return jsonify({'status': 'ok', 'redirect': url_for('profile')})
 
-
-# ====================== ВХОД ЧЕРЕЗ ЭЦП ======================
 @app.route('/login-eds', methods=['GET', 'POST'])
 def login_eds():
     if request.method == 'GET':
         return render_template('login_eds.html')
-    
-    # POST — обработка данных от NCALayer
     data = request.get_json() or {}
     eds_iin = data.get('eds_iin')
-
     if not eds_iin:
         return jsonify({'status': 'error', 'message': 'Данные ЭЦП не получены'}), 400
-
     u = User.query.filter_by(eds_iin=eds_iin).first()
-    
     if not u:
         return jsonify({'status': 'error', 'message': 'Пользователь с этим ЭЦП не найден. Пожалуйста, зарегистрируйтесь.'}), 404
-
     login_user(u)
     redirect_url = url_for('admin_dashboard') if u.role == 'admin' else url_for('profile')
     return jsonify({'status': 'ok', 'redirect': redirect_url})
-
-
 
 @app.route('/logout')
 @login_required
@@ -814,52 +807,43 @@ def logout():
     flash('Вы вышли из системы.', 'info')
     return redirect(url_for('home'))
 
-# --- API Endpoints ---
-
 # --- Настройка почты ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')  # dilnaz_utegenova@mail.ru
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')  # пароль или app password
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')  # обязательно!
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 
 mail = Mail(app)
 
 
-
 @app.route('/submit_application', methods=['POST'])
+@login_required
 def submit_application():
     data = request.form
-    
-    # ──────────────────────────────── ИСПРАВЛЕНИЕ ────────────────────────────────
-    grant_or_paid = data.get('grant_or_paid') or 'unknown'     # если поля нет → 'paid'
-    # ──────────────────────────────────────────────────────────────────────────────
-
+    u = current_user
+    grant_or_paid = data.get('grant_or_paid') or 'paid'
     app_entry = Application(
-        first_name    = data.get('first_name'),
-        last_name     = data.get('last_name'),
-        phone         = data.get('phone'),
-        email         = data.get('email'),
-        education     = data.get('education'),
-        specialty     = data.get('specialty'),
-        grant_or_paid = grant_or_paid,                    # ← теперь всегда строка
-        comment       = data.get('comment')
+        user_id         = u.id,
+        first_name      = u.first_name or data.get('first_name', ''),
+        last_name       = u.last_name  or data.get('last_name',  ''),
+        phone           = u.phone      or data.get('phone',      ''),
+        email           = u.email      or data.get('email',      ''),
+        education       = u.school_name or data.get('education', ''),
+        education_level = data.get('education_level'),
+        specialty       = data.get('specialty'),
+        grant_or_paid   = grant_or_paid,
+        comment         = data.get('comment')
     )
-    
     db.session.add(app_entry)
     db.session.commit()
-    
-    # остальной код (отправка почты, flash, redirect) остаётся без изменений
-
-    # Отправка на почту
     try:
         msg = Message(
             subject=f"Новая заявка: {app_entry.first_name} {app_entry.last_name}",
             sender=app.config['MAIL_USERNAME'],
-            recipients=['dilnaz22112005@gmail.com'],  # сюда
-            body=f"""
-Новая заявка на поступление:
+            recipients=['dilnaz22112005@gmail.com'],
+            body=f"""Новая заявка на поступление:
 
 Имя: {app_entry.first_name}
 Фамилия: {app_entry.last_name}
@@ -867,14 +851,13 @@ def submit_application():
 Email: {app_entry.email}
 Образование: {app_entry.education}
 Специальность: {app_entry.specialty}
+Уровень: {app_entry.education_level or '—'}
 Форма обучения: {app_entry.grant_or_paid}
-Комментарий: {app_entry.comment or 'нет'}
-            """
+Комментарий: {app_entry.comment or 'нет'}"""
         )
         mail.send(msg)
     except Exception as e:
         print("Ошибка при отправке письма:", e)
-
     flash('Заявка успешно отправлена!', 'success')
     return redirect(url_for('home'))
 
@@ -900,32 +883,23 @@ def get_questions():
 
 def calculate_mbti(answers, questions):
     if len(answers) < 25:
-        return "INTP"  # fallback
-
-    # Фильтруем None и считаем только валидные ответы
+        return "INTP"
     def safe_sum(slice_answers):
         valid = [x for x in slice_answers if x is not None]
         return sum(valid) if valid else 0
-
-    # Делим вопросы по осям (по 7 на первые три, 5 на последнюю — стандартно)
-    ei_score = safe_sum(answers[0:7])      # вопросы 1–7 → E/I
-    ns_score = safe_sum(answers[7:14])     # 8–14 → S/N
-    tf_score = safe_sum(answers[14:21])    # 15–21 → T/F
-    jp_score = safe_sum(answers[21:25])    # 22–25 → J/P
-
-    # Средний балл по оси (если все ответы — 3, то 21 для 7 вопросов)
+    ei_score = safe_sum(answers[0:7])
+    ns_score = safe_sum(answers[7:14])
+    tf_score = safe_sum(answers[14:21])
+    jp_score = safe_sum(answers[21:25])
     mid_ei = 3.5 * min(len([x for x in answers[0:7] if x is not None]), 7)
     mid_ns = 3.5 * min(len([x for x in answers[7:14] if x is not None]), 7)
     mid_tf = 3.5 * min(len([x for x in answers[14:21] if x is not None]), 7)
     mid_jp = 3.5 * min(len([x for x in answers[21:25] if x is not None]), 5)
-
-    # Формируем тип
     result = ""
     result += "E" if ei_score > mid_ei else "I"
     result += "S" if ns_score > mid_ns else "N"
     result += "T" if tf_score > mid_tf else "F"
     result += "J" if jp_score > mid_jp else "P"
-
     return result
 
 @app.route('/api/test/submit', methods=['POST'])
@@ -936,11 +910,8 @@ def submit_test():
     lang = session.get('lang', current_user.language)
     questions = load_questions(lang)
     mbti = calculate_mbti(answers, questions)
-
     mbti_data = load_mbti_data()
     result_info = mbti_data.get(mbti, {})
-
-    # ← ВОТ ЭТО ГЛАВНОЕ ИСПРАВЛЕНИЕ!
     rec = {
         'title': (result_info.get('title') or {}).get(lang, mbti),
         'description': (result_info.get('description') or {}).get(lang, 'Описание временно недоступно.'),
@@ -948,7 +919,6 @@ def submit_test():
         'percentages': result_info.get('percentages', {}),
         'professions': (result_info.get('professions') or {}).get(lang, ['Нет рекомендаций']),
     }
-
     result = TestResult(
         user_id=current_user.id,
         answers=json.dumps(answers, ensure_ascii=False),
@@ -957,110 +927,64 @@ def submit_test():
     )
     db.session.add(result)
     db.session.commit()
-
-    return jsonify({
-        'mbti': mbti,
-        'recommendations': rec
-    })
+    return jsonify({'mbti': mbti, 'recommendations': rec})
 
 
-# === ИНИЦИАЛИЗАЦИЯ АДМИНА ===
 def create_admin():
-    """Создаём администратора с новой системой ролей"""
     admin = User.query.filter_by(email='admin@site.com').first()
-    
     if not admin:
-        admin = User(
-            name='Администратор',
-            email='admin@site.com',
-            role='admin',           # ← новая роль
-            is_admin=True,
-            language='ru'
-        )
+        admin = User(name='Администратор', email='admin@site.com', role='admin', language='ru')
         admin.set_password('admin123')
         db.session.add(admin)
         db.session.commit()
         print("✅ Администратор создан (role = admin)")
     else:
-        # Если админ уже существует — обновляем роль
         if admin.role != 'admin':
             admin.role = 'admin'
-            admin.is_admin = True
             db.session.commit()
             print("✅ Роль администратора обновлена")
 
 def fix_existing_users():
     db.session.execute(db.text("""
-        UPDATE "user" 
-        SET role = 'applicant', 
-            is_admin = FALSE 
+        UPDATE "user"
+        SET role = 'applicant'
         WHERE role IS NULL OR role = ''
     """))
     db.session.commit()
-    print("✅ Все существующие пользователи исправлены на applicant")
 
 @app.route('/api/admin/notify', methods=['POST'])
 @login_required
 def admin_notify():
     if not current_user.is_admin:
         return jsonify({'status': 'error', 'message': 'Доступ запрещен'}), 403
-
     data = request.get_json() or {}
     title = data.get('title')
     message = data.get('message')
     notif_type = data.get('type')
-    recipient = data.get('recipient')  # "all" или user_id
-
+    recipient = data.get('recipient')
     if not title or not message:
         return jsonify({'status': 'error', 'message': 'Заполните все поля'}), 400
-
     if recipient == 'all':
         users = User.query.all()
         for u in users:
-            notif = Notification(
-                title=title,
-                message=message,
-                notif_type=notif_type,
-                recipient_id=u.id
-            )
+            notif = Notification(title=title, message=message, notif_type=notif_type, recipient_id=u.id)
             db.session.add(notif)
-
-            # ← отправка email каждому
             try:
-                msg = Message(
-                    subject=title,
-                    recipients=[u.email],
-                    body=f"{message}\n\nУниверситет Жубанова"
-                )
+                msg = Message(subject=title, recipients=[u.email], body=f"{message}\n\nУниверситет Жубанова")
                 mail.send(msg)
             except Exception as e:
                 print("Ошибка email:", e)
-
     else:
         user = User.query.get(int(recipient))
         if not user:
             return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
-
-        notif = Notification(
-            title=title,
-            message=message,
-            notif_type=notif_type,
-            recipient_id=user.id
-        )
+        notif = Notification(title=title, message=message, notif_type=notif_type, recipient_id=user.id)
         db.session.add(notif)
-
-        # отправка email конкретному
         try:
-            msg = Message(
-                subject=title,
-                recipients=[user.email],
-                body=f"{message}\n\nУниверситет Жубанова"
-            )
+            msg = Message(subject=title, recipients=[user.email], body=f"{message}\n\nУниверситет Жубанова")
             mail.send(msg)
         except Exception as e:
             print("Ошибка email:", e)
-
-
     db.session.commit()
     return jsonify({'status': 'ok', 'message': 'Уведомление отправлено'})
 
@@ -1069,16 +993,9 @@ def admin_notify():
 @login_required
 def get_notifications():
     notifs = Notification.query.filter_by(recipient_id=current_user.id).order_by(Notification.created_at.desc()).all()
-    
     return jsonify([
-        {
-            'id': n.id,
-            'title': n.title,
-            'message': n.message,
-            'type': n.notif_type,
-            'is_read': n.is_read,
-            'created_at': n.created_at.strftime('%d.%m.%Y %H:%M')
-        }
+        {'id': n.id, 'title': n.title, 'message': n.message, 'type': n.notif_type,
+         'is_read': n.is_read, 'created_at': n.created_at.strftime('%d.%m.%Y %H:%M')}
         for n in notifs
     ])
 
@@ -1094,20 +1011,14 @@ def mark_read(notif_id):
 
 with app.app_context():
     db.create_all()
-    create_admin()
-    load_faq_exact()
-
-# === ИНИЦИАЛИЗАЦИЯ ПРИ ЗАПУСКЕ ===
-with app.app_context():
-    db.create_all()
-    create_admin()               # ← теперь работает
+    #create_admin()
     load_faq_exact()
     load_dialog_scenarios()
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-        create_admin()
+        #create_admin()
         load_faq_exact()
         load_dialog_scenarios()
     app.run(debug=True)

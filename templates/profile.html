@@ -3,87 +3,402 @@
 {% block content %}
 <section class="profile-section">
   <div class="profile-card wide">
-    <!-- Заголовок + аватар -->
+
+    <!-- Header -->
     <div class="profile-header">
       <div class="avatar-circle">
         <i class="fas fa-user"></i>
       </div>
       <div>
-        <h2>{{ user.name }}</h2>
-        <p class="subtitle">{{ user.email }}</p>
+        <h2>{{ user.last_name or '' }} {{ user.first_name or user.name or '' }} {{ user.middle_name or '' }}</h2>
+        <p class="subtitle">{{ user.email or '' }}</p>
       </div>
       <a href="{{ url_for('logout') }}" class="logout-btn" title="{{ t('Выйти') }}">
         <i class="fas fa-sign-out-alt"></i>
       </a>
     </div>
 
-    <div class="profile-grid">
-      <!-- Левая колонка -->
-      <div class="profile-info">
-        <div class="info-item">
-          <span class="label">{{ t('Роль:') }}</span>
-          <span class="value">{{ t('Админ') if user.is_admin else t('Пользователь') }}</span>
-        </div>
-
-        <div class="info-item">
-          <span class="label">{{ t('ЕНТ баллы:') }}</span>
-          <span class="value highlight">{{ user.ent_total }}</span>
-        </div>
-
-        {% if result %}
-        <div class="info-item">
-          <span class="label">{{ t('Тип личности (MBTI):') }}</span>
-          <span class="value mbti">{{ result.mbti_type }}</span>
-        </div>
-
-        <!-- Прогресс-бар -->
-        <div class="progress-container">
-          <div class="progress-label">
-            {{ t('Порог поступления:') }} <strong>70</strong> / 140
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: {{ (user.ent_total / 140 * 100)|round(0) }}%"></div>
-          </div>
-        </div>
+    <!-- Tabs -->
+    <div class="profile-tabs">
+      <button class="tab-btn active" data-tab="personal">
+        <i class="fas fa-id-card"></i> {{ t('Личные данные') }}
+      </button>
+      <button class="tab-btn" data-tab="documents">
+        <i class="fas fa-folder-open"></i> {{ t('Документы') }}
+        {% set uploaded_count = docs_by_type|length %}
+        {% if uploaded_count > 0 %}
+          <span class="tab-badge">{{ uploaded_count }}</span>
         {% endif %}
+      </button>
+      <button class="tab-btn" data-tab="results">
+        <i class="fas fa-chart-bar"></i> {{ t('Результаты') }}
+      </button>
+    </div>
+
+    <!-- ===== TAB: Личные данные ===== -->
+    <div class="tab-content active" id="tab-personal">
+      <form method="POST" action="{{ url_for('profile_edit') }}" class="profile-form">
+        <div class="form-section-title">{{ t('Основная информация') }}</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>{{ t('Фамилия') }}</label>
+            <input type="text" name="last_name" value="{{ user.last_name or '' }}"
+                   class="form-control" placeholder="{{ t('Фамилия') }}">
+          </div>
+          <div class="form-group">
+            <label>{{ t('Имя') }}</label>
+            <input type="text" name="first_name" value="{{ user.first_name or '' }}"
+                   class="form-control" placeholder="{{ t('Имя') }}">
+          </div>
+          <div class="form-group">
+            <label>{{ t('Отчество') }}</label>
+            <input type="text" name="middle_name" value="{{ user.middle_name or '' }}"
+                   class="form-control" placeholder="{{ t('Отчество') }}">
+          </div>
+          <div class="form-group">
+            <label>{{ t('ИИН') }}</label>
+            <input type="text" name="iin" value="{{ user.iin or '' }}"
+                   class="form-control" placeholder="000000000000"
+                   maxlength="12" pattern="[0-9]{12}"
+                   title="{{ t('ИИН — 12 цифр') }}">
+          </div>
+          <div class="form-group">
+            <label>{{ t('Телефон') }}</label>
+            <input type="tel" name="phone" value="{{ user.phone or '' }}"
+                   class="form-control" placeholder="+7 (700) 000-0000">
+          </div>
+          <div class="form-group">
+            <label>{{ t('Дата рождения') }}</label>
+            <input type="date" name="birth_date"
+                   value="{{ user.birth_date.strftime('%Y-%m-%d') if user.birth_date else '' }}"
+                   class="form-control">
+          </div>
+          <div class="form-group full-width">
+            <label>{{ t('Адрес') }}</label>
+            <input type="text" name="address" value="{{ user.address or '' }}"
+                   class="form-control" placeholder="{{ t('Город, улица, дом, квартира') }}">
+          </div>
+        </div>
+
+        <div class="form-section-title" style="margin-top:1.5rem;">{{ t('Учебное заведение') }}</div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>{{ t('Школа / Колледж') }}</label>
+            <input type="text" name="school_name" value="{{ user.school_name or '' }}"
+                   class="form-control" placeholder="{{ t('Название учебного заведения') }}">
+          </div>
+          <div class="form-group">
+            <label>{{ t('Год окончания') }}</label>
+            <input type="number" name="graduation_year"
+                   value="{{ user.graduation_year or '' }}"
+                   class="form-control" min="2000" max="2035" placeholder="2024">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn orange">
+            <i class="fas fa-save"></i> {{ t('Сохранить изменения') }}
+          </button>
+          <a href="{{ url_for('status') }}" class="btn btn-outline">
+            <i class="fas fa-paper-plane"></i> {{ t('Подать заявку') }}
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ===== TAB: Документы ===== -->
+    <div class="tab-content" id="tab-documents">
+      <p class="doc-hint">
+        <i class="fas fa-info-circle"></i>
+        {{ t('Загрузите документы для поступления. Допустимые форматы: PDF, JPG, PNG (до 10 МБ каждый).') }}
+      </p>
+      <div class="documents-grid">
+        {% for doc_key, doc_label in doc_types.items() %}
+          {% set doc = docs_by_type.get(doc_key) %}
+          <div class="doc-card {{ 'uploaded' if doc else 'empty' }}">
+            <div class="doc-icon-wrap">
+              {% if doc_key == 'photo_3x4' %}
+                <i class="fas fa-portrait"></i>
+              {% elif doc_key == 'iin_scan' %}
+                <i class="fas fa-id-card"></i>
+              {% elif doc_key == 'school_certificate' %}
+                <i class="fas fa-graduation-cap"></i>
+              {% elif doc_key == 'medical_certificate' %}
+                <i class="fas fa-file-medical"></i>
+              {% elif doc_key == 'transcript' %}
+                <i class="fas fa-list-alt"></i>
+              {% else %}
+                <i class="fas fa-file"></i>
+              {% endif %}
+            </div>
+            <div class="doc-body">
+              <span class="doc-label">{{ doc_label }}</span>
+              {% if doc %}
+                <span class="doc-status ok">
+                  <i class="fas fa-check-circle"></i> {{ t('Загружен') }}
+                </span>
+                <span class="doc-meta">{{ '%.1f'|format(doc.file_size / 1024) }} KB &bull; {{ doc.filename }}</span>
+              {% else %}
+                <span class="doc-status missing">
+                  <i class="fas fa-times-circle"></i> {{ t('Не загружен') }}
+                </span>
+              {% endif %}
+            </div>
+            <div class="doc-actions">
+              {% if doc %}
+                <a href="{{ url_for('serve_document', doc_id=doc.id) }}" target="_blank"
+                   class="doc-btn view" title="{{ t('Просмотреть') }}">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <form method="POST" action="{{ url_for('delete_document', doc_id=doc.id) }}"
+                      style="display:inline;"
+                      onsubmit="return confirm('{{ t('Удалить документ?') }}')">
+                  <button type="submit" class="doc-btn del" title="{{ t('Удалить') }}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </form>
+              {% endif %}
+              <form method="POST" action="{{ url_for('upload_document') }}"
+                    enctype="multipart/form-data" class="upload-form">
+                <input type="hidden" name="doc_type" value="{{ doc_key }}">
+                <label class="doc-btn upload" title="{{ t('Загрузить') }}">
+                  <i class="fas fa-upload"></i>
+                  <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png"
+                         style="display:none;" onchange="this.form.submit()">
+                </label>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
       </div>
+    </div>
 
-      <!-- Правая колонка -->
-      <div class="profile-actions-column">
-        {% if result %}
-        <div class="recommendations">
-          <h4>{{ t('Рекомендации') }}</h4>
-
-          <!-- ← ИСПРАВЛЕНО: result.recommended_programs уже dict, не нужен from_json -->
-          <p class="suggestions">{{ result.recommended_programs.description }}</p>
-
-          {% if result.recommended_programs.professions %}
-          <ul class="recommended-list">
-            {% for prof in result.recommended_programs.professions %}
-            <li>📘 {{ prof }}</li>
-            {% endfor %}
-          </ul>
+    <!-- ===== TAB: Результаты ===== -->
+    <div class="tab-content" id="tab-results">
+      <div class="profile-grid">
+        <div class="profile-info">
+          <div class="info-item">
+            <span class="label">{{ t('ЕНТ баллы:') }}</span>
+            <span class="value highlight">{{ user.ent_total }}</span>
+          </div>
+          {% if result %}
+          <div class="info-item">
+            <span class="label">{{ t('Тип личности (MBTI):') }}</span>
+            <span class="value mbti">{{ result.mbti_type }}</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-label">
+              {{ t('Порог поступления:') }} <strong>70</strong> / 140
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill"
+                   style="width: {{ [user.ent_total / 140 * 100, 100]|min|round(0) }}%">
+              </div>
+            </div>
+          </div>
           {% endif %}
         </div>
-        {% else %}
-        <div class="no-result">
-          <p>{{ t('Вы ещё не проходили психологический тест.') }}</p>
-          <a href="{{ url_for('test_psy') }}" class="btn orange">{{ t('Пройти тест') }}</a>
-        </div>
-        {% endif %}
 
-        <div class="quick-actions">
-          <a href="{{ url_for('calculator') }}" class="action-card">
-            <i class="fas fa-calculator"></i>
-            <span>{{ t('Калькулятор ЕНТ') }}</span>
-          </a>
-          <a href="{{ url_for('status') }}" class="action-card">
-            <i class="fas fa-file-alt"></i>
-            <span>{{ t('Статус заявки') }}</span>
-          </a>
+        <div class="profile-actions-column">
+          {% if result %}
+          <div class="recommendations">
+            <h4>{{ t('Рекомендации') }}</h4>
+            <p class="suggestions">{{ result.recommended_programs.description }}</p>
+            {% if result.recommended_programs.professions %}
+            <ul class="recommended-list">
+              {% for prof in result.recommended_programs.professions %}
+              <li>📘 {{ prof }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="no-result">
+            <p>{{ t('Вы ещё не проходили психологический тест.') }}</p>
+            <a href="{{ url_for('test_psy') }}" class="btn orange">{{ t('Пройти тест') }}</a>
+          </div>
+          {% endif %}
+          <div class="quick-actions">
+            <a href="{{ url_for('calculator') }}" class="action-card">
+              <i class="fas fa-calculator"></i>
+              <span>{{ t('Калькулятор ЕНТ') }}</span>
+            </a>
+            <a href="{{ url_for('status') }}" class="action-card">
+              <i class="fas fa-file-alt"></i>
+              <span>{{ t('Подать заявку') }}</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
+
   </div>
 </section>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  function switchTab(name) {
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+  }
+
+  tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
+
+  if (window.location.hash === '#documents') switchTab('documents');
+</script>
+
+<style>
+  .profile-tabs {
+    display: flex;
+    gap: .5rem;
+    margin: 1.5rem 0 1rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: .5rem;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    padding: .55rem 1.2rem;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-size: .95rem;
+    color: #666;
+    position: relative;
+    transition: background .15s, color .15s;
+  }
+  .tab-btn:hover { background: #f5f5f5; color: #333; }
+  .tab-btn.active { background: #fff3e0; color: #e67e22; font-weight: 600; }
+  .tab-badge {
+    display: inline-block;
+    background: #27ae60;
+    color: #fff;
+    border-radius: 50%;
+    font-size: .7rem;
+    width: 18px; height: 18px;
+    line-height: 18px;
+    text-align: center;
+    margin-left: .3rem;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .profile-form { padding: .5rem 0; }
+  .form-section-title {
+    font-size: .85rem;
+    font-weight: 700;
+    color: #e67e22;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    margin-bottom: .75rem;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem 1.2rem;
+  }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group.full-width { grid-column: 1 / -1; }
+  .form-group label {
+    font-size: .8rem;
+    color: #888;
+    margin-bottom: .25rem;
+    font-weight: 600;
+  }
+  .form-control {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: .5rem .75rem;
+    font-size: .95rem;
+    transition: border .15s;
+    outline: none;
+  }
+  .form-control:focus { border-color: #e67e22; }
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .btn-outline {
+    border: 2px solid #e67e22;
+    color: #e67e22;
+    background: transparent;
+    padding: .55rem 1.4rem;
+    border-radius: 8px;
+    font-size: .95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .btn-outline:hover { background: #e67e22; color: #fff; }
+
+  .doc-hint {
+    color: #888;
+    font-size: .9rem;
+    margin-bottom: 1rem;
+  }
+  .documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .doc-card {
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+    background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .doc-card.uploaded { border-color: #27ae60; background: #f0fff4; }
+  .doc-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .doc-icon-wrap {
+    font-size: 1.8rem;
+    color: #bbb;
+    min-width: 40px;
+    text-align: center;
+    padding-top: .2rem;
+  }
+  .doc-card.uploaded .doc-icon-wrap { color: #27ae60; }
+  .doc-body { flex: 1; min-width: 0; }
+  .doc-label { display: block; font-size: .9rem; font-weight: 600; color: #333; }
+  .doc-status { display: block; font-size: .8rem; margin-top: .15rem; }
+  .doc-status.ok { color: #27ae60; }
+  .doc-status.missing { color: #aaa; }
+  .doc-meta { display: block; font-size: .75rem; color: #999; margin-top: .1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-actions {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    align-items: center;
+  }
+  .doc-btn {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+    text-decoration: none;
+    transition: background .15s;
+  }
+  .doc-btn.view { background: #e8f4fd; color: #3498db; }
+  .doc-btn.view:hover { background: #3498db; color: #fff; }
+  .doc-btn.del { background: #fde8e8; color: #e74c3c; }
+  .doc-btn.del:hover { background: #e74c3c; color: #fff; }
+  .doc-btn.upload { background: #f0f0f0; color: #555; cursor: pointer; }
+  .doc-btn.upload:hover { background: #e67e22; color: #fff; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full-width { grid-column: auto; }
+  }
+</style>
 {% endblock %}
