@@ -5,427 +5,433 @@
 <div class="container py-5">
   <h1 class="text-center mb-4">{{ t('Подать заявку на поступление') }}</h1>
 
-  {% if not profile_complete %}
-  <div class="alert-warning-banner">
-    <i class="fas fa-exclamation-triangle"></i>
-    {{ t('Для подачи заявки заполните профиль: ФИО, ИИН, телефон, школу.') }}
-    <a href="{{ url_for('profile') }}">{{ t('Перейти в профиль') }} →</a>
-  </div>
-  {% endif %}
+  {% if existing_app %}
+    <!-- Show tracker for existing application -->
+    {% set st = APP_STATUSES.get(existing_app.status, {}) %}
+    {% set cur_step = st.get('step', 1) %}
+    {% set is_final = existing_app.status in ('approved', 'rejected', 'revision') %}
 
-  <div class="application-layout">
-
-    <!-- ===== Левая колонка: профиль + документы ===== -->
-    <div class="app-sidebar">
-
-      <!-- Личные данные -->
-      <div class="sidebar-card">
-        <div class="sidebar-card-title">
-          <i class="fas fa-user-circle"></i> {{ t('Личные данные') }}
-          <a href="{{ url_for('profile') }}" class="edit-link" title="{{ t('Редактировать') }}">
-            <i class="fas fa-pen"></i>
-          </a>
+    <div class="existing-app-banner">
+      <div class="eab-header">
+        <i class="fas fa-clipboard-check"></i>
+        <div>
+          <div class="eab-title">Ваша заявка принята</div>
+          <div class="eab-specialty">{{ existing_app.specialty }}</div>
         </div>
-        <table class="profile-summary">
-          <tr>
-            <td class="ps-key">{{ t('ФИО') }}</td>
-            <td class="ps-val">
-              {% set fio = (user.last_name or '') + ' ' + (user.first_name or '') + ' ' + (user.middle_name or '') %}
-              {% if fio.strip() %}{{ fio.strip() }}{% else %}<span class="missing">{{ t('Не указано') }}</span>{% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td class="ps-key">{{ t('ИИН') }}</td>
-            <td class="ps-val">
-              {% if user.iin %}{{ user.iin }}{% else %}<span class="missing">{{ t('Не указан') }}</span>{% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td class="ps-key">{{ t('Телефон') }}</td>
-            <td class="ps-val">
-              {% if user.phone %}{{ user.phone }}{% else %}<span class="missing">{{ t('Не указан') }}</span>{% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td class="ps-key">{{ t('Email') }}</td>
-            <td class="ps-val">{{ user.email or '—' }}</td>
-          </tr>
-          <tr>
-            <td class="ps-key">{{ t('Школа') }}</td>
-            <td class="ps-val">
-              {% if user.school_name %}{{ user.school_name }}{% else %}<span class="missing">{{ t('Не указана') }}</span>{% endif %}
-            </td>
-          </tr>
-          {% if user.graduation_year %}
-          <tr>
-            <td class="ps-key">{{ t('Год окончания') }}</td>
-            <td class="ps-val">{{ user.graduation_year }}</td>
-          </tr>
-          {% endif %}
-        </table>
+        <span class="eab-status" style="background:{{ st.get('color','#999') }}20;
+              color:{{ st.get('color','#999') }}; border-color:{{ st.get('color','#999') }}40;">
+          {{ st.get('label', existing_app.status) }}
+        </span>
       </div>
 
-      <!-- Документы -->
-      <div class="sidebar-card">
-        <div class="sidebar-card-title">
-          <i class="fas fa-folder-open"></i> {{ t('Документы') }}
-          <a href="{{ url_for('profile') }}#documents" class="edit-link" title="{{ t('Загрузить') }}">
-            <i class="fas fa-upload"></i>
-          </a>
-        </div>
-        {% for doc_key, doc_label in doc_types.items() %}
-          {% set doc = docs_by_type.get(doc_key) %}
-          <div class="doc-check-row {{ 'ok' if doc else 'no' }}">
-            <i class="fas {{ 'fa-check-circle' if doc else 'fa-circle' }}"></i>
-            <span>{{ doc_label }}</span>
+      <!-- Tracker -->
+      <div class="status-tracker">
+        {% for key, label in TRACKER_STEPS %}
+          {% if key == 'final' %}
+            {% if is_final %}
+              {% set fst = APP_STATUSES.get(existing_app.status, {}) %}
+              <div class="st-step done" style="--sc:{{ fst.get('color','#27ae60') }}">
+                <div class="st-dot"><i class="fas fa-flag"></i></div>
+                <div class="st-label">{{ fst.get('label', label) }}</div>
+              </div>
+            {% else %}
+              <div class="st-step">
+                <div class="st-dot">5</div>
+                <div class="st-label">{{ label }}</div>
+              </div>
+            {% endif %}
+          {% else %}
+            {% set s_num = APP_STATUSES.get(key, {}).get('step', 1) %}
+            <div class="st-step {% if cur_step > s_num %}done{% elif cur_step == s_num and not is_final %}active{% endif %}">
+              <div class="st-dot">
+                {% if cur_step > s_num %}<i class="fas fa-check"></i>{% else %}{{ s_num }}{% endif %}
+              </div>
+              <div class="st-label">{{ label }}</div>
+            </div>
+          {% endif %}
+          {% if not loop.last %}<div class="st-line"></div>{% endif %}
+        {% endfor %}
+      </div>
+
+      {% if existing_app.staff_note %}
+      <div class="eab-note">
+        <i class="fas fa-comment-dots"></i> {{ existing_app.staff_note }}
+      </div>
+      {% endif %}
+
+      {% if existing_app.comments %}
+      <div class="eab-comments">
+        <div class="eab-comments-title">Комментарии комиссии:</div>
+        {% for c in existing_app.comments %}
+          <div class="eab-comment">
+            <i class="fas fa-user-tie"></i>
+            <span>{{ c.text }}</span>
+            <span class="eab-comment-date">{{ c.created_at.strftime('%d.%m.%Y') }}</span>
           </div>
         {% endfor %}
-        <a href="{{ url_for('profile') }}#documents" class="sidebar-link-btn">
-          <i class="fas fa-upload"></i> {{ t('Управление документами') }}
-        </a>
+      </div>
+      {% endif %}
+
+      <a href="{{ url_for('profile') }}#application" class="eab-link">
+        <i class="fas fa-bell"></i> Все уведомления и подробности → в личном кабинете
+      </a>
+    </div>
+
+  {% else %}
+    <!-- No existing app: show submission form -->
+    {% if not profile_complete %}
+    <div class="alert-warning-banner">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ t('Для подачи заявки заполните профиль: ФИО, ИИН, телефон, школу.') }}
+      <a href="{{ url_for('profile') }}">{{ t('Перейти в профиль') }} →</a>
+    </div>
+    {% endif %}
+
+    <div class="application-layout">
+
+      <div class="app-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">
+            <i class="fas fa-user-circle"></i> {{ t('Личные данные') }}
+            <a href="{{ url_for('profile') }}" class="edit-link" title="{{ t('Редактировать') }}">
+              <i class="fas fa-pen"></i>
+            </a>
+          </div>
+          <table class="profile-summary">
+            <tr>
+              <td class="ps-key">{{ t('ФИО') }}</td>
+              <td class="ps-val">
+                {% set fio = (user.last_name or '') + ' ' + (user.first_name or '') + ' ' + (user.middle_name or '') %}
+                {% if fio.strip() %}{{ fio.strip() }}{% else %}<span class="missing">{{ t('Не указано') }}</span>{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td class="ps-key">{{ t('ИИН') }}</td>
+              <td class="ps-val">{% if user.iin %}{{ user.iin }}{% else %}<span class="missing">{{ t('Не указан') }}</span>{% endif %}</td>
+            </tr>
+            <tr>
+              <td class="ps-key">{{ t('Телефон') }}</td>
+              <td class="ps-val">{% if user.phone %}{{ user.phone }}{% else %}<span class="missing">{{ t('Не указан') }}</span>{% endif %}</td>
+            </tr>
+            <tr>
+              <td class="ps-key">{{ t('Email') }}</td>
+              <td class="ps-val">{{ user.email or '—' }}</td>
+            </tr>
+            <tr>
+              <td class="ps-key">{{ t('Школа') }}</td>
+              <td class="ps-val">{% if user.school_name %}{{ user.school_name }}{% else %}<span class="missing">{{ t('Не указана') }}</span>{% endif %}</td>
+            </tr>
+            {% if user.graduation_year %}
+            <tr>
+              <td class="ps-key">{{ t('Год окончания') }}</td>
+              <td class="ps-val">{{ user.graduation_year }}</td>
+            </tr>
+            {% endif %}
+          </table>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">
+            <i class="fas fa-folder-open"></i> {{ t('Документы') }}
+            <a href="{{ url_for('profile') }}#documents" class="edit-link"><i class="fas fa-upload"></i></a>
+          </div>
+          {% for doc_key, doc_label in doc_types.items() %}
+            {% set doc = docs_by_type.get(doc_key) %}
+            <div class="doc-check-row {{ 'ok' if doc else 'no' }}">
+              <i class="fas {{ 'fa-check-circle' if doc else 'fa-circle' }}"></i>
+              <span>{{ doc_label }}</span>
+            </div>
+          {% endfor %}
+          <a href="{{ url_for('profile') }}#documents" class="sidebar-link-btn">
+            <i class="fas fa-upload"></i> {{ t('Управление документами') }}
+          </a>
+        </div>
+      </div>
+
+      <div class="app-form-wrap">
+        <form method="POST" action="{{ url_for('submit_application') }}" class="app-form">
+          <h5 class="form-section-title">{{ t('Выбор специальности') }}</h5>
+
+          <div class="form-group mb-3">
+            <label for="education_level">{{ t('Уровень образования') }}</label>
+            <select name="education_level" id="education_level" class="form-control" required>
+              <option value="" disabled selected>{{ t('Выберите уровень образования') }}</option>
+              <option value="bachelor">{{ t('Бакалавриат') }}</option>
+              <option value="master">{{ t('Магистратура') }}</option>
+              <option value="doctor">{{ t('Докторантура') }}</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label for="specialty">{{ t('Желаемая специальность') }}</label>
+            <select name="specialty" id="specialty" class="form-control" required>
+              <option value="" disabled selected>{{ t('Выберите желаемую специальность') }}</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label>{{ t('Форма обучения') }}</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="grant_or_paid" value="grant">
+                <span>{{ t('Грант') }}</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="grant_or_paid" value="paid" checked>
+                <span>{{ t('Платно') }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group mb-4">
+            <label>{{ t('Комментарий') }} <span style="color:#aaa;">({{ t('по желанию') }})</span></label>
+            <textarea name="comment" class="form-control" rows="3"
+                      placeholder="{{ t('Дополнительная информация...') }}"></textarea>
+          </div>
+
+          <button type="submit" class="btn orange btn-full"
+                  {% if not profile_complete %}onclick="return confirm('{{ t('Профиль заполнен не полностью. Всё равно отправить?') }}')"{% endif %}>
+            <i class="fas fa-paper-plane"></i> {{ t('Отправить заявку') }}
+          </button>
+        </form>
       </div>
 
     </div>
-
-    <!-- ===== Правая колонка: форма заявки ===== -->
-    <div class="app-form-wrap">
-      <form method="POST" action="{{ url_for('submit_application') }}" class="app-form">
-
-        <h5 class="form-section-title">{{ t('Выбор специальности') }}</h5>
-
-        <!-- Уровень образования -->
-        <div class="form-group mb-3">
-          <label for="education_level">{{ t('Уровень образования') }}</label>
-          <select name="education_level" id="education_level" class="form-control" required>
-            <option value="" disabled selected>{{ t('Выберите уровень образования') }}</option>
-            <option value="bachelor">{{ t('Бакалавриат') }}</option>
-            <option value="master">{{ t('Магистратура') }}</option>
-            <option value="doctor">{{ t('Докторантура') }}</option>
-          </select>
-        </div>
-
-        <!-- Специальность -->
-        <div class="form-group mb-3">
-          <label for="specialty">{{ t('Желаемая специальность') }}</label>
-          <select name="specialty" id="specialty" class="form-control" required>
-            <option value="" disabled selected>{{ t('Выберите желаемую специальность') }}</option>
-          </select>
-        </div>
-
-        <!-- Форма обучения -->
-        <div class="form-group mb-3">
-          <label>{{ t('Форма обучения') }}</label>
-          <div class="radio-group">
-            <label class="radio-label">
-              <input type="radio" name="grant_or_paid" value="grant">
-              <span>{{ t('Грант') }}</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="grant_or_paid" value="paid" checked>
-              <span>{{ t('Платно') }}</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Комментарий -->
-        <div class="form-group mb-4">
-          <label>{{ t('Комментарий') }} <span style="color:#aaa;">({{ t('по желанию') }})</span></label>
-          <textarea name="comment" class="form-control" rows="3"
-                    placeholder="{{ t('Дополнительная информация...') }}"></textarea>
-        </div>
-
-        <button type="submit" class="btn orange btn-full"
-                {% if not profile_complete %}
-                  onclick="return confirm('{{ t('Профиль заполнен не полностью. Всё равно отправить?') }}')"
-                {% endif %}>
-          <i class="fas fa-paper-plane"></i> {{ t('Отправить заявку') }}
-        </button>
-      </form>
-    </div>
-
-  </div>
+  {% endif %}
 </div>
 
 <style>
-  .alert-warning-banner {
-    background: #fff8e1;
-    border: 1px solid #ffe082;
-    border-radius: 10px;
-    padding: .85rem 1.25rem;
-    margin-bottom: 1.5rem;
-    font-size: .92rem;
-    color: #795548;
-  }
-  .alert-warning-banner a { color: #e67e22; font-weight: 600; }
-
-  .application-layout {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 1.5rem;
-    align-items: start;
-  }
-  @media (max-width: 768px) {
-    .application-layout { grid-template-columns: 1fr; }
-  }
-
-  .sidebar-card {
+  /* Existing app banner */
+  .existing-app-banner {
     background: #fff;
-    border-radius: 12px;
-    padding: 1.25rem;
-    box-shadow: 0 2px 12px rgba(0,0,0,.07);
-    margin-bottom: 1.25rem;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,.08);
+    margin-bottom: 2rem;
   }
-  .sidebar-card-title {
-    font-weight: 700;
-    font-size: .95rem;
-    color: #333;
-    margin-bottom: .85rem;
+  .eab-header {
     display: flex;
     align-items: center;
-    gap: .45rem;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
   }
-  .sidebar-card-title i { color: #e67e22; }
-  .edit-link {
+  .eab-header > i { font-size: 2rem; color: #e67e22; }
+  .eab-title { font-weight: 700; font-size: 1.1rem; color: #333; }
+  .eab-specialty { color: #888; font-size: .9rem; margin-top: .15rem; }
+  .eab-status {
     margin-left: auto;
-    color: #aaa;
-    font-size: .85rem;
-    text-decoration: none;
+    display: inline-block;
+    padding: .35rem .9rem;
+    border-radius: 20px;
+    font-size: .82rem;
+    font-weight: 700;
+    border: 1px solid;
+    white-space: nowrap;
   }
-  .edit-link:hover { color: #e67e22; }
 
-  .profile-summary { width: 100%; border-collapse: collapse; font-size: .88rem; }
-  .profile-summary tr + tr td { border-top: 1px solid #f0f0f0; }
-  .ps-key { color: #999; padding: .35rem 0; width: 40%; vertical-align: top; }
-  .ps-val { color: #333; padding: .35rem 0; font-weight: 500; }
-  .missing { color: #e74c3c; font-style: italic; }
+  /* Tracker */
+  .status-tracker {
+    display: flex;
+    align-items: center;
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    overflow-x: auto;
+  }
+  .st-step { display:flex; flex-direction:column; align-items:center; gap:.35rem; min-width:80px; flex-shrink:0; }
+  .st-dot { width:34px; height:34px; border-radius:50%; background:#f0f0f0; color:#bbb; display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; border:2px solid #eee; }
+  .st-step.done .st-dot { background:var(--sc,#27ae60); border-color:var(--sc,#27ae60); color:#fff; }
+  .st-step.active .st-dot { background:#fff; border-color:#e67e22; color:#e67e22; box-shadow:0 0 0 3px rgba(230,126,34,.15); }
+  .st-label { font-size:.68rem; color:#bbb; text-align:center; max-width:80px; line-height:1.2; }
+  .st-step.done .st-label, .st-step.active .st-label { color:#555; font-weight:600; }
+  .st-line { flex:1; height:2px; background:#eee; min-width:16px; margin-bottom:1.2rem; }
+  .st-step.done + .st-line { background:#27ae60; }
 
-  .doc-check-row {
+  .eab-note {
+    background: #fff8e1;
+    border-radius: 8px;
+    padding: .65rem 1rem;
+    font-size: .88rem;
+    color: #795548;
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: .5rem;
-    font-size: .87rem;
-    padding: .3rem 0;
-    color: #aaa;
   }
-  .doc-check-row.ok { color: #27ae60; }
-  .doc-check-row.ok i { color: #27ae60; }
-  .doc-check-row.no i { color: #ddd; }
-  .sidebar-link-btn {
-    display: inline-block;
-    margin-top: .75rem;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: .4rem .9rem;
-    font-size: .85rem;
-    color: #555;
-    text-decoration: none;
-    transition: border-color .15s, color .15s;
-  }
-  .sidebar-link-btn:hover { border-color: #e67e22; color: #e67e22; }
-
-  .app-form-wrap {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1.75rem;
-    box-shadow: 0 2px 12px rgba(0,0,0,.07);
-  }
-  .app-form .form-section-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 1.25rem;
-  }
-  .app-form .form-group { display: flex; flex-direction: column; }
-  .app-form .form-group label {
-    font-size: .82rem;
-    color: #888;
-    font-weight: 600;
-    margin-bottom: .3rem;
-  }
-  .app-form .form-control {
-    border: 1px solid #ddd;
-    border-radius: 8px;
+  .eab-comments { margin-bottom: 1rem; }
+  .eab-comments-title { font-size: .82rem; font-weight: 700; color: #888; margin-bottom: .5rem; }
+  .eab-comment {
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+    font-size: .88rem;
+    color: #444;
     padding: .5rem .75rem;
-    font-size: .95rem;
-    outline: none;
-    transition: border .15s;
+    background: #f5f5f5;
+    border-radius: 8px;
+    margin-bottom: .4rem;
   }
-  .app-form .form-control:focus { border-color: #e67e22; }
-  .mb-3 { margin-bottom: 1rem; }
-  .mb-4 { margin-bottom: 1.5rem; }
+  .eab-comment i { color: #e67e22; flex-shrink: 0; padding-top: .1rem; }
+  .eab-comment-date { margin-left: auto; font-size: .75rem; color: #bbb; flex-shrink: 0; }
+  .eab-link {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .88rem;
+    color: #e67e22;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .eab-link:hover { text-decoration: underline; }
 
-  .radio-group { display: flex; gap: 1.5rem; margin-top: .2rem; }
-  .radio-label {
-    display: flex; align-items: center; gap: .4rem;
-    cursor: pointer; font-size: .95rem; color: #444;
-  }
-  .btn-full { width: 100%; justify-content: center; }
+  /* Form layout */
+  .alert-warning-banner { background:#fff8e1; border:1px solid #ffe082; border-radius:10px; padding:.85rem 1.25rem; margin-bottom:1.5rem; font-size:.92rem; color:#795548; }
+  .alert-warning-banner a { color:#e67e22; font-weight:600; }
+  .application-layout { display:grid; grid-template-columns:340px 1fr; gap:1.5rem; align-items:start; }
+  @media (max-width:768px) { .application-layout { grid-template-columns:1fr; } }
+  .sidebar-card { background:#fff; border-radius:12px; padding:1.25rem; box-shadow:0 2px 12px rgba(0,0,0,.07); margin-bottom:1.25rem; }
+  .sidebar-card-title { font-weight:700; font-size:.95rem; color:#333; margin-bottom:.85rem; display:flex; align-items:center; gap:.45rem; }
+  .sidebar-card-title i { color:#e67e22; }
+  .edit-link { margin-left:auto; color:#aaa; font-size:.85rem; text-decoration:none; }
+  .edit-link:hover { color:#e67e22; }
+  .profile-summary { width:100%; border-collapse:collapse; font-size:.88rem; }
+  .profile-summary tr+tr td { border-top:1px solid #f0f0f0; }
+  .ps-key { color:#999; padding:.35rem 0; width:40%; vertical-align:top; }
+  .ps-val { color:#333; padding:.35rem 0; font-weight:500; }
+  .missing { color:#e74c3c; font-style:italic; }
+  .doc-check-row { display:flex; align-items:center; gap:.5rem; font-size:.87rem; padding:.3rem 0; color:#aaa; }
+  .doc-check-row.ok { color:#27ae60; }
+  .doc-check-row.ok i { color:#27ae60; }
+  .doc-check-row.no i { color:#ddd; }
+  .sidebar-link-btn { display:inline-block; margin-top:.75rem; border:1px solid #ddd; border-radius:8px; padding:.4rem .9rem; font-size:.85rem; color:#555; text-decoration:none; transition:border-color .15s,color .15s; }
+  .sidebar-link-btn:hover { border-color:#e67e22; color:#e67e22; }
+  .app-form-wrap { background:#fff; border-radius:12px; padding:1.75rem; box-shadow:0 2px 12px rgba(0,0,0,.07); }
+  .app-form .form-section-title { font-size:1rem; font-weight:700; color:#333; margin-bottom:1.25rem; }
+  .app-form .form-group { display:flex; flex-direction:column; }
+  .app-form .form-group label { font-size:.82rem; color:#888; font-weight:600; margin-bottom:.3rem; }
+  .app-form .form-control { border:1px solid #ddd; border-radius:8px; padding:.5rem .75rem; font-size:.95rem; outline:none; transition:border .15s; }
+  .app-form .form-control:focus { border-color:#e67e22; }
+  .mb-3 { margin-bottom:1rem; }
+  .mb-4 { margin-bottom:1.5rem; }
+  .radio-group { display:flex; gap:1.5rem; margin-top:.2rem; }
+  .radio-label { display:flex; align-items:center; gap:.4rem; cursor:pointer; font-size:.95rem; color:#444; }
+  .btn-full { width:100%; justify-content:center; }
 </style>
 
 <script>
   const defaultSpecialtyLabel = "{{ t('Выберите желаемую специальность') }}";
-
-const groups = {
+  const groups = {
     bachelor: [
-      {label: "{{ t('Факультет педагогики и менеджмента в образовании') }}", options: [
-        {value: "6B01102", text: "6B01102 — {{ t('Психология и менеджмент образования') }}"},
-        {value: "6B01201", text: "6B01201 — {{ t('Дошкольное обучение и воспитание') }}"},
-        {value: "6B01301", text: "6B01301 — {{ t('Педагогика и методика начального обучения') }}"},
-        {value: "6B01902", text: "6B01902 — {{ t('Специальная педагогика') }}"},
-        {value: "6B03101", text: "6B03101 — {{ t('Психология') }}"}
+      {label:"{{ t('Факультет педагогики и менеджмента в образовании') }}", options:[
+        {value:"6B01102",text:"6B01102 — {{ t('Психология и менеджмент образования') }}"},
+        {value:"6B01201",text:"6B01201 — {{ t('Дошкольное обучение и воспитание') }}"},
+        {value:"6B01301",text:"6B01301 — {{ t('Педагогика и методика начального обучения') }}"},
+        {value:"6B01902",text:"6B01902 — {{ t('Специальная педагогика') }}"},
+        {value:"6B03101",text:"6B03101 — {{ t('Психология') }}"},
+        {value:"6B03102",text:"6B03102 — {{ t('Клиническая психология') }}"}
       ]},
-      {label: "{{ t('Исторический факультет') }}", options: [
-        {value: "6B01506", text: "6B01506 — {{ t('География') }}"},
-        {value: "6B01603", text: "6B01603 — {{ t('История и обществознание') }}"},
-        {value: "6B02201", text: "6B02201 — {{ t('История') }}"},
-        {value: "6B05203", text: "6B05203 — {{ t('Ландшафтное проектирование') }}"},
-        {value: "6B11101", text: "6B11101 — {{ t('Туризм') }}"}
+      {label:"{{ t('Исторический факультет') }}", options:[
+        {value:"6B01506",text:"6B01506 — {{ t('География') }}"},
+        {value:"6B01603",text:"6B01603 — {{ t('История и обществознание') }}"},
+        {value:"6B02201",text:"6B02201 — {{ t('История') }}"},
+        {value:"6B05203",text:"6B05203 — {{ t('Ландшафтное проектирование') }}"},
+        {value:"6B11101",text:"6B11101 — {{ t('Туризм') }}"}
       ]},
-      {label: "{{ t('Профессионально-творческий факультет') }}", options: [
-        {value: "6B01401", text: "6B01401 — {{ t('Музыкальное образование') }}"},
-        {value: "6B01404", text: "6B01404 — {{ t('Физическая культура и спорт') }}"},
-        {value: "6B01406", text: "6B01406 — {{ t('Художественное образование') }}"},
-        {value: "6B02101", text: "6B02101 — {{ t('Хореография') }}"},
-        {value: "6B02102", text: "6B02102 — {{ t('Дизайн') }}"},
-        {value: "6B07207", text: "6B07207 — {{ t('Технология и конструирование изделий легкой промышленности') }}"},
-        {value: "6B11102", text: "6B11102 — {{ t('Культурно-досуговая работа') }}"},
-        {value: "6B01407", text: "6B01407 — {{ t('Трудовое обучение и основы предпринимательства') }}"}
+      {label:"{{ t('Профессионально-творческий факультет') }}", options:[
+        {value:"6B01401",text:"6B01401 — {{ t('Музыкальное образование') }}"},
+        {value:"6B01404",text:"6B01404 — {{ t('Физическая культура и спорт') }}"},
+        {value:"6B01406",text:"6B01406 — {{ t('Художественное образование') }}"},
+        {value:"6B02101",text:"6B02101 — {{ t('Хореография') }}"},
+        {value:"6B02102",text:"6B02102 — {{ t('Дизайн') }}"},
+        {value:"6B07207",text:"6B07207 — {{ t('Технология и конструирование изделий легкой промышленности') }}"},
+        {value:"6B11102",text:"6B11102 — {{ t('Культурно-досуговая работа') }}"},
+        {value:"6B01407",text:"6B01407 — {{ t('Трудовое обучение и основы предпринимательства') }}"}
       ]},
-      {label: "{{ t('Технический факультет') }}", options: [
-        {value: "6B07106", text: "6B07106 — {{ t('Электроэнергетика') }}"},
-        {value: "6B07107", text: "6B07107 — {{ t('Автоматизация и управление') }}"},
-        {value: "6B07201", text: "6B07201 — {{ t('Горное дело') }}"},
-        {value: "6B07202", text: "6B07202 — {{ t('Нефтегазовое дело') }}"},
-        {value: "6B07203", text: "6B07203 — {{ t('Металлургия') }}"},
-        {value: "6B07301", text: "6B07301 — {{ t('Строительство') }}"},
-        {value: "6B07101", text: "6B07101 — {{ t('Транспорт, транспортная техника и технологии') }}"}
+      {label:"{{ t('Технический факультет') }}", options:[
+        {value:"6B07106",text:"6B07106 — {{ t('Электроэнергетика') }}"},
+        {value:"6B07107",text:"6B07107 — {{ t('Автоматизация и управление') }}"},
+        {value:"6B07201",text:"6B07201 — {{ t('Горное дело') }}"},
+        {value:"6B07202",text:"6B07202 — {{ t('Нефтегазовое дело') }}"},
+        {value:"6B07203",text:"6B07203 — {{ t('Металлургия') }}"},
+        {value:"6B07301",text:"6B07301 — {{ t('Строительство') }}"},
+        {value:"6B11301",text:"6B11301 — {{ t('Организация перевозок, движения и эксплуатация транспорта') }}"},
+        {value:"6B07101",text:"6B07101 — {{ t('Транспорт, транспортная техника и технологии') }}"}
       ]},
-      {label: "{{ t('Факультет естествознания') }}", options: [
-        {value: "6B01513", text: "6B01513 — {{ t('Биология') }}"},
-        {value: "6B05101", text: "6B05101 — {{ t('Биология') }}"},
-        {value: "6B05102", text: "6B05102 — {{ t('Биотехнология') }}"},
-        {value: "6B05201", text: "6B05201 — {{ t('Экология') }}"},
-        {value: "6B05302", text: "6B05302 — {{ t('Химия') }}"},
-        {value: "6B01514", text: "6B01514 — {{ t('Химия') }}"},
-        {value: "6B07206", text: "6B07206 — {{ t('Технология продовольственных продуктов') }}"}
+      {label:"{{ t('Факультет естествознания') }}", options:[
+        {value:"6B01513",text:"6B01513 — {{ t('Биология') }}"},
+        {value:"6B05101",text:"6B05101 — {{ t('Биология') }}"},
+        {value:"6B05102",text:"6B05102 — {{ t('Биотехнология') }}"},
+        {value:"6B05201",text:"6B05201 — {{ t('Экология') }}"},
+        {value:"6B05302",text:"6B05302 — {{ t('Химия') }}"},
+        {value:"6B01514",text:"6B01514 — {{ t('Химия') }}"},
+        {value:"6B07206",text:"6B07206 — {{ t('Технология продовольственных продуктов') }}"}
       ]},
-      {label: "{{ t('Физико-математический факультет') }}", options: [
-        {value: "6B01501", text: "6B01501 — {{ t('Математика') }}"},
-        {value: "6B05301", text: "6B05301 — {{ t('Физика') }}"},
-        {value: "6B05401", text: "6B05401 — {{ t('Математика') }}"},
-        {value: "6B06103", text: "6B06103 — {{ t('Вычислительная техника и программное обеспечение') }}"},
-        {value: "6B01503", text: "6B01503 — {{ t('Информатика') }}"},
-        {value: "6B06105", text: "6B06105 — {{ t('Компьютерная инженерия') }}"},
-        {value: "6B06102", text: "6B06102 — {{ t('IT-медицина') }}"},
-        {value: "6B01512", text: "6B01512 — {{ t('Физика') }}"}
+      {label:"{{ t('Физико-математический факультет') }}", options:[
+        {value:"6B01501",text:"6B01501 — {{ t('Математика') }}"},
+        {value:"6B05301",text:"6B05301 — {{ t('Физика') }}"},
+        {value:"6B05401",text:"6B05401 — {{ t('Математика') }}"},
+        {value:"6B06103",text:"6B06103 — {{ t('Вычислительная техника и программное обеспечение') }}"},
+        {value:"6B01503",text:"6B01503 — {{ t('Информатика') }}"},
+        {value:"6B06105",text:"6B06105 — {{ t('Компьютерная инженерия') }}"},
+        {value:"6B06102",text:"6B06102 — {{ t('IT-медицина') }}"},
+        {value:"6B01512",text:"6B01512 — {{ t('Физика') }}"}
       ]},
-      {label: "{{ t('Филологический факультет') }}", options: [
-        {value: "6B01701", text: "6B01701 — {{ t('Казахский язык и литература') }}"},
-        {value: "6B01702", text: "6B01702 — {{ t('Русский язык и литература') }}"},
-        {value: "6B02304", text: "6B02304 — {{ t('Филология: казахская филология') }}"}
+      {label:"{{ t('Филологический факультет') }}", options:[
+        {value:"6B01701",text:"6B01701 — {{ t('Казахский язык и литература') }}"},
+        {value:"6B01702",text:"6B01702 — {{ t('Русский язык и литература') }}"},
+        {value:"6B02304",text:"6B02304 — {{ t('Филология: казахская филология') }}"}
       ]},
-      {label: "{{ t('Факультет иностранных языков') }}", options: [
-        {value: "6B02302", text: "6B02302 — {{ t('Переводческое дело') }}"},
-        {value: "6B02303", text: "6B02303 — {{ t('Иностранная филология') }}"},
-        {value: "6B01708", text: "6B01708 — {{ t('Английский язык') }}"}
+      {label:"{{ t('Факультет иностранных языков') }}", options:[
+        {value:"6B01706",text:"6B01706 — {{ t('Иностранный язык: два иностранных языка') }}"},
+        {value:"6B02302",text:"6B02302 — {{ t('Переводческое дело') }}"},
+        {value:"6B02303",text:"6B02303 — {{ t('Иностранная филология') }}"},
+        {value:"6B01708",text:"6B01708 — {{ t('Английский язык') }}"}
       ]},
-      {label: "{{ t('Факультет экономики и права') }}", options: [
-        {value: "6B04101", text: "6B04101 — {{ t('Экономика') }}"},
-        {value: "6B04102", text: "6B04102 — {{ t('Менеджмент') }}"},
-        {value: "6B04103", text: "6B04103 — {{ t('Учет и аудит') }}"},
-        {value: "6B04104", text: "6B04104 — {{ t('Финансы') }}"},
-        {value: "6B04201", text: "6B04201 — {{ t('Право') }}"}
+      {label:"{{ t('Факультет экономики и права') }}", options:[
+        {value:"6B04101",text:"6B04101 — {{ t('Экономика') }}"},
+        {value:"6B04102",text:"6B04102 — {{ t('Менеджмент') }}"},
+        {value:"6B04103",text:"6B04103 — {{ t('Учет и аудит') }}"},
+        {value:"6B04104",text:"6B04104 — {{ t('Финансы') }}"},
+        {value:"6B04105",text:"6B04105 — {{ t('Государственное и местное управление') }}"},
+        {value:"6B04201",text:"6B04201 — {{ t('Право') }}"}
       ]},
-      {label: "{{ t('Heriot-Watt Campus') }}", options: [
-        {value: "6B06107", text: "6B06107 — {{ t('Компьютерная инженерия') }} (Heriot-Watt)"},
-        {value: "6B07108", text: "6B07108 — {{ t('Электроэнергетика') }} (Heriot-Watt)"},
-        {value: "6B07209", text: "6B07209 — {{ t('Нефтяная инженерия и энергоменеджмент') }} (Heriot-Watt)"}
+      {label:"{{ t('Heriot-Watt Campus') }}", options:[
+        {value:"6B06107",text:"6B06107 — {{ t('Компьютерная инженерия') }} (Heriot-Watt)"},
+        {value:"6B07108",text:"6B07108 — {{ t('Электроэнергетика') }} (Heriot-Watt)"},
+        {value:"6B07209",text:"6B07209 — {{ t('Нефтяная инженерия и энергоменеджмент') }} (Heriot-Watt)"}
       ]}
     ],
     master: [
-      {label: "{{ t('Факультет педагогики и менеджмента в образовании') }}", options: [
-        {value: "7M01106", text: "7M01106 — {{ t('Менеджмент и лидерство в образовании') }}"},
-        {value: "7M01201", text: "7M01201 — {{ t('Дошкольное обучение и воспитание') }}"},
-        {value: "7M01301", text: "7M01301 — {{ t('Педагогика и методика начального обучения') }}"},
-        {value: "7M01901", text: "7M01901 — {{ t('Специальная педагогика') }}"},
-        {value: "7M03101", text: "7M03101 — {{ t('Психология') }}"}
-      ]},
-      {label: "{{ t('Исторический факультет') }}", options: [
-        {value: "7M01506", text: "7M01506 — {{ t('География') }}"},
-        {value: "7M01601", text: "7M01601 — {{ t('История') }}"},
-        {value: "7M02201", text: "7M02201 — {{ t('История') }}"}
-      ]},
-      {label: "{{ t('Профессионально-творческий факультет') }}", options: [
-        {value: "7M01401", text: "7M01401 — {{ t('Музыкальное образование') }}"},
-        {value: "7M01404", text: "7M01404 — {{ t('Физическая культура и спорт') }}"},
-        {value: "7M01405", text: "7M01405 — {{ t('Визуальное искусство, художественный труд, графика и проектирование') }}"}
-      ]},
-      {label: "{{ t('Технический факультет') }}", options: [
-        {value: "7M07101", text: "7M07101 — {{ t('Транспорт, транспортная техника и технологии') }}"},
-        {value: "7M07107", text: "7M07107 — {{ t('Транспорт, транспортная техника и технологии') }}"},
-        {value: "7M07202", text: "7M07202 — {{ t('Нефтегазовое дело') }}"},
-        {value: "7M07210", text: "7M07210 — {{ t('Нефтегазовое дело') }}"},
-        {value: "7M07201", text: "7M07201 — {{ t('Горное дело') }}"},
-        {value: "7M07209", text: "7M07209 — {{ t('Горное дело') }}"},
-        {value: "7M07203", text: "7M07203 — {{ t('Металлургия') }}"},
-        {value: "7M07213", text: "7M07213 — {{ t('Металлургия') }}"}
-      ]},
-      {label: "{{ t('Факультет естествознания') }}", options: [
-        {value: "7M05101", text: "7M05101 — {{ t('Биология') }}"},
-        {value: "7M05201", text: "7M05201 — {{ t('Экология') }}"},
-        {value: "7M01504", text: "7M01504 — {{ t('Химия') }}"},
-        {value: "7M01505", text: "7M01505 — {{ t('Биология') }}"},
-        {value: "7M07102", text: "7M07102 — {{ t('Химическая технология органических веществ') }}"}
-      ]},
-      {label: "{{ t('Физико-математический факультет') }}", options: [
-        {value: "7M01501", text: "7M01501 — {{ t('Математика') }}"},
-        {value: "7M01502", text: "7M01502 — {{ t('Физика') }}"},
-        {value: "7M01503", text: "7M01503 — {{ t('Информатика') }}"},
-        {value: "7M05301", text: "7M05301 — {{ t('Физика') }}"},
-        {value: "7M05401", text: "7M05401 — {{ t('Математика') }}"},
-        {value: "7M06103", text: "7M06103 — {{ t('Вычислительная техника и программное обеспечение') }}"}
-      ]},
-      {label: "{{ t('Филологический факультет') }}", options: [
-        {value: "7M01701", text: "7M01701 — {{ t('Казахский язык и литература') }}"},
-        {value: "7M01704", text: "7M01704 — {{ t('Русский язык и литература в школах с нерусским') }}"},
-        {value: "7M02304", text: "7M02304 — {{ t('Филология') }}"}
-      ]},
-      {label: "{{ t('Факультет иностранных языков') }}", options: [
-        {value: "7M01706", text: "7M01706 — {{ t('Иностранный язык: два иностранных языка') }}"},
-        {value: "7M02303", text: "7M02303 — {{ t('Иностранная филология') }}"}
-      ]},
-      {label: "{{ t('Факультет экономики и права') }}", options: [
-        {value: "7M04101", text: "7M04101 — {{ t('Экономика') }}"},
-        {value: "7M04102", text: "7M04102 — {{ t('Менеджмент (СОП)') }}"},
-        {value: "7M04108", text: "7M04108 — {{ t('Деловое администрирование') }}"},
-        {value: "7M04119", text: "7M04119 — {{ t('Деловое администрирование') }}"},
-        {value: "7M04104", text: "7M04104 — {{ t('Финансы') }}"},
-        {value: "7M04201", text: "7M04201 — {{ t('Юриспруденция') }}"},
-        {value: "7M04202", text: "7M04202 — {{ t('Юриспруденция') }}"}
-      ]}
+      {label:"{{ t('Педагогика и психология') }}", options:[{value:"7M01101",text:"7M01101 — {{ t('Педагогика и психология') }}"},{value:"7M01105",text:"7M01105 — {{ t('Педагогическое измерение') }}"}]},
+      {label:"{{ t('Дошкольное обучение и воспитание') }}", options:[{value:"7M01201",text:"7M01201 — {{ t('Дошкольное обучение и воспитание') }}"}]},
+      {label:"{{ t('Педагогика начального обучения') }}", options:[{value:"7M01301",text:"7M01301 — {{ t('Педагогика и методика начального обучения') }}"}]},
+      {label:"{{ t('Музыкальное образование') }}", options:[{value:"7M01401",text:"7M01401 — {{ t('Музыкальное образование') }}"}]},
+      {label:"{{ t('Физическая культура и спорт') }}", options:[{value:"7M01404",text:"7M01404 — {{ t('Физическая культура и спорт') }}"}]},
+      {label:"{{ t('Математика') }}", options:[{value:"7M01501",text:"7M01501 — {{ t('Математика') }}"},{value:"7M05401",text:"7M05401 — {{ t('Математика') }}"}]},
+      {label:"{{ t('Физика') }}", options:[{value:"7M01502",text:"7M01502 — {{ t('Физика') }}"},{value:"7M05301",text:"7M05301 — {{ t('Физика') }}"}]},
+      {label:"{{ t('Информатика') }}", options:[{value:"7M01503",text:"7M01503 — {{ t('Информатика') }}"},{value:"7M06103",text:"7M06103 — {{ t('Вычислительная техника и программное обеспечение') }}"}]},
+      {label:"{{ t('Биология') }}", options:[{value:"7M01505",text:"7M01505 — {{ t('Биология') }}"},{value:"7M05101",text:"7M05101 — {{ t('Биология') }}"}]},
+      {label:"{{ t('История') }}", options:[{value:"7M01601",text:"7M01601 — {{ t('История') }}"},{value:"7M02201",text:"7M02201 — {{ t('История') }}"}]},
+      {label:"{{ t('Казахский язык и литература') }}", options:[{value:"7M01701",text:"7M01701 — {{ t('Казахский язык и литература') }}"}]},
+      {label:"{{ t('Иностранный язык') }}", options:[{value:"7M01706",text:"7M01706 — {{ t('Иностранный язык: два иностранных языка') }}"},{value:"7M02302",text:"7M02302 — {{ t('Переводческое дело') }}"},{value:"7M02303",text:"7M02303 — {{ t('Иностранная филология') }}"}]},
+      {label:"{{ t('Психология') }}", options:[{value:"7M03101",text:"7M03101 — {{ t('Психология') }}"}]},
+      {label:"{{ t('Экономика и менеджмент') }}", options:[{value:"7M04101",text:"7M04101 — {{ t('Экономика') }}"},{value:"7M04102",text:"7M04102 — {{ t('Менеджмент') }}"},{value:"7M04108",text:"7M04108 — {{ t('Деловое администрирование') }}"}]},
+      {label:"{{ t('Право') }}", options:[{value:"7M04201",text:"7M04201 — {{ t('Юриспруденция') }}"},{value:"7M04202",text:"7M04202 — {{ t('Юриспруденция') }}"}]},
+      {label:"{{ t('Горное дело и нефтегаз') }}", options:[{value:"7M07201",text:"7M07201 — {{ t('Горное дело') }}"},{value:"7M07202",text:"7M07202 — {{ t('Нефтегазовое дело') }}"},{value:"7M07203",text:"7M07203 — {{ t('Металлургия') }}"}]}
     ],
     doctor: [
-      {label: "{{ t('Факультет педагогики и менеджмента в образовании') }}", options: [
-        {value: "8D01301", text: "8D01301 — {{ t('Педагогика и методика начального обучения') }}"}
-      ]},
-      {label: "{{ t('Исторический факультет') }}", options: [
-        {value: "8D02201", text: "8D02201 — {{ t('История') }}"}
-      ]},
-      {label: "{{ t('Факультет иностранных языков') }}", options: [
-        {value: "8D02303", text: "8D02303 — {{ t('Иностранная филология') }}"}
-      ]},
-      {label: "{{ t('Филологический факультет') }}", options: [
-        {value: "8D02304", text: "8D02304 — {{ t('Филология') }}"}
-      ]},
-      {label: "{{ t('Факультет экономики и права') }}", options: [
-        {value: "8D04101", text: "8D04101 — {{ t('Экономика') }}"}
-      ]},
-      {label: "{{ t('Факультет естествознания') }}", options: [
-        {value: "8D05302", text: "8D05302 — {{ t('Химия и технология современных материалов') }}"}
-      ]},
-      {label: "{{ t('Физико-математический факультет') }}", options: [
-        {value: "8D05301", text: "8D05301 — {{ t('Физика') }}"},
-        {value: "8D05401", text: "8D05401 — {{ t('Математика') }}"}
+      {label:"{{ t('Программы докторантуры') }}", options:[
+        {value:"8D01301",text:"8D01301 — {{ t('Педагогика и методика начального обучения') }}"},
+        {value:"8D02201",text:"8D02201 — {{ t('История') }}"},
+        {value:"8D02303",text:"8D02303 — {{ t('Иностранная филология') }}"},
+        {value:"8D02304",text:"8D02304 — {{ t('Филология') }}"},
+        {value:"8D04101",text:"8D04101 — {{ t('Экономика') }}"},
+        {value:"8D05302",text:"8D05302 — {{ t('Химия и технология современных материалов') }}"},
+        {value:"8D05301",text:"8D05301 — {{ t('Физика') }}"},
+        {value:"8D05401",text:"8D05401 — {{ t('Математика') }}"},
+        {value:"8D07203",text:"8D07203 — {{ t('Металлургия') }}"}
       ]}
     ]
   };
@@ -433,24 +439,26 @@ const groups = {
   const levelSelect = document.getElementById('education_level');
   const specialtySelect = document.getElementById('specialty');
 
-  levelSelect.addEventListener('change', function() {
-    const level = this.value;
-    specialtySelect.innerHTML = `<option value="" disabled selected>${defaultSpecialtyLabel}</option>`;
-    if (level && groups[level]) {
-      groups[level].forEach(group => {
-        if (group.options.length > 0) {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = group.label;
-          group.options.forEach(opt => {
-            const option = document.createElement('option');
-            option.value = opt.value;
-            option.textContent = opt.text;
-            optgroup.appendChild(option);
-          });
-          specialtySelect.appendChild(optgroup);
-        }
-      });
-    }
-  });
+  if (levelSelect) {
+    levelSelect.addEventListener('change', function() {
+      const level = this.value;
+      specialtySelect.innerHTML = `<option value="" disabled selected>${defaultSpecialtyLabel}</option>`;
+      if (level && groups[level]) {
+        groups[level].forEach(group => {
+          if (group.options.length > 0) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = group.label;
+            group.options.forEach(opt => {
+              const option = document.createElement('option');
+              option.value = opt.value;
+              option.textContent = opt.text;
+              optgroup.appendChild(option);
+            });
+            specialtySelect.appendChild(optgroup);
+          }
+        });
+      }
+    });
+  }
 </script>
 {% endblock %}

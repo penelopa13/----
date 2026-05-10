@@ -4,11 +4,8 @@
 <section class="profile-section">
   <div class="profile-card wide">
 
-    <!-- Header -->
     <div class="profile-header">
-      <div class="avatar-circle">
-        <i class="fas fa-user"></i>
-      </div>
+      <div class="avatar-circle"><i class="fas fa-user"></i></div>
       <div>
         <h2>{{ user.last_name or '' }} {{ user.first_name or user.name or '' }} {{ user.middle_name or '' }}</h2>
         <p class="subtitle">{{ user.email or '' }}</p>
@@ -18,16 +15,20 @@
       </a>
     </div>
 
-    <!-- Tabs -->
     <div class="profile-tabs">
       <button class="tab-btn active" data-tab="personal">
         <i class="fas fa-id-card"></i> {{ t('Личные данные') }}
       </button>
       <button class="tab-btn" data-tab="documents">
         <i class="fas fa-folder-open"></i> {{ t('Документы') }}
-        {% set uploaded_count = docs_by_type|length %}
-        {% if uploaded_count > 0 %}
-          <span class="tab-badge">{{ uploaded_count }}</span>
+        {% if docs_by_type|length > 0 %}
+          <span class="tab-badge">{{ docs_by_type|length }}</span>
+        {% endif %}
+      </button>
+      <button class="tab-btn" data-tab="application">
+        <i class="fas fa-paper-plane"></i> {{ t('Моя заявка') }}
+        {% if unread_count > 0 %}
+          <span class="tab-badge notif">{{ unread_count }}</span>
         {% endif %}
       </button>
       <button class="tab-btn" data-tab="results">
@@ -35,7 +36,7 @@
       </button>
     </div>
 
-    <!-- ===== TAB: Личные данные ===== -->
+    <!-- TAB: Личные данные -->
     <div class="tab-content active" id="tab-personal">
       <form method="POST" action="{{ url_for('profile_edit') }}" class="profile-form">
         <div class="form-section-title">{{ t('Основная информация') }}</div>
@@ -59,8 +60,7 @@
             <label>{{ t('ИИН') }}</label>
             <input type="text" name="iin" value="{{ user.iin or '' }}"
                    class="form-control" placeholder="000000000000"
-                   maxlength="12" pattern="[0-9]{12}"
-                   title="{{ t('ИИН — 12 цифр') }}">
+                   maxlength="12" pattern="[0-9]{12}" title="{{ t('ИИН — 12 цифр') }}">
           </div>
           <div class="form-group">
             <label>{{ t('Телефон') }}</label>
@@ -89,8 +89,7 @@
           </div>
           <div class="form-group">
             <label>{{ t('Год окончания') }}</label>
-            <input type="number" name="graduation_year"
-                   value="{{ user.graduation_year or '' }}"
+            <input type="number" name="graduation_year" value="{{ user.graduation_year or '' }}"
                    class="form-control" min="2000" max="2035" placeholder="2024">
           </div>
         </div>
@@ -106,7 +105,7 @@
       </form>
     </div>
 
-    <!-- ===== TAB: Документы ===== -->
+    <!-- TAB: Документы -->
     <div class="tab-content" id="tab-documents">
       <p class="doc-hint">
         <i class="fas fa-info-circle"></i>
@@ -117,42 +116,28 @@
           {% set doc = docs_by_type.get(doc_key) %}
           <div class="doc-card {{ 'uploaded' if doc else 'empty' }}">
             <div class="doc-icon-wrap">
-              {% if doc_key == 'photo_3x4' %}
-                <i class="fas fa-portrait"></i>
-              {% elif doc_key == 'iin_scan' %}
-                <i class="fas fa-id-card"></i>
-              {% elif doc_key == 'school_certificate' %}
-                <i class="fas fa-graduation-cap"></i>
-              {% elif doc_key == 'medical_certificate' %}
-                <i class="fas fa-file-medical"></i>
-              {% elif doc_key == 'transcript' %}
-                <i class="fas fa-list-alt"></i>
-              {% else %}
-                <i class="fas fa-file"></i>
-              {% endif %}
+              {% if doc_key == 'photo_3x4' %}<i class="fas fa-portrait"></i>
+              {% elif doc_key == 'iin_scan' %}<i class="fas fa-id-card"></i>
+              {% elif doc_key == 'school_certificate' %}<i class="fas fa-graduation-cap"></i>
+              {% elif doc_key == 'medical_certificate' %}<i class="fas fa-file-medical"></i>
+              {% elif doc_key == 'transcript' %}<i class="fas fa-list-alt"></i>
+              {% else %}<i class="fas fa-file"></i>{% endif %}
             </div>
             <div class="doc-body">
               <span class="doc-label">{{ doc_label }}</span>
               {% if doc %}
-                <span class="doc-status ok">
-                  <i class="fas fa-check-circle"></i> {{ t('Загружен') }}
-                </span>
+                <span class="doc-status ok"><i class="fas fa-check-circle"></i> {{ t('Загружен') }}</span>
                 <span class="doc-meta">{{ '%.1f'|format(doc.file_size / 1024) }} KB &bull; {{ doc.filename }}</span>
               {% else %}
-                <span class="doc-status missing">
-                  <i class="fas fa-times-circle"></i> {{ t('Не загружен') }}
-                </span>
+                <span class="doc-status missing"><i class="fas fa-times-circle"></i> {{ t('Не загружен') }}</span>
               {% endif %}
             </div>
             <div class="doc-actions">
               {% if doc %}
                 <a href="{{ url_for('serve_document', doc_id=doc.id) }}" target="_blank"
-                   class="doc-btn view" title="{{ t('Просмотреть') }}">
-                  <i class="fas fa-eye"></i>
-                </a>
+                   class="doc-btn view" title="{{ t('Просмотреть') }}"><i class="fas fa-eye"></i></a>
                 <form method="POST" action="{{ url_for('delete_document', doc_id=doc.id) }}"
-                      style="display:inline;"
-                      onsubmit="return confirm('{{ t('Удалить документ?') }}')">
+                      style="display:inline;" onsubmit="return confirm('{{ t('Удалить документ?') }}')">
                   <button type="submit" class="doc-btn del" title="{{ t('Удалить') }}">
                     <i class="fas fa-trash"></i>
                   </button>
@@ -173,7 +158,137 @@
       </div>
     </div>
 
-    <!-- ===== TAB: Результаты ===== -->
+    <!-- TAB: Моя заявка -->
+    <div class="tab-content" id="tab-application">
+
+      {% if existing_app %}
+        {% set st = APP_STATUSES.get(existing_app.status, {}) %}
+        {% set cur_step = st.get('step', 1) %}
+        {% set is_final = existing_app.status in ('approved', 'rejected', 'revision') %}
+
+        <!-- Progress Tracker -->
+        <div class="tracker-wrap">
+          {% for key, label in TRACKER_STEPS %}
+            {% if key == 'final' %}
+              {% if is_final %}
+                {% set fst = APP_STATUSES.get(existing_app.status, {}) %}
+                <div class="tr-step done" style="--sc:{{ fst.get('color','#27ae60') }}">
+                  <div class="tr-dot"><i class="fas fa-flag"></i></div>
+                  <div class="tr-label">{{ fst.get('label', label) }}</div>
+                </div>
+              {% else %}
+                <div class="tr-step">
+                  <div class="tr-dot">5</div>
+                  <div class="tr-label">{{ label }}</div>
+                </div>
+              {% endif %}
+            {% else %}
+              {% set s_num = APP_STATUSES.get(key, {}).get('step', 1) %}
+              <div class="tr-step {% if cur_step > s_num %}done{% elif cur_step == s_num and not is_final %}active{% endif %}">
+                <div class="tr-dot">
+                  {% if cur_step > s_num %}<i class="fas fa-check"></i>{% else %}{{ s_num }}{% endif %}
+                </div>
+                <div class="tr-label">{{ label }}</div>
+              </div>
+            {% endif %}
+            {% if not loop.last %}<div class="tr-line"></div>{% endif %}
+          {% endfor %}
+        </div>
+
+        <!-- App summary -->
+        <div class="app-summary-card">
+          <div class="app-summary-row">
+            <span class="aps-key">Специальность</span>
+            <span class="aps-val"><strong>{{ existing_app.specialty }}</strong></span>
+          </div>
+          <div class="app-summary-row">
+            <span class="aps-key">Форма обучения</span>
+            <span class="aps-val">
+              {% if existing_app.grant_or_paid == 'grant' %}Грант{% else %}Платно{% endif %}
+            </span>
+          </div>
+          <div class="app-summary-row">
+            <span class="aps-key">Дата подачи</span>
+            <span class="aps-val">{{ existing_app.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+          </div>
+          <div class="app-summary-row">
+            <span class="aps-key">Текущий статус</span>
+            <span class="aps-val">
+              <span class="status-pill" style="background:{{ st.get('color','#999') }}20;
+                    color:{{ st.get('color','#999') }}; border-color:{{ st.get('color','#999') }}40;">
+                {{ st.get('label', existing_app.status) }}
+              </span>
+            </span>
+          </div>
+          {% if existing_app.staff_note %}
+          <div class="app-summary-row">
+            <span class="aps-key">Примечание</span>
+            <span class="aps-val app-note">{{ existing_app.staff_note }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Staff comments -->
+        {% if existing_app.comments %}
+          <div class="comments-section">
+            <div class="comments-title"><i class="fas fa-comments"></i> Комментарии комиссии</div>
+            {% for c in existing_app.comments %}
+              <div class="comment-card">
+                <div class="comment-meta">
+                  <i class="fas fa-user-tie"></i>
+                  Сотрудник приёмной комиссии
+                  <span class="comment-time">{{ c.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
+                </div>
+                <div class="comment-text">{{ c.text }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+      {% else %}
+        <div class="no-app-state">
+          <i class="fas fa-file-alt"></i>
+          <p>{{ t('Вы ещё не подавали заявку на поступление.') }}</p>
+          <a href="{{ url_for('status') }}" class="btn orange">
+            <i class="fas fa-paper-plane"></i> {{ t('Подать заявку') }}
+          </a>
+        </div>
+      {% endif %}
+
+      <!-- Notifications -->
+      {% if notifications %}
+        <div class="notif-section">
+          <div class="notif-section-title">
+            <i class="fas fa-bell"></i> Уведомления
+            {% if unread_count > 0 %}
+              <button class="mark-all-btn" onclick="markAllRead()">
+                Отметить все прочитанными
+              </button>
+            {% endif %}
+          </div>
+          {% for n in notifications %}
+            <div class="notif-item {{ 'unread' if not n.is_read }} notif-{{ n.notif_type }}"
+                 id="notif-{{ n.id }}" onclick="markRead({{ n.id }})">
+              <div class="notif-icon">
+                {% if n.notif_type == 'success' %}<i class="fas fa-check-circle"></i>
+                {% elif n.notif_type == 'error' %}<i class="fas fa-times-circle"></i>
+                {% elif n.notif_type == 'warning' %}<i class="fas fa-exclamation-triangle"></i>
+                {% else %}<i class="fas fa-info-circle"></i>{% endif %}
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-msg">{{ n.message }}</div>
+                <div class="notif-time">{{ n.created_at.strftime('%d.%m.%Y %H:%M') }}</div>
+              </div>
+              {% if not n.is_read %}<div class="notif-dot"></div>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- TAB: Результаты -->
     <div class="tab-content" id="tab-results">
       <div class="profile-grid">
         <div class="profile-info">
@@ -187,18 +302,14 @@
             <span class="value mbti">{{ result.mbti_type }}</span>
           </div>
           <div class="progress-container">
-            <div class="progress-label">
-              {{ t('Порог поступления:') }} <strong>70</strong> / 140
-            </div>
+            <div class="progress-label">{{ t('Порог поступления:') }} <strong>70</strong> / 140</div>
             <div class="progress-bar">
               <div class="progress-fill"
-                   style="width: {{ [user.ent_total / 140 * 100, 100]|min|round(0) }}%">
-              </div>
+                   style="width: {{ [user.ent_total / 140 * 100, 100]|min|round(0) }}%"></div>
             </div>
           </div>
           {% endif %}
         </div>
-
         <div class="profile-actions-column">
           {% if result %}
           <div class="recommendations">
@@ -220,12 +331,10 @@
           {% endif %}
           <div class="quick-actions">
             <a href="{{ url_for('calculator') }}" class="action-card">
-              <i class="fas fa-calculator"></i>
-              <span>{{ t('Калькулятор ЕНТ') }}</span>
+              <i class="fas fa-calculator"></i><span>{{ t('Калькулятор ЕНТ') }}</span>
             </a>
             <a href="{{ url_for('status') }}" class="action-card">
-              <i class="fas fa-file-alt"></i>
-              <span>{{ t('Подать заявку') }}</span>
+              <i class="fas fa-file-alt"></i><span>{{ t('Подать заявку') }}</span>
             </a>
           </div>
         </div>
@@ -243,162 +352,138 @@
     tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
     tabContents.forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
   }
-
   tabBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
 
   if (window.location.hash === '#documents') switchTab('documents');
+  if (window.location.hash === '#application') switchTab('application');
+
+  function markRead(id) {
+    fetch(`/api/notifications/read/${id}`, {method: 'POST'})
+      .then(() => {
+        const el = document.getElementById('notif-' + id);
+        if (el) {
+          el.classList.remove('unread');
+          const dot = el.querySelector('.notif-dot');
+          if (dot) dot.remove();
+        }
+      });
+  }
+
+  function markAllRead() {
+    fetch('/api/notifications/read-all', {method: 'POST'})
+      .then(() => {
+        document.querySelectorAll('.notif-item.unread').forEach(el => {
+          el.classList.remove('unread');
+          const dot = el.querySelector('.notif-dot');
+          if (dot) dot.remove();
+        });
+        const badge = document.querySelector('.tab-badge.notif');
+        if (badge) badge.remove();
+      });
+  }
 </script>
 
 <style>
-  .profile-tabs {
-    display: flex;
-    gap: .5rem;
-    margin: 1.5rem 0 1rem;
-    border-bottom: 2px solid #eee;
-    padding-bottom: .5rem;
-    flex-wrap: wrap;
-  }
-  .tab-btn {
-    background: none;
-    border: none;
-    padding: .55rem 1.2rem;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    font-size: .95rem;
-    color: #666;
-    position: relative;
-    transition: background .15s, color .15s;
-  }
-  .tab-btn:hover { background: #f5f5f5; color: #333; }
-  .tab-btn.active { background: #fff3e0; color: #e67e22; font-weight: 600; }
-  .tab-badge {
-    display: inline-block;
-    background: #27ae60;
-    color: #fff;
-    border-radius: 50%;
-    font-size: .7rem;
-    width: 18px; height: 18px;
-    line-height: 18px;
-    text-align: center;
-    margin-left: .3rem;
-  }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+  .profile-tabs { display:flex; gap:.5rem; margin:1.5rem 0 1rem; border-bottom:2px solid #eee; padding-bottom:.5rem; flex-wrap:wrap; }
+  .tab-btn { background:none; border:none; padding:.55rem 1.2rem; border-radius:8px 8px 0 0; cursor:pointer; font-size:.95rem; color:#666; transition:background .15s,color .15s; }
+  .tab-btn:hover { background:#f5f5f5; color:#333; }
+  .tab-btn.active { background:#fff3e0; color:#e67e22; font-weight:600; }
+  .tab-badge { display:inline-block; background:#27ae60; color:#fff; border-radius:50%; font-size:.7rem; width:18px; height:18px; line-height:18px; text-align:center; margin-left:.3rem; }
+  .tab-badge.notif { background:#e74c3c; }
+  .tab-content { display:none; }
+  .tab-content.active { display:block; }
 
-  .profile-form { padding: .5rem 0; }
-  .form-section-title {
-    font-size: .85rem;
-    font-weight: 700;
-    color: #e67e22;
-    text-transform: uppercase;
-    letter-spacing: .07em;
-    margin-bottom: .75rem;
-  }
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: .75rem 1.2rem;
-  }
-  .form-group { display: flex; flex-direction: column; }
-  .form-group.full-width { grid-column: 1 / -1; }
-  .form-group label {
-    font-size: .8rem;
-    color: #888;
-    margin-bottom: .25rem;
-    font-weight: 600;
-  }
-  .form-control {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: .5rem .75rem;
-    font-size: .95rem;
-    transition: border .15s;
-    outline: none;
-  }
-  .form-control:focus { border-color: #e67e22; }
-  .form-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-  }
-  .btn-outline {
-    border: 2px solid #e67e22;
-    color: #e67e22;
-    background: transparent;
-    padding: .55rem 1.4rem;
-    border-radius: 8px;
-    font-size: .95rem;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background .15s, color .15s;
-  }
-  .btn-outline:hover { background: #e67e22; color: #fff; }
+  .profile-form { padding:.5rem 0; }
+  .form-section-title { font-size:.85rem; font-weight:700; color:#e67e22; text-transform:uppercase; letter-spacing:.07em; margin-bottom:.75rem; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem 1.2rem; }
+  .form-group { display:flex; flex-direction:column; }
+  .form-group.full-width { grid-column:1/-1; }
+  .form-group label { font-size:.8rem; color:#888; margin-bottom:.25rem; font-weight:600; }
+  .form-control { border:1px solid #ddd; border-radius:8px; padding:.5rem .75rem; font-size:.95rem; transition:border .15s; outline:none; }
+  .form-control:focus { border-color:#e67e22; }
+  .form-actions { display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap; }
+  .btn-outline { border:2px solid #e67e22; color:#e67e22; background:transparent; padding:.55rem 1.4rem; border-radius:8px; font-size:.95rem; cursor:pointer; text-decoration:none; transition:background .15s,color .15s; }
+  .btn-outline:hover { background:#e67e22; color:#fff; }
 
-  .doc-hint {
-    color: #888;
-    font-size: .9rem;
-    margin-bottom: 1rem;
-  }
-  .documents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1rem;
-  }
-  .doc-card {
-    border: 2px solid #eee;
-    border-radius: 12px;
-    padding: 1rem;
-    display: flex;
-    gap: .75rem;
-    align-items: flex-start;
-    background: #fff;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  .doc-card.uploaded { border-color: #27ae60; background: #f0fff4; }
-  .doc-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.08); }
-  .doc-icon-wrap {
-    font-size: 1.8rem;
-    color: #bbb;
-    min-width: 40px;
-    text-align: center;
-    padding-top: .2rem;
-  }
-  .doc-card.uploaded .doc-icon-wrap { color: #27ae60; }
-  .doc-body { flex: 1; min-width: 0; }
-  .doc-label { display: block; font-size: .9rem; font-weight: 600; color: #333; }
-  .doc-status { display: block; font-size: .8rem; margin-top: .15rem; }
-  .doc-status.ok { color: #27ae60; }
-  .doc-status.missing { color: #aaa; }
-  .doc-meta { display: block; font-size: .75rem; color: #999; margin-top: .1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .doc-actions {
-    display: flex;
-    flex-direction: column;
-    gap: .35rem;
-    align-items: center;
-  }
-  .doc-btn {
-    width: 32px; height: 32px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .85rem;
-    text-decoration: none;
-    transition: background .15s;
-  }
-  .doc-btn.view { background: #e8f4fd; color: #3498db; }
-  .doc-btn.view:hover { background: #3498db; color: #fff; }
-  .doc-btn.del { background: #fde8e8; color: #e74c3c; }
-  .doc-btn.del:hover { background: #e74c3c; color: #fff; }
-  .doc-btn.upload { background: #f0f0f0; color: #555; cursor: pointer; }
-  .doc-btn.upload:hover { background: #e67e22; color: #fff; }
+  .doc-hint { color:#888; font-size:.9rem; margin-bottom:1rem; }
+  .documents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; }
+  .doc-card { border:2px solid #eee; border-radius:12px; padding:1rem; display:flex; gap:.75rem; align-items:flex-start; background:#fff; transition:border-color .15s,box-shadow .15s; }
+  .doc-card.uploaded { border-color:#27ae60; background:#f0fff4; }
+  .doc-card:hover { box-shadow:0 2px 12px rgba(0,0,0,.08); }
+  .doc-icon-wrap { font-size:1.8rem; color:#bbb; min-width:40px; text-align:center; padding-top:.2rem; }
+  .doc-card.uploaded .doc-icon-wrap { color:#27ae60; }
+  .doc-body { flex:1; min-width:0; }
+  .doc-label { display:block; font-size:.9rem; font-weight:600; color:#333; }
+  .doc-status { display:block; font-size:.8rem; margin-top:.15rem; }
+  .doc-status.ok { color:#27ae60; }
+  .doc-status.missing { color:#aaa; }
+  .doc-meta { display:block; font-size:.75rem; color:#999; margin-top:.1rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .doc-actions { display:flex; flex-direction:column; gap:.35rem; align-items:center; }
+  .doc-btn { width:32px; height:32px; border-radius:6px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.85rem; text-decoration:none; transition:background .15s; }
+  .doc-btn.view { background:#e8f4fd; color:#3498db; }
+  .doc-btn.view:hover { background:#3498db; color:#fff; }
+  .doc-btn.del { background:#fde8e8; color:#e74c3c; }
+  .doc-btn.del:hover { background:#e74c3c; color:#fff; }
+  .doc-btn.upload { background:#f0f0f0; color:#555; cursor:pointer; }
+  .doc-btn.upload:hover { background:#e67e22; color:#fff; }
 
-  @media (max-width: 640px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .form-group.full-width { grid-column: auto; }
+  /* Tracker */
+  .tracker-wrap { display:flex; align-items:center; background:#f9f9f9; border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; overflow-x:auto; gap:0; }
+  .tr-step { display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:80px; flex-shrink:0; }
+  .tr-dot { width:34px; height:34px; border-radius:50%; background:#f0f0f0; color:#bbb; display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; border:2px solid #eee; }
+  .tr-step.done .tr-dot { background:var(--sc,#27ae60); border-color:var(--sc,#27ae60); color:#fff; }
+  .tr-step.active .tr-dot { background:#fff; border-color:#e67e22; color:#e67e22; box-shadow:0 0 0 3px rgba(230,126,34,.15); }
+  .tr-label { font-size:.68rem; color:#bbb; text-align:center; max-width:80px; line-height:1.2; }
+  .tr-step.done .tr-label, .tr-step.active .tr-label { color:#555; font-weight:600; }
+  .tr-line { flex:1; height:2px; background:#eee; min-width:16px; margin-bottom:1.2rem; }
+  .tr-step.done + .tr-line { background:#27ae60; }
+
+  /* App summary */
+  .app-summary-card { background:#fff; border-radius:10px; padding:1rem 1.25rem; box-shadow:0 1px 6px rgba(0,0,0,.06); margin-bottom:1rem; }
+  .app-summary-row { display:flex; gap:1rem; padding:.4rem 0; border-bottom:1px solid #f5f5f5; font-size:.88rem; }
+  .app-summary-row:last-child { border-bottom:none; }
+  .aps-key { color:#999; width:140px; flex-shrink:0; }
+  .aps-val { color:#333; font-weight:500; }
+  .app-note { color:#e67e22; font-style:italic; }
+  .status-pill { display:inline-block; padding:.25rem .7rem; border-radius:20px; font-size:.78rem; font-weight:600; border:1px solid; }
+
+  /* Comments */
+  .comments-section { margin-bottom:1.25rem; }
+  .comments-title { font-weight:700; font-size:.9rem; color:#333; margin-bottom:.75rem; display:flex; align-items:center; gap:.4rem; }
+  .comments-title i { color:#e67e22; }
+  .comment-card { background:#fff; border-radius:8px; padding:.85rem 1rem; margin-bottom:.5rem; border-left:3px solid #e67e22; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+  .comment-meta { font-size:.78rem; color:#999; margin-bottom:.4rem; display:flex; align-items:center; gap:.4rem; }
+  .comment-time { margin-left:auto; }
+  .comment-text { font-size:.9rem; color:#444; line-height:1.55; }
+
+  /* No app */
+  .no-app-state { text-align:center; padding:2.5rem; color:#ccc; }
+  .no-app-state i { font-size:3rem; margin-bottom:.75rem; display:block; }
+  .no-app-state p { color:#888; margin-bottom:1rem; }
+
+  /* Notifications */
+  .notif-section { margin-top:1.5rem; }
+  .notif-section-title { font-weight:700; font-size:.9rem; color:#333; margin-bottom:.75rem; display:flex; align-items:center; gap:.5rem; }
+  .mark-all-btn { margin-left:auto; background:none; border:1px solid #ddd; border-radius:6px; padding:.2rem .7rem; font-size:.78rem; color:#888; cursor:pointer; }
+  .mark-all-btn:hover { border-color:#e67e22; color:#e67e22; }
+  .notif-item { display:flex; gap:.75rem; align-items:flex-start; padding:.85rem 1rem; border-radius:10px; margin-bottom:.5rem; background:#f9f9f9; border:1px solid #eee; cursor:pointer; transition:background .15s; position:relative; }
+  .notif-item.unread { background:#fffbf5; border-color:#ffe4c4; }
+  .notif-item:hover { background:#f5f5f5; }
+  .notif-icon { font-size:1.1rem; padding-top:.1rem; flex-shrink:0; }
+  .notif-success .notif-icon { color:#27ae60; }
+  .notif-error .notif-icon { color:#e74c3c; }
+  .notif-warning .notif-icon { color:#e67e22; }
+  .notif-info .notif-icon { color:#3498db; }
+  .notif-body { flex:1; }
+  .notif-title { font-size:.88rem; font-weight:600; color:#333; }
+  .notif-msg { font-size:.82rem; color:#666; margin-top:.2rem; }
+  .notif-time { font-size:.75rem; color:#bbb; margin-top:.3rem; }
+  .notif-dot { width:8px; height:8px; border-radius:50%; background:#e67e22; flex-shrink:0; margin-top:.4rem; }
+
+  @media (max-width:640px) {
+    .form-grid { grid-template-columns:1fr; }
+    .form-group.full-width { grid-column:auto; }
+    .tracker-wrap { padding:.75rem; }
   }
 </style>
 {% endblock %}

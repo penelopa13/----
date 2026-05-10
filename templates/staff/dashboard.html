@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block title %}Приёмная комиссия — Заявки{% endblock %}
+
+{% block content %}
+<div class="staff-wrap">
+
+  <div class="staff-header">
+    <div>
+      <h2><i class="fas fa-briefcase"></i> Кабинет приёмной комиссии</h2>
+      <p class="staff-subtitle">Управление заявками абитуриентов</p>
+    </div>
+    <div class="staff-user-info">
+      <i class="fas fa-user-tie"></i> {{ current_user.name or current_user.email }}
+      <a href="{{ url_for('logout') }}" class="logout-link" title="Выйти">
+        <i class="fas fa-sign-out-alt"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">{{ total }}</div>
+      <div class="stat-label"><i class="fas fa-file-alt"></i> Всего заявок</div>
+    </div>
+    <div class="stat-card received">
+      <div class="stat-num">{{ by_status.get('received', 0) }}</div>
+      <div class="stat-label"><i class="fas fa-inbox"></i> Получено</div>
+    </div>
+    <div class="stat-card checking">
+      <div class="stat-num">{{ by_status.get('checking', 0) + by_status.get('review', 0) }}</div>
+      <div class="stat-label"><i class="fas fa-search"></i> На проверке</div>
+    </div>
+    <div class="stat-card approved">
+      <div class="stat-num">{{ by_status.get('approved', 0) }}</div>
+      <div class="stat-label"><i class="fas fa-check-circle"></i> Одобрено</div>
+    </div>
+    <div class="stat-card rejected">
+      <div class="stat-num">{{ by_status.get('rejected', 0) }}</div>
+      <div class="stat-label"><i class="fas fa-times-circle"></i> Отклонено</div>
+    </div>
+    <div class="stat-card revision">
+      <div class="stat-num">{{ by_status.get('revision', 0) }}</div>
+      <div class="stat-label"><i class="fas fa-edit"></i> На доработке</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <form method="GET" action="{{ url_for('staff_dashboard') }}" class="filter-bar">
+    <div class="filter-group">
+      <input type="text" name="search" value="{{ search }}"
+             class="filter-input" placeholder="Поиск по имени, email, ИИН...">
+    </div>
+    <div class="filter-group">
+      <select name="status" class="filter-select">
+        <option value="">Все статусы</option>
+        {% for key, info in APP_STATUSES.items() %}
+          <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>
+            {{ info.label }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="filter-btn">
+      <i class="fas fa-filter"></i> Фильтр
+    </button>
+    {% if status_filter or search %}
+      <a href="{{ url_for('staff_dashboard') }}" class="filter-reset">
+        <i class="fas fa-times"></i> Сбросить
+      </a>
+    {% endif %}
+  </form>
+
+  <!-- Applications Table -->
+  <div class="table-card">
+    {% if applications %}
+    <table class="apps-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Абитуриент</th>
+          <th>ИИН</th>
+          <th>Специальность</th>
+          <th>Уровень</th>
+          <th>Форма</th>
+          <th>Дата</th>
+          <th>Статус</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in applications %}
+        <tr>
+          <td class="td-id">{{ a.id }}</td>
+          <td class="td-name">
+            <strong>{{ a.last_name }} {{ a.first_name }}</strong>
+            {% if a.email %}<div class="td-sub">{{ a.email }}</div>{% endif %}
+          </td>
+          <td class="td-iin">
+            {% if a.user and a.user.iin %}{{ a.user.iin }}{% else %}—{% endif %}
+          </td>
+          <td class="td-spec">
+            <span title="{{ a.specialty }}">{{ a.specialty[:30] }}{% if a.specialty|length > 30 %}…{% endif %}</span>
+          </td>
+          <td>
+            {% if a.education_level == 'bachelor' %}Бакалавр
+            {% elif a.education_level == 'master' %}Магистр
+            {% elif a.education_level == 'doctor' %}Докторант
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            {% if a.grant_or_paid == 'grant' %}
+              <span class="badge badge-green">Грант</span>
+            {% else %}
+              <span class="badge badge-blue">Платно</span>
+            {% endif %}
+          </td>
+          <td class="td-date">{{ a.created_at.strftime('%d.%m.%Y') }}</td>
+          <td>
+            {% set st = APP_STATUSES.get(a.status, {}) %}
+            <span class="status-badge" style="background:{{ st.get('color','#999') }}20; color:{{ st.get('color','#999') }}; border-color:{{ st.get('color','#999') }}40;">
+              {{ st.get('label', a.status) }}
+            </span>
+          </td>
+          <td>
+            <a href="{{ url_for('staff_application_detail', app_id=a.id) }}"
+               class="action-btn" title="Открыть заявку">
+              <i class="fas fa-eye"></i> Открыть
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <p>Заявок не найдено</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<style>
+  .staff-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+
+  .staff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .staff-header h2 { font-size: 1.5rem; color: #333; margin: 0; }
+  .staff-subtitle { color: #888; font-size: .9rem; margin: .25rem 0 0; }
+  .staff-user-info {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .9rem;
+    color: #555;
+    background: #f9f9f9;
+    padding: .5rem 1rem;
+    border-radius: 8px;
+  }
+  .logout-link { color: #e74c3c; text-decoration: none; margin-left: .5rem; }
+  .logout-link:hover { color: #c0392b; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border-left: 4px solid #ddd;
+  }
+  .stat-card.received  { border-left-color: #3498db; }
+  .stat-card.checking  { border-left-color: #9b59b6; }
+  .stat-card.approved  { border-left-color: #27ae60; }
+  .stat-card.rejected  { border-left-color: #e74c3c; }
+  .stat-card.revision  { border-left-color: #e67e22; }
+  .stat-num { font-size: 2rem; font-weight: 700; color: #333; }
+  .stat-label { font-size: .78rem; color: #888; margin-top: .2rem; }
+
+  .filter-bar {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .filter-group { flex: 1; min-width: 180px; }
+  .filter-input, .filter-select {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: .5rem .75rem;
+    font-size: .9rem;
+    outline: none;
+  }
+  .filter-input:focus, .filter-select:focus { border-color: #e67e22; }
+  .filter-btn {
+    background: #e67e22;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: .5rem 1.25rem;
+    font-size: .9rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .filter-btn:hover { background: #d35400; }
+  .filter-reset {
+    color: #aaa;
+    font-size: .85rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .filter-reset:hover { color: #e74c3c; }
+
+  .table-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    overflow: hidden;
+  }
+  .apps-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  .apps-table th {
+    background: #f8f8f8;
+    padding: .75rem 1rem;
+    text-align: left;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #888;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+  }
+  .apps-table td {
+    padding: .85rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+  .apps-table tr:last-child td { border-bottom: none; }
+  .apps-table tr:hover td { background: #fafafa; }
+
+  .td-id { color: #bbb; font-size: .8rem; width: 40px; }
+  .td-name strong { display: block; }
+  .td-sub { font-size: .78rem; color: #999; }
+  .td-iin { font-family: monospace; font-size: .85rem; }
+  .td-spec { max-width: 200px; }
+  .td-date { color: #888; font-size: .82rem; white-space: nowrap; }
+
+  .status-badge {
+    display: inline-block;
+    padding: .25rem .65rem;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .badge {
+    display: inline-block;
+    padding: .2rem .55rem;
+    border-radius: 20px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+  .badge-green { background: #e8f8ee; color: #27ae60; }
+  .badge-blue  { background: #e8f4fd; color: #3498db; }
+
+  .action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    background: #f0f0f0;
+    color: #333;
+    border-radius: 6px;
+    padding: .35rem .75rem;
+    font-size: .82rem;
+    text-decoration: none;
+    transition: background .15s;
+    white-space: nowrap;
+  }
+  .action-btn:hover { background: #e67e22; color: #fff; }
+
+  .empty-state {
+    padding: 3rem;
+    text-align: center;
+    color: #ccc;
+    font-size: 1.1rem;
+  }
+  .empty-state i { font-size: 3rem; display: block; margin-bottom: .75rem; }
+
+  @media (max-width: 768px) {
+    .apps-table { font-size: .78rem; }
+    .apps-table th, .apps-table td { padding: .6rem .5rem; }
+  }
+</style>
+{% endblock %}
