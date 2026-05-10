@@ -2,6 +2,7 @@
 {% block title %}{{ t('Образовательные программы') }} - {{ t('Талапкер') }}{% endblock %}
 
 {% block content %}
+{% set img_lang = lang() %}
 <section class="section">
     <div class="container">
 <h1 align="center">{{ t('Образовательные программы') | upper }}</h1>
@@ -21,37 +22,31 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В01102 - {{ t('Психология и менеджмент образования') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01102.png" alt="{{ t('Психология и менеджмент образования') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/6В01102 Психология және білім беру менеджменті.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty pedagogy and management in education/6В01102 Psychology and Educational Management.png{%- else -%}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/6В01102 Психология и менеджмент образования.png{%- endif -%}" alt="{{ t('Психология и менеджмент образования') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01201 - {{ t('Дошкольное обучение и воспитание') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01201.jpg" alt="{{ t('Дошкольное обучение и воспитание') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/6В01201 Мектепке дейінгі оқыту және тәрбиелеу.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty pedagogy and management in education/6В01201 Preschool education and upbringing.png{%- else -%}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/6В01201 Дошкольное обучение и воспитание.png{%- endif -%}" alt="{{ t('Дошкольное обучение и воспитание') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01301 - {{ t('Педагогика и методика начального обучения') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01301.jpg" alt="{{ t('Педагогика и методика начального обучения') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/6В01301 Бастауышта оқыту педагогикасы мен әдістемесі.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty pedagogy and management in education/6В01301 Pedagogy and methods of primary education.png{%- else -%}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/6В01301 Педагогика и методика начального обучения.png{%- endif -%}" alt="{{ t('Педагогика и методика начального обучения') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01902 - {{ t('Специальная педагогика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01902.jpg" alt="{{ t('Специальная педагогика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/6В01902 Арнайы педагогика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty pedagogy and management in education/6В01902 Special pedagogy.png{%- else -%}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/6В01902 Специальная педагогика.png{%- endif -%}" alt="{{ t('Специальная педагогика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В03101 - {{ t('Психология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B03101.jpg" alt="{{ t('Психология') }}">
-                            </div>
-                        </div>
-                        <div class="accord-item">
-                            <div class="accord-item_head">6В03102 - {{ t('Клиническая психология') }}</div>
-                            <div class="accord-item_content">
-                                <img src="/static/images/programs/6B03102.jpg" alt="{{ t('Клиническая психология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/6В03101 Психология.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty pedagogy and management in education/6В03101 Psychology.png{%- else -%}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/6В03101 Психология.png{%- endif -%}" alt="{{ t('Психология') }}">
                             </div>
                         </div>
                     </div>
@@ -62,31 +57,31 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В01506 - {{ t('География') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01506.jpg" alt="{{ t('География') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Тарих факультеті/6В01506 География.png{%- elif img_lang == 'en' -%}/static/images/programs/en/History Faculty/6В01506 Geography.png{%- else -%}/static/images/programs/ru/Исторический факультет/6В01506 География.png{%- endif -%}" alt="{{ t('География') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01603 - {{ t('История и обществознание') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01603.jpg" alt="{{ t('История и обществознание') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Тарих факультеті/6В01603 Тарих және қоғамтану.png{%- elif img_lang == 'en' -%}/static/images/programs/en/History Faculty/6В01603 History and social studies.png{%- else -%}/static/images/programs/ru/Исторический факультет/6В01603 История и обществознание.png{%- endif -%}" alt="{{ t('История и обществознание') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В02201 - {{ t('История') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B02201.jpg" alt="{{ t('История') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Тарих факультеті/6В02201 Тарих.png{%- elif img_lang == 'en' -%}/static/images/programs/en/History Faculty/6В02201 History.png{%- else -%}/static/images/programs/ru/Исторический факультет/6В02201 История.png{%- endif -%}" alt="{{ t('История') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05203 - {{ t('Ландшафтное проектирование') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05203.jpg" alt="{{ t('Ландшафтное проектирование') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Тарих факультеті/6В05203 Ландшафтық жобалау.png{%- elif img_lang == 'en' -%}/static/images/programs/en/History Faculty/6В05203 Landscape design.png{%- else -%}/static/images/programs/ru/Исторический факультет/6В05203 Ландшафтное проектирование.png{%- endif -%}" alt="{{ t('Ландшафтное проектирование') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В11101 - {{ t('Туризм') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B11101.jpg" alt="{{ t('Туризм') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Тарих факультеті/6В11101 Туризм.png{%- elif img_lang == 'en' -%}/static/images/programs/en/History Faculty/6В11101 Tourism.png{%- else -%}/static/images/programs/ru/Исторический факультет/6В11101 Туризм.png{%- endif -%}" alt="{{ t('Туризм') }}">
                             </div>
                         </div>
                     </div>
@@ -97,49 +92,49 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В01401 - {{ t('Музыкальное образование') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01401.jpg" alt="{{ t('Музыкальное образование') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В01401 Музыкалық білім.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В01401 Music education.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В01401 Музыкальное образование.png{%- endif -%}" alt="{{ t('Музыкальное образование') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01404 - {{ t('Физическая культура и спорт') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01404.jpg" alt="{{ t('Физическая культура и спорт') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В01404 Денешынықтыру және спорт.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В01404 Physical training and sports.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В01404 Физическая культура и спорт.png{%- endif -%}" alt="{{ t('Физическая культура и спорт') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01406 - {{ t('Художественное образование') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01406.jpg" alt="{{ t('Художественное образование') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В01406 Көркем білім.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В01406 Art education.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В01406 Художественное образование..png{%- endif -%}" alt="{{ t('Художественное образование') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В02101 - {{ t('Хореография') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B02101.jpg" alt="{{ t('Хореография') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В02101 Хореография.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В02101 Choreography.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В02101 Хореография.png{%- endif -%}" alt="{{ t('Хореография') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В02102 - {{ t('Дизайн') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B02102.jpg" alt="{{ t('Дизайн') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В02102 Дизайн.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В02102 Design.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В02102 Дизайн.png{%- endif -%}" alt="{{ t('Дизайн') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07207 - {{ t('Технология и конструирование изделий легкой промышленности') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07207.jpg" alt="{{ t('Технология и конструирование изделий легкой промышленности') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6B07207 Жеңіл өнеркәсіп бұйымдарының технологиясы және құрастырылуы.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В07207 Technology and design of light industry products.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В07207 Технология и конструирование изделий легкой промышленности.png{%- endif -%}" alt="{{ t('Технология и конструирование изделий легкой промышленности') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В11102 - {{ t('Культурно-досуговая работа') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B11102.jpg" alt="{{ t('Культурно-досуговая работа') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В11102 Мәдени-тынығу жұмысы.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В11102 Cultural and leisure work.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В11102 Культурно-досуговая работа.png{%- endif -%}" alt="{{ t('Культурно-досуговая работа') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01407 - {{ t('Трудовое обучение и основы предпринимательства') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01407.jpg" alt="{{ t('Трудовое обучение и основы предпринимательства') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/6В01407 Еңбекке баулу және кәсіпкерлік негіздері.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Professional and Creative faculty/6В01407 - Labor Training and Basics of Entrepreneurship.png{%- else -%}/static/images/programs/ru/Профессионально-творческий факультет/6В01407 Трудовое обучение и основы предпринимательсва.png{%- endif -%}" alt="{{ t('Трудовое обучение и основы предпринимательства') }}">
                             </div>
                         </div>
                     </div>
@@ -150,49 +145,44 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В07106 - {{ t('Электроэнергетика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07106.jpg" alt="{{ t('Электроэнергетика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07106 Электроэнергетика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07106 Electric power industry.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07106 Электроэнергетика.png{%- endif -%}" alt="{{ t('Электроэнергетика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07107 - {{ t('Автоматизация и управление') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07107.jpg" alt="{{ t('Автоматизация и управление') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07107 Автоматтандыру және басқару.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07107 Аutomation and control.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07107 Автоматизация и управление.png{%- endif -%}" alt="{{ t('Автоматизация и управление') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07201 - {{ t('Горное дело') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07201.jpg" alt="{{ t('Горное дело') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07201 Тау-кен ісі.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07201 Mining.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07201 Горное дело.png{%- endif -%}" alt="{{ t('Горное дело') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07202 - {{ t('Нефтегазовое дело') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07202.jpg" alt="{{ t('Нефтегазовое дело') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07202 Мұнай газ ісі.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07202 Oil and gas business.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07202 Нефтегазовое дело.png{%- endif -%}" alt="{{ t('Нефтегазовое дело') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07203 - {{ t('Металлургия') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07203.jpg" alt="{{ t('Металлургия') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07203 Металлургия.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07203 Metallurgy.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07203 Металлургия.png{%- endif -%}" alt="{{ t('Металлургия') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07301 - {{ t('Строительство') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07301.jpg" alt="{{ t('Строительство') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07301 Құрылыс.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07301 Construstion.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07301 Строительство.png{%- endif -%}" alt="{{ t('Строительство') }}">
                             </div>
                         </div>
-                        <div class="accord-item">
-                            <div class="accord-item_head">6В11301 - {{ t('Организация перевозок, движения и эксплуатация транспорта') }}</div>
-                            <div class="accord-item_content">
-                                <img src="/static/images/programs/6B11301.jpg" alt="{{ t('Организация перевозок, движения и эксплуатация транспорта') }}">
-                            </div>
-                        </div>
+                       
                         <div class="accord-item">
                             <div class="accord-item_head">6В07101 - {{ t('Транспорт, транспортная техника и технологии') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07101.jpg" alt="{{ t('Транспорт, транспортная техника и технологии') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Техникалық факультеті/6В07101 Көлік, көліктік техника және технологиялар.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Technical faculty/6В07101 Transport, transport equipment and technologies.png{%- else -%}/static/images/programs/ru/Технический факультет/6В07101 Транспорт, транспортная техника и технологии.png{%- endif -%}" alt="{{ t('Транспорт, транспортная техника и технологии') }}">
                             </div>
                         </div>
                     </div>
@@ -203,43 +193,43 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В01513 - {{ t('Биология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01513.jpg" alt="{{ t('Биология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В01513 Биология.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В01513 Biology.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В01513 Биология.png{%- endif -%}" alt="{{ t('Биология') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05101 - {{ t('Биология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05101.jpg" alt="{{ t('Биология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В05101 Биология.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В05101 Biology.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В05101 Биология.png{%- endif -%}" alt="{{ t('Биология') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05102 - {{ t('Биотехнология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05102.jpg" alt="{{ t('Биотехнология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В05102 Биотехнология.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В05102 Biotechnology.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В05102 Биотехнология.png{%- endif -%}" alt="{{ t('Биотехнология') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05201 - {{ t('Экология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05201.jpg" alt="{{ t('Экология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В05201 Экология.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В05201 Ecology.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В05201 Экология.png{%- endif -%}" alt="{{ t('Экология') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05302 - {{ t('Химия') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05302.jpg" alt="{{ t('Химия') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В05302 Химия.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В05302 Chemistry.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В05302 Химия.png{%- endif -%}" alt="{{ t('Химия') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01514 - {{ t('Химия') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01514.jpg" alt="{{ t('Химия') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В01514 Химия.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В01514 Chemistry.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В01514 Химия.png{%- endif -%}" alt="{{ t('Химия') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07206 - {{ t('Технология продовольственных продуктов') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07206.jpg" alt="{{ t('Технология продовольственных продуктов') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Жаратылыстану факультеті/6В07206 Азық-түлік өнімдерінің технологиясы.png{%- elif img_lang == 'en' -%}/static/images/programs/en/The faculty of Natural Sciences/6В07206 Technology of food products.png{%- else -%}/static/images/programs/ru/Факультет естествознания/6В07206 Технология продовольственных продуктов.png{%- endif -%}" alt="{{ t('Технология продовольственных продуктов') }}">
                             </div>
                         </div>
                     </div>
@@ -250,49 +240,49 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В01501 - {{ t('Математика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01501.jpg" alt="{{ t('Математика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В01501 Математика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B01501 Mathematics.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В01501 Математика.png{%- endif -%}" alt="{{ t('Математика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05301 - {{ t('Физика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05301.jpg" alt="{{ t('Физика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В05301 Физика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B05301 Physics.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В05301 Физика.png{%- endif -%}" alt="{{ t('Физика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В05401 - {{ t('Математика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B05401.jpg" alt="{{ t('Математика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В05401 Математика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6В05401 Mathematics.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В05401 Математика.png{%- endif -%}" alt="{{ t('Математика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В06103 - {{ t('Вычислительная техника и программное обеспечение') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B06103.jpg" alt="{{ t('Вычислительная техника и программное обеспечение') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В06103 Есептеу техникасы және бағдарламалық қамтамасыз ету.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B06103 Computing equipment and software.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В06103 Вычислительная техника и программное обеспечение.png{%- endif -%}" alt="{{ t('Вычислительная техника и программное обеспечение') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01503 - {{ t('Информатика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01503.jpg" alt="{{ t('Информатика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В01503 Информатика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B01503 Informatics.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В01503 Информатика.png{%- endif -%}" alt="{{ t('Информатика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В06105 - {{ t('Компьютерная инженерия') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B06105.jpg" alt="{{ t('Компьютерная инженерия') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В06105 Компьютерлік инженерия.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B06105 Computer engineering.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В06105 Компьютерная инженерия.png{%- endif -%}" alt="{{ t('Компьютерная инженерия') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В06102 - {{ t('IT-медицина') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B06102.jpg" alt="{{ t('IT-медицина') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Физика-математикалық факультеті/6В06102 IT-медицина.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B06102 IT-medicine.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6В06102 IT-медицина.png{%- endif -%}" alt="{{ t('IT-медицина') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6B01512 - {{ t('Физика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01512.jpg" alt="{{ t('Физика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}static/images/programs/kk/Физика-математикалық факультеті/6B01512 Физика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Physical and Mathematical faculty/6B01512 Physics.png{%- else -%}/static/images/programs/ru/Физико-математический факультет/6B01512 Физика.png{%- endif -%}" alt="{{ t('Физика') }}">
                             </div>
                         </div>
                     </div>
@@ -303,19 +293,19 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В01701 - {{ t('Казахский язык и литература') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01701.jpg" alt="{{ t('Казахский язык и литература') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Филология факультеті/6В01701 Қазақ тілі мен әдебиеті.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Philological faculty/6В01701 Kazakh language and literature.png{%- else -%}/static/images/programs/ru/Филологический факультет/6В01701 Казахский язык и литература.png{%- endif -%}" alt="{{ t('Казахский язык и литература') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01702 - {{ t('Русский язык и литература') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01702.jpg" alt="{{ t('Русский язык и литература') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Филология факультеті/6В01702 Орыс тілі мен әдебиеті.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Philological faculty/6В01702 Russian language and literature.png{%- else -%}/static/images/programs/ru/Филологический факультет/6В01702 Русский язык и литература.png{%- endif -%}" alt="{{ t('Русский язык и литература') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В02304 - {{ t('Филология: казахская филология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B02304.jpg" alt="{{ t('Филология: казахская филология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Филология факультеті/6В02304 қазақ филологиясы.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Philological faculty/6В02304 Philology Kazakh philology.png{%- else -%}/static/images/programs/ru/Филологический факультет/6В02304  казахская филология.png{%- endif -%}" alt="{{ t('Филология: казахская филология') }}">
                             </div>
                         </div>
                     </div>
@@ -323,28 +313,23 @@
                     <!-- Факультет иностранных языков -->
                     <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
                     <div class="accord">
-                        <div class="accord-item">
-                            <div class="accord-item_head">6В01706 - {{ t('Иностранный язык: два иностранных языка') }}</div>
-                            <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01706.jpg" alt="{{ t('Иностранный язык: два иностранных языка') }}">
-                            </div>
-                        </div>
+                      
                         <div class="accord-item">
                             <div class="accord-item_head">6В02302 - {{ t('Переводческое дело') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B02302.jpg" alt="{{ t('Переводческое дело') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Шетел тілдері факультеті/6В02302 Аударма ісі.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of foreign languages/6В02302 Interpreting and translation.png{%- else -%}/static/images/programs/ru/Факультет иностранных языков/6В02302 Переводческое дело.png{%- endif -%}" alt="{{ t('Переводческое дело') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В02303 - {{ t('Иностранная филология') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B02303.jpg" alt="{{ t('Иностранная филология') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Шетел тілдері факультеті/6В02303 Шетел филологиясы.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of foreign languages/6В02303 Foreign philology.png{%- else -%}/static/images/programs/ru/Факультет иностранных языков/6В02303 Иностранная филология.png{%- endif -%}" alt="{{ t('Иностранная филология') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В01708 - {{ t('Английский язык') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B01708.jpg" alt="{{ t('Английский язык') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Шетел тілдері факультеті/6В01708 Ағылшын тілі.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of foreign languages/6В01708 English language.png{%- else -%}/static/images/programs/ru/Факультет иностранных языков/6В01708 Английский язык.png{%- endif -%}" alt="{{ t('Английский язык') }}">
                             </div>
                         </div>
                     </div>
@@ -355,37 +340,32 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В04101 - {{ t('Экономика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B04101.jpg" alt="{{ t('Экономика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Экономика және құқық факультеті/6В04101 Экономика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of Economics and Law/6В04101 Economics.png{%- else -%}/static/images/programs/ru/Факультет экономики и права/6В04101 Экономика.png{%- endif -%}" alt="{{ t('Экономика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В04102 - {{ t('Менеджмент') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B04102.jpg" alt="{{ t('Менеджмент') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Экономика және құқық факультеті/6В04102 Менеджмент.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of Economics and Law/6В04102 Management.png{%- else -%}/static/images/programs/ru/Факультет экономики и права/6В04102 Менеджмент.png{%- endif -%}" alt="{{ t('Менеджмент') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В04103 - {{ t('Учет и аудит') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B04103.jpg" alt="{{ t('Учет и аудит') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Экономика және құқық факультеті/6В04103 Есеп және аудит.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of Economics and Law/6В04103 Accounting and audit.png{%- else -%}/static/images/programs/ru/Факультет экономики и права/6В04103 Учет и аудит.png{%- endif -%}" alt="{{ t('Учет и аудит') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В04104 - {{ t('Финансы') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B04104.jpg" alt="{{ t('Финансы') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Экономика және құқық факультеті/6В04104 Қаржы.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of Economics and Law/6В04104 Finance.png{%- else -%}/static/images/programs/ru/Факультет экономики и права/6В04104 Финансы.png{%- endif -%}" alt="{{ t('Финансы') }}">
                             </div>
                         </div>
-                        <div class="accord-item">
-                            <div class="accord-item_head">6В04105 - {{ t('Государственное и местное управление') }}</div>
-                            <div class="accord-item_content">
-                                <img src="/static/images/programs/6B04105.jpg" alt="{{ t('Государственное и местное управление') }}">
-                            </div>
-                        </div>
+                       
                         <div class="accord-item">
                             <div class="accord-item_head">6В04201 - {{ t('Право') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B04201.jpg" alt="{{ t('Право') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Экономика және құқық факультеті/6В04201 Құқықтану.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Faculty of Economics and Law/6B04201 Law.png{%- else -%}/static/images/programs/ru/Факультет экономики и права/6В04201 Юриспруденция.png{%- endif -%}" alt="{{ t('Право') }}">
                             </div>
                         </div>
                     </div>
@@ -396,203 +376,57 @@
                         <div class="accord-item">
                             <div class="accord-item_head">6В06107 - {{ t('Компьютерная инженерия') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B06107.jpg" alt="{{ t('Компьютерная инженерия') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Heriot-Watt Campus/6B06107 Компьютерлік инженерия.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Heriot-Watt Campus/6B06107 Computational Sciences and Software engineering.png{%- else -%}/static/images/programs/ru/Heriot-Watt Campus/6В06107 Компьютерная инженерия.png{%- endif -%}" alt="{{ t('Компьютерная инженерия') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07108 - {{ t('Электроэнергетика') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07108.jpg" alt="{{ t('Электроэнергетика') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Heriot-Watt Campus/6В07108 Электроэнергетика.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Heriot-Watt Campus/6B07108 Electrical and electronic systems.png{%- else -%}/static/images/programs/ru/Heriot-Watt Campus/6В07108 Электроэнергетика.png{%- endif -%}" alt="{{ t('Электроэнергетика') }}">
                             </div>
                         </div>
                         <div class="accord-item">
                             <div class="accord-item_head">6В07209 - {{ t('Нефтяная инженерия и энергоменеджмент') }}</div>
                             <div class="accord-item_content">
-                                <img src="/static/images/programs/6B07209.jpg" alt="{{ t('Нефтяная инженерия и энергоменеджмент') }}">
+                                <img src="{%- if img_lang == 'kk' -%}/static/images/programs/kk/Heriot-Watt Campus/6B07209 Мұнай инженериясы және энергоменеджмент.png{%- elif img_lang == 'en' -%}/static/images/programs/en/Heriot-Watt Campus/6В07209 Petroleum with transition engineering.png{%- else -%}/static/images/programs/ru/Heriot-Watt Campus/6В07209 Нефтяная инженерия и энергоменеджмент.png{%- endif -%}" alt="{{ t('Нефтяная инженерия и энергоменеджмент') }}">
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div id="master" style="margin-top:50px;">
+<div id="master" style="margin-top:50px;">
                 <h3 align="center"><b>{{ t('МАГИСТРАТУРА') }}</b></h3>
 
                 <!-- Факультет педагогики и менеджмента в образовании -->
                 <p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
                 <div class="accord">
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01101 – {{ t('Педагогика и психология') }} (2 года)</div>
+                    <div class="accord-item_head">7M01106 – {{ t('Менеджмент и лидерство в образовании') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01101.jpg" alt="{{ t('Педагогика и психология') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/7M01106 Білімдегі менеджмент және көшбасшылық.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Pedagogy and Management in Education/7M01106 Management and Leadership in Education.png{% else %}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/7M01106 Менеджмент и лидерство в образовании.png{% endif %}" alt="{{ t('Менеджмент и лидерство в образовании') }}">
                     </div>
                 </div>
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01105 – {{ t('Педагогические измерения') }} (2 года)</div>
+                    <div class="accord-item_head">7M01201 – {{ t('Дошкольное обучение и воспитание') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01105.jpg" alt="{{ t('Педагогические измерения') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/7M01201 Мектепке дейінгі оқыту және тәрбиелеу.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Pedagogy and Management in Education/7M01201 Preschool Education and Upbringing.png{% else %}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/7M01201 Дошкольное обучение и воспитание.png{% endif %}" alt="{{ t('Дошкольное обучение и воспитание') }}">
                     </div>
                 </div>
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01106 – {{ t('Менеджмент и лидерство в образовании') }} (2 года)</div>
+                    <div class="accord-item_head">7M01301 – {{ t('Педагогика и методика начального обучения') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01106.jpg" alt="{{ t('Менеджмент и лидерство в образовании') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/7M01301 Бастауыш оқытудың педагогикасы мен әдістемесі.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Pedagogy and Management in Education/7M01301 Pedagogy and Methods of Primary Education.png{% else %}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/7M01301 Педагогика и методика начального обучения.png{% endif %}" alt="{{ t('Педагогика и методика начального обучения') }}">
                     </div>
                 </div>
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01901 – {{ t('Специальная педагогика') }} (2 года)</div>
+                    <div class="accord-item_head">7M01901 – {{ t('Специальная педагогика') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01901.jpg" alt="{{ t('Специальная педагогика') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/7M01901 Арнайы педагогика.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Pedagogy and Management in Education/7M01901 Special Education.png{% else %}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/7M01901 Специальная педагогика.png{% endif %}" alt="{{ t('Специальная педагогика') }}">
                     </div>
                 </div>
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M03101 – {{ t('Психология') }} (2 года)</div>
+                    <div class="accord-item_head">7M03101 – {{ t('Психология') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M03101.jpg" alt="{{ t('Психология') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Дошкольное и начальное образование -->
-                <p align="center"><b>{{ t('Дошкольное и начальное образование') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01201 – {{ t('Дошкольное обучение и воспитание') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01201.jpg" alt="{{ t('Дошкольное обучение и воспитание') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01301 – {{ t('Педагогика и методика начального обучения') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01301.jpg" alt="{{ t('Педагогика и методика начального обучения') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет искусства, культуры и спорта -->
-                <p align="center"><b>{{ t('Факультет искусства, культуры и спорта') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01401 – {{ t('Музыкальное образование') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01401.jpg" alt="{{ t('Музыкальное образование') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01404 – {{ t('Физическая культура и спорт') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01404.jpg" alt="{{ t('Физическая культура и спорт') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01405 – {{ t('Визуальное искусство, художественный труд, графика и проектирование') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01405.jpg" alt="{{ t('Визуальное искусство, художественный труд, графика и проектирование') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Физико-математический факультет -->
-                <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01501 – {{ t('Математика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01501.jpg" alt="{{ t('Математика') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01502 – {{ t('Физика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01502.jpg" alt="{{ t('Физика') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01503 – {{ t('Информатика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01503.jpg" alt="{{ t('Информатика') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01504 – {{ t('Химия') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01504.jpg" alt="{{ t('Химия') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01505 – {{ t('Биология') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01505.jpg" alt="{{ t('Биология') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01506 – {{ t('География') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01506.jpg" alt="{{ t('География') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01601 – {{ t('История') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01601.jpg" alt="{{ t('История') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M05301 – {{ t('Физика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M05301.jpg" alt="{{ t('Физика') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M05401 – {{ t('Математика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M05401.jpg" alt="{{ t('Математика') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет естествознания -->
-                <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M05101 – {{ t('Биология') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M05101.jpg" alt="{{ t('Биология') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M05201 – {{ t('Экология') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M05201.jpg" alt="{{ t('Экология') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Филологический факультет -->
-                <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01701 – {{ t('Казахский язык и литература') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01701.jpg" alt="{{ t('Казахский язык и литература') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01704 – {{ t('Русский язык и литература в школах с нерусским языком обучения') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01704.jpg" alt="{{ t('Русский язык и литература в школах с нерусским языком обучения') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M01706 – {{ t('Иностранный язык: два иностранных языка') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M01706.jpg" alt="{{ t('Иностранный язык: два иностранных языка') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M02304 – {{ t('Филология') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M02304.jpg" alt="{{ t('Филология') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/7M03101 Психология.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Pedagogy and Management in Education/7M03101 Psychology.png{% else %}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/7M03101 Психология.png{% endif %}" alt="{{ t('Психология') }}">
                     </div>
                 </div>
                 </div>
@@ -601,254 +435,44 @@
                 <p align="center"><b>{{ t('Исторический факультет') }}</b></p>
                 <div class="accord">
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M02201 – {{ t('История') }} (2 года)</div>
+                    <div class="accord-item_head">7M01506 – {{ t('География') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M02201.jpg" alt="{{ t('История') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Тарих факультеті/7M01506 География.png{% elif img_lang == 'en' %}/static/images/programs/en/History Faculty/7M01506 Geography.png{% else %}/static/images/programs/ru/Исторический факультет/7M01506 География.png{% endif %}" alt="{{ t('География') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01601 – {{ t('История') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Тарих факультеті/7M01601 Тарих.png{% elif img_lang == 'en' %}/static/images/programs/en/History Faculty/7M01601 History.png{% else %}/static/images/programs/ru/Исторический факультет/7M01601 История.png{% endif %}" alt="{{ t('История') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M02201 – {{ t('История') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Тарих факультеті/7M02201 Тарих.png{% elif img_lang == 'en' %}/static/images/programs/en/History Faculty/7M02201 History.png{% else %}/static/images/programs/ru/Исторический факультет/7M02201 История.png{% endif %}" alt="{{ t('История') }}">
                     </div>
                 </div>
                 </div>
 
-                <!-- Факультет иностранных языков -->
-                <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
+                <!-- Профессионально-творческий факультет -->
+                <p align="center"><b>{{ t('Профессионально-творческий факультет') }}</b></p>
                 <div class="accord">
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M02302 – {{ t('Переводческое дело') }} (2 года)</div>
+                    <div class="accord-item_head">7M01401 – {{ t('Музыкальное образование') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M02302.jpg" alt="{{ t('Переводческое дело') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/7M01401 Музыкалық білім.png{% elif img_lang == 'en' %}/static/images/programs/en/Professional and Creative Faculty/7M01401 Music Education.png{% else %}/static/images/programs/ru/Профессионально-творческий факультет/7M01401 Музыкальное образование.png{% endif %}" alt="{{ t('Музыкальное образование') }}">
                     </div>
                 </div>
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M02303 – {{ t('Иностранная филология') }} (2 года)</div>
+                    <div class="accord-item_head">7M01404 – {{ t('Физическая культура и спорт') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M02303.jpg" alt="{{ t('Иностранная филология') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет экономики и права -->
-                <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04101 – {{ t('Экономика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04101.jpg" alt="{{ t('Экономика') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/7M01404 Дене шынықтыру және спорт.png{% elif img_lang == 'en' %}/static/images/programs/en/Professional and Creative Faculty/7M01404 Physical Education and Sports.png{% else %}/static/images/programs/ru/Профессионально-творческий факультет/7M01404 Физическая культура и спорт.png{% endif %}" alt="{{ t('Физическая культура и спорт') }}">
                     </div>
                 </div>
                 <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04105 – {{ t('Государственное и местное управление') }} (2 года)</div>
+                    <div class="accord-item_head">7M01405 – {{ t('Визуальное искусство, художественный труд, графика и проектирование') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04105.jpg" alt="{{ t('Государственное и местное управление') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04102 – {{ t('Менеджмент (СОП)') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04102.jpg" alt="{{ t('Менеджмент (СОП)') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04108 – {{ t('Деловое администрирование') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04108.jpg" alt="{{ t('Деловое администрирование') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="1">
-                    <div class="accord-item_head">7M04119 – {{ t('Деловое администрирование') }} (1 год)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04119.jpg" alt="{{ t('Деловое администрирование') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04104 – {{ t('Финансы') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04104.jpg" alt="{{ t('Финансы') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04121 – {{ t('Цифровой маркетинг') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04121.jpg" alt="{{ t('Цифровой маркетинг') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M04201 – {{ t('Юриспруденция') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04201.jpg" alt="{{ t('Юриспруденция') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="1">
-                    <div class="accord-item_head">7M04202 – {{ t('Юриспруденция') }} (1 год)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M04202.jpg" alt="{{ t('Юриспруденция') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет информационных технологий -->
-                <p align="center"><b>{{ t('Факультет информационных технологий') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M06102 – {{ t('Информационные системы') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M06102.jpg" alt="{{ t('Информационные системы') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M06103 – {{ t('Вычислительная техника и программное обеспечение') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M06103.jpg" alt="{{ t('Вычислительная техника и программное обеспечение') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Инженерно-технический факультет -->
-                <p align="center"><b>{{ t('Инженерно-технический факультет') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M07102 – {{ t('Химическая технология органических веществ') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07102.jpg" alt="{{ t('Химическая технология органических веществ') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M07106 – {{ t('Электроэнергетика') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07106.jpg" alt="{{ t('Электроэнергетика') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M07107 – {{ t('Транспорт, транспортная техника и технологии') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07107.jpg" alt="{{ t('Транспорт, транспортная техника и технологии') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="1">
-                    <div class="accord-item_head">7M07107 – {{ t('Транспорт, транспортная техника и технологии') }} (1 год)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07107.jpg" alt="{{ t('Транспорт, транспортная техника и технологии') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M07202 – {{ t('Нефтегазовое дело') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07202.jpg" alt="{{ t('Нефтегазовое дело') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="1">
-                    <div class="accord-item_head">7M07210 – {{ t('Нефтегазовое дело') }} (1 год)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07210.jpg" alt="{{ t('Нефтегазовое дело') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M07201 – {{ t('Горное дело') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07201.jpg" alt="{{ t('Горное дело') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="1">
-                    <div class="accord-item_head">7M07209 – {{ t('Горное дело') }} (1 год)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07209.jpg" alt="{{ t('Горное дело') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="2">
-                    <div class="accord-item_head">7M07203 – {{ t('Металлургия') }} (2 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07203.jpg" alt="{{ t('Металлургия') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="1">
-                    <div class="accord-item_head">7M07213 – {{ t('Металлургия') }} (1 год)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/7M07213.jpg" alt="{{ t('Металлургия') }}">
-                    </div>
-                </div>
-                </div>
-                </div>
-
-                <div id="phd" style="margin-top: 50px;">
-                <h3 align="center"><b>{{ t('ДОКТОРАНТУРА') }}</b></h3>
-
-                <!-- Факультет педагогики и менеджмента в образовании -->
-                <p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D01301 - {{ t('Педагогика и методика начального обучения') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D01301.jpg" alt="{{ t('Педагогика и методика начального обучения') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Исторический факультет -->
-                <p align="center"><b>{{ t('Исторический факультет') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D02201 - {{ t('История') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D02201.jpg" alt="{{ t('История') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет иностранных языков -->
-                <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D02303 - {{ t('Иностранная филология') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D02303.jpg" alt="{{ t('Иностранная филология') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Филологический факультет -->
-                <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D02304 - {{ t('Филология') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D02304.jpg" alt="{{ t('Филология') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет экономики и права -->
-                <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D04101 - {{ t('Экономика') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D04101.jpg" alt="{{ t('Экономика') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Факультет естествознания -->
-                <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D05302 - {{ t('Химия и технология современных материалов') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D05302.jpg" alt="{{ t('Химия и технология современных материалов') }}">
-                    </div>
-                </div>
-                </div>
-
-                <!-- Физико-математический факультет -->
-                <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
-                <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D05301 - {{ t('Физика') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D05301.jpg" alt="{{ t('Физика') }}">
-                    </div>
-                </div>
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D05401 - {{ t('Математика') }} (3 года)</div>
-                    <div class="accord-item_content">
-                        <img src="/static/images/programs/8D05401.jpg" alt="{{ t('Математика') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Кәсіби-шығармашылық факультеті/7M01405 Бейнелеу өнері көркем еңбек графика және жобалау.png{% elif img_lang == 'en' %}/static/images/programs/en/Professional and Creative Faculty/7M01405 Visual Arts Art Graphics and Design.png{% else %}/static/images/programs/ru/Профессионально-творческий факультет/7M01405 Визуальное искусство художественный труд графика и проектирование.png{% endif %}" alt="{{ t('Визуальное искусство, художественный труд, графика и проектирование') }}">
                     </div>
                 </div>
                 </div>
@@ -856,14 +480,314 @@
                 <!-- Технический факультет -->
                 <p align="center"><b>{{ t('Технический факультет') }}</b></p>
                 <div class="accord">
-                <div class="accord-item" data-duration="3">
-                    <div class="accord-item_head">8D07203 - {{ t('Металлургия') }} (3 года)</div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M07101 – {{ t('Транспорт, транспортная техника и технологии') }} ({{ t('2 года') }})</div>
                     <div class="accord-item_content">
-                        <img src="/static/images/programs/8D07203.jpg" alt="{{ t('Металлургия') }}">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07101 Көлік көліктік техника және технологиялар.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07101 Transport Transport Equipment and Technologies.png{% else %}/static/images/programs/ru/Технический факультет/7M07101 Транспорт транспортная техника и технологии.png{% endif %}" alt="{{ t('Транспорт, транспортная техника и технологии') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="1">
+                    <div class="accord-item_head">7M07107 – {{ t('Транспорт, транспортная техника и технологии') }} ({{ t('1 год') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07107 Көлік көліктік техника және технологиялар 1 жыл.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07107 Transport Transport Equipment and Technologies 1 year.png{% else %}/static/images/programs/ru/Технический факультет/7M07107 Транспорт транспортная техника и технологии 1 год.png{% endif %}" alt="{{ t('Транспорт, транспортная техника и технологии') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M07202 – {{ t('Нефтегазовое дело') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07202 Мұнай-газ ісі.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07202 Oil and Gas Engineering.png{% else %}/static/images/programs/ru/Технический факультет/7M07202 Нефтегазовое дело.png{% endif %}" alt="{{ t('Нефтегазовое дело') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="1">
+                    <div class="accord-item_head">7M07210 – {{ t('Нефтегазовое дело') }} ({{ t('1 год') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07210 Мұнай-газ ісі 1 жыл.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07210 Oil and Gas Engineering 1 year.png{% else %}/static/images/programs/ru/Технический факультет/7M07210 Нефтегазовое дело 1 год.png{% endif %}" alt="{{ t('Нефтегазовое дело') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M07201 – {{ t('Горное дело') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07201 Тау-кен ісі.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07201 Mining.png{% else %}/static/images/programs/ru/Технический факультет/7M07201 Горное дело.png{% endif %}" alt="{{ t('Горное дело') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="1">
+                    <div class="accord-item_head">7M07209 – {{ t('Горное дело') }} ({{ t('1 год') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07209 Тау-кен ісі 1 жыл.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07209 Mining 1 year.png{% else %}/static/images/programs/ru/Технический факультет/7M07209 Горное дело 1 год.png{% endif %}" alt="{{ t('Горное дело') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M07203 – {{ t('Металлургия') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07203 Металлургия.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07203 Metallurgy.png{% else %}/static/images/programs/ru/Технический факультет/7M07203 Металлургия.png{% endif %}" alt="{{ t('Металлургия') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="1">
+                    <div class="accord-item_head">7M07213 – {{ t('Металлургия') }} ({{ t('1 год') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Техникалық факультеті/7M07213 Металлургия 1 жыл.png{% elif img_lang == 'en' %}/static/images/programs/en/Technical Faculty/7M07213 Metallurgy 1 year.png{% else %}/static/images/programs/ru/Технический факультет/7M07213 Металлургия 1 год.png{% endif %}" alt="{{ t('Металлургия') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Факультет естествознания -->
+                <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M05101 – {{ t('Биология') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Жаратылыстану факультеті/7M05101 Биология.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Natural Sciences/7M05101 Biology.png{% else %}/static/images/programs/ru/Факультет естествознания/7M05101 Биология.png{% endif %}" alt="{{ t('Биология') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M05201 – {{ t('Экология') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Жаратылыстану факультеті/7M05201 Экология.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Natural Sciences/7M05201 Ecology.png{% else %}/static/images/programs/ru/Факультет естествознания/7M05201 Экология.png{% endif %}" alt="{{ t('Экология') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01504 – {{ t('Химия') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Жаратылыстану факультеті/7M01504 Химия.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Natural Sciences/7M01504 Chemistry.png{% else %}/static/images/programs/ru/Факультет естествознания/7M01504 Химия.png{% endif %}" alt="{{ t('Химия') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01505 – {{ t('Биология') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Жаратылыстану факультеті/7M01505 Биология.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Natural Sciences/7M01505 Biology.png{% else %}/static/images/programs/ru/Факультет естествознания/7M01505 Биология.png{% endif %}" alt="{{ t('Биология') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M07102 – {{ t('Химическая технология органических веществ') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Жаратылыстану факультеті/7M07102 Органикалық заттардың химиялық технологиясы.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Natural Sciences/7M07102 Chemical Technology of Organic Substances.png{% else %}/static/images/programs/ru/Факультет естествознания/7M07102 Химическая технология органических веществ.png{% endif %}" alt="{{ t('Химическая технология органических веществ') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Физико-математический факультет -->
+                <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01501 – {{ t('Математика') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/7M01501 Математика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/7M01501 Mathematics.png{% else %}/static/images/programs/ru/Физико-математический факультет/7M01501 Математика.png{% endif %}" alt="{{ t('Математика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01502 – {{ t('Физика') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/7M01502 Физика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/7M01502 Physics.png{% else %}/static/images/programs/ru/Физико-математический факультет/7M01502 Физика.png{% endif %}" alt="{{ t('Физика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01503 – {{ t('Информатика') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/7M01503 Информатика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/7M01503 Informatics.png{% else %}/static/images/programs/ru/Физико-математический факультет/7M01503 Информатика.png{% endif %}" alt="{{ t('Информатика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M05301 – {{ t('Физика') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/7M05301 Физика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/7M05301 Physics.png{% else %}/static/images/programs/ru/Физико-математический факультет/7M05301 Физика.png{% endif %}" alt="{{ t('Физика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M05401 – {{ t('Математика') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/7M05401 Математика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/7M05401 Mathematics.png{% else %}/static/images/programs/ru/Физико-математический факультет/7M05401 Математика.png{% endif %}" alt="{{ t('Математика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M06103 – {{ t('Вычислительная техника и программное обеспечение') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/7M06103 Есептеу техникасы және бағдарламалық қамтамасыз ету.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/7M06103 Computing Equipment and Software.png{% else %}/static/images/programs/ru/Физико-математический факультет/7M06103 Вычислительная техника и программное обеспечение.png{% endif %}" alt="{{ t('Вычислительная техника и программное обеспечение') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Филологический факультет -->
+                <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01701 – {{ t('Казахский язык и литература') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Филология факультеті/7M01701 Қазақ тілі мен әдебиеті.png{% elif img_lang == 'en' %}/static/images/programs/en/Philological Faculty/7M01701 Kazakh Language and Literature.png{% else %}/static/images/programs/ru/Филологический факультет/7M01701 Казахский язык и литература.png{% endif %}" alt="{{ t('Казахский язык и литература') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01704 – {{ t('Русский язык и литература в школах с нерусским языком обучения') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Филология факультеті/7M01704 Орыс тілі мен әдебиеті.png{% elif img_lang == 'en' %}/static/images/programs/en/Philological Faculty/7M01704 Russian Language and Literature.png{% else %}/static/images/programs/ru/Филологический факультет/7M01704 Русский язык и литература.png{% endif %}" alt="{{ t('Русский язык и литература в школах с нерусским языком обучения') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M02304 – {{ t('Филология') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Филология факультеті/7M02304 Филология.png{% elif img_lang == 'en' %}/static/images/programs/en/Philological Faculty/7M02304 Philology.png{% else %}/static/images/programs/ru/Филологический факультет/7M02304 Филология.png{% endif %}" alt="{{ t('Филология') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Факультет иностранных языков -->
+                <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M01706 – {{ t('Иностранный язык: два иностранных языка') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Шетел тілдері факультеті/7M01706 Шетел тілі екі шетел тілі.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Foreign Languages/7M01706 Foreign Language Two Foreign Languages.png{% else %}/static/images/programs/ru/Факультет иностранных языков/7M01706 Иностранный язык два иностранных языка.png{% endif %}" alt="{{ t('Иностранный язык: два иностранных языка') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M02303 – {{ t('Иностранная филология') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Шетел тілдері факультеті/7M02303 Шетел филологиясы.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Foreign Languages/7M02303 Foreign Philology.png{% else %}/static/images/programs/ru/Факультет иностранных языков/7M02303 Иностранная филология.png{% endif %}" alt="{{ t('Иностранная филология') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Факультет экономики и права -->
+                <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M04101 – {{ t('Экономика') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04101 Экономика.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04101 Economics.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04101 Экономика.png{% endif %}" alt="{{ t('Экономика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M04102 – {{ t('Менеджмент (СОП)') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04102 Менеджмент БҮБ.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04102 Management SOP.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04102 Менеджмент СОП.png{% endif %}" alt="{{ t('Менеджмент (СОП)') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M04108 – {{ t('Деловое администрирование') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04108 Іскерлік әкімшілендіру.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04108 Business Administration.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04108 Деловое администрирование.png{% endif %}" alt="{{ t('Деловое администрирование') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="1">
+                    <div class="accord-item_head">7M04119 – {{ t('Деловое администрирование') }} ({{ t('1 год') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04119 Іскерлік әкімшілендіру 1 жыл.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04119 Business Administration 1 year.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04119 Деловое администрирование 1 год.png{% endif %}" alt="{{ t('Деловое администрирование') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M04104 – {{ t('Финансы') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04104 Қаржы.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04104 Finance.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04104 Финансы.png{% endif %}" alt="{{ t('Финансы') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="2">
+                    <div class="accord-item_head">7M04201 – {{ t('Юриспруденция') }} ({{ t('2 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04201 Құқықтану.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04201 Jurisprudence.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04201 Юриспруденция.png{% endif %}" alt="{{ t('Юриспруденция') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="1">
+                    <div class="accord-item_head">7M04202 – {{ t('Юриспруденция') }} ({{ t('1 год') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/7M04202 Құқықтану 1 жыл.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/7M04202 Jurisprudence 1 year.png{% else %}/static/images/programs/ru/Факультет экономики и права/7M04202 Юриспруденция 1 год.png{% endif %}" alt="{{ t('Юриспруденция') }}">
                     </div>
                 </div>
                 </div>
                 </div>
+                <div id="phd" style="margin-top: 50px;">
+
+<div id="phd" style="margin-top: 50px;">
+
+
+                    
+                <h3 align="center"><b>{{ t('ДОКТОРАНТУРА') }}</b></h3>
+
+                <!-- Факультет педагогики и менеджмента в образовании -->
+                <p align="center"><b>{{ t('Факультет педагогики и менеджмента в образовании') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D01301 - {{ t('Педагогика и методика начального обучения') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Педагогика және білім берудегі менеджмент факультеті/8D01301 Бастауыш оқытудың педагогикасы мен әдістемесі.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Pedagogy and Management in Education/8D01301 Pedagogy and Methods of Primary Education.png{% else %}/static/images/programs/ru/Факультет педагогики и менеджмента в образовании/8D01301 Педагогика и методика начального обучения.png{% endif %}" alt="{{ t('Педагогика и методика начального обучения') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Исторический факультет -->
+                <p align="center"><b>{{ t('Исторический факультет') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D02201 - {{ t('История') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Тарих факультеті/8D02201 Тарих.png{% elif img_lang == 'en' %}/static/images/programs/en/History Faculty/8D02201 History.png{% else %}/static/images/programs/ru/Исторический факультет/8D02201 История.png{% endif %}" alt="{{ t('История') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Факультет иностранных языков -->
+                <p align="center"><b>{{ t('Факультет иностранных языков') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D02303 - {{ t('Иностранная филология') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Шетел тілдері факультеті/8D02303 Шетел филологиясы.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Foreign Languages/8D02303 Foreign Philology.png{% else %}/static/images/programs/ru/Факультет иностранных языков/8D02303 Иностранная филология.png{% endif %}" alt="{{ t('Иностранная филология') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Филологический факультет -->
+                <p align="center"><b>{{ t('Филологический факультет') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D02304 - {{ t('Филология') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Филология факультеті/8D02304 Филология.png{% elif img_lang == 'en' %}/static/images/programs/en/Philological Faculty/8D02304 Philology.png{% else %}/static/images/programs/ru/Филологический факультет/8D02304 Филология.png{% endif %}" alt="{{ t('Филология') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Факультет экономики и права -->
+                <p align="center"><b>{{ t('Факультет экономики и права') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D04101 - {{ t('Экономика') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Экономика және құқық факультеті/8D04101 Экономика.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Economics and Law/8D04101 Economics.png{% else %}/static/images/programs/ru/Факультет экономики и права/8D04101 Экономика.png{% endif %}" alt="{{ t('Экономика') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Факультет естествознания -->
+                <p align="center"><b>{{ t('Факультет естествознания') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D05302 - {{ t('Химия и технология современных материалов') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Жаратылыстану факультеті/8D05302 Заманауи материалдардың химиясы мен технологиясы.png{% elif img_lang == 'en' %}/static/images/programs/en/Faculty of Natural Sciences/8D05302 Chemistry and Technology of Modern Materials.png{% else %}/static/images/programs/ru/Факультет естествознания/8D05302 Химия и технология современных материалов.png{% endif %}" alt="{{ t('Химия и технология современных материалов') }}">
+                    </div>
+                </div>
+                </div>
+
+                <!-- Физико-математический факультет -->
+                <p align="center"><b>{{ t('Физико-математический факультет') }}</b></p>
+                <div class="accord">
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D05301 - {{ t('Физика') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/8D05301 Физика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/8D05301 Physics.png{% else %}/static/images/programs/ru/Физико-математический факультет/8D05301 Физика.png{% endif %}" alt="{{ t('Физика') }}">
+                    </div>
+                </div>
+                <div class="accord-item" data-duration="3">
+                    <div class="accord-item_head">8D05401 - {{ t('Математика') }} ({{ t('3 года') }})</div>
+                    <div class="accord-item_content">
+                        <img src="{% if img_lang == 'kk' %}/static/images/programs/kk/Физика-математикалық факультеті/8D05401 Математика.png{% elif img_lang == 'en' %}/static/images/programs/en/Physics and Mathematics Faculty/8D05401 Mathematics.png{% else %}/static/images/programs/ru/Физико-математический факультет/8D05401 Математика.png{% endif %}" alt="{{ t('Математика') }}">
+                    </div>
+                </div>
+                </div>
+
+            </div>
+        </div>
+        <button id="back-to-top" title="Наверх">↑</button>
+
             </div>
         </div>
         <button id="back-to-top" title="Наверх">↑</button>
