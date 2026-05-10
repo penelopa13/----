@@ -1214,6 +1214,26 @@ def create_admin():
         admin.role = 'admin'
         db.session.commit()
 
+def create_staff():
+    staff = User.query.filter_by(email='staff@site.com').first()
+    
+    if not staff:
+        staff = User(
+            name='Сотрудник Приёмной Комиссии',
+            email='staff@site.com',
+            role='staff',
+            language='ru'
+        )
+        staff.set_password('staff123')   # ← пароль можно легко поменять
+        db.session.add(staff)
+        db.session.commit()
+        print("✅ Создан Staff аккаунт: staff@site.com / staff123")
+    else:
+        if staff.role != 'staff':
+            staff.role = 'staff'
+            db.session.commit()
+            print("✅ Роль пользователя staff@site.com обновлена на 'staff'")
+
 def fix_existing_users():
     db.session.execute(db.text("""
         UPDATE "user" SET role = 'applicant' WHERE role IS NULL OR role = ''
@@ -1224,6 +1244,7 @@ with app.app_context():
     db.create_all()
     create_admin()
     load_faq_exact()
+    create_staff()          # ← добавь эту строку
     load_dialog_scenarios()
 
 if __name__ == '__main__':
@@ -1231,5 +1252,6 @@ if __name__ == '__main__':
         db.create_all()
         create_admin()
         load_faq_exact()
+        create_staff()          # ← добавь эту строку
         load_dialog_scenarios()
     app.run(debug=True)
