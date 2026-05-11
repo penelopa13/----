@@ -1,47 +1,47 @@
 {% extends "base.html" %}
-{% block title %}Заявка #{{ application.id }}{% endblock %}
+{% block title %}{{ t('Заявка #') }}{{ application.id }}{% endblock %}
 
 {% block content %}
 <div class="detail-wrap">
 
   <div class="detail-topbar">
     <a href="{{ url_for('staff_dashboard') }}" class="back-btn">
-      <i class="fas fa-arrow-left"></i> К списку заявок
+      <i class="fas fa-arrow-left"></i> {{ t('К списку заявок') }}
     </a>
-    <div class="detail-id">Заявка #{{ application.id }}</div>
+    <div class="detail-id">{{ t('Заявка #') }}{{ application.id }}</div>
   </div>
 
   <!-- Progress tracker -->
-  {% set cur_step = APP_STATUSES.get(application.status, {}).get('step', 1) %}
-  {% set is_final = application.status in ('approved', 'rejected', 'revision') %}
-  <div class="tracker-bar">
-    {% for key, label in TRACKER_STEPS %}
-      {% if key == 'final' %}
-        {% set step_num = 5 %}
-        {% if is_final %}
-          {% set st = APP_STATUSES.get(application.status, {}) %}
-          <div class="tracker-step done" style="--sc:{{ st.get('color','#27ae60') }}">
-            <div class="tracker-dot"><i class="fas fa-flag"></i></div>
-            <div class="tracker-label">{{ st.get('label', label) }}</div>
-          </div>
-        {% else %}
-          <div class="tracker-step {% if cur_step >= 5 %}done{% elif cur_step == 4 %}next{% endif %}">
-            <div class="tracker-dot">5</div>
-            <div class="tracker-label">{{ label }}</div>
-          </div>
-        {% endif %}
+{% set cur_step = APP_STATUSES.get(application.status, {}).get('step', 1) %}
+{% set is_final = application.status in ('approved', 'rejected', 'revision') %}
+<div class="tracker-bar">
+  {% for key, label_key in TRACKER_STEPS %}
+    {% if key == 'final' %}
+      {% set step_num = 5 %}
+      {% if is_final %}
+        {% set st = APP_STATUSES.get(application.status, {}) %}
+        <div class="tracker-step done" style="--sc:{{ st.get('color','#27ae60') }}">
+          <div class="tracker-dot"><i class="fas fa-flag"></i></div>
+          <div class="tracker-label">{{ t(st.get('label_key', label_key)) }}</div>
+        </div>
       {% else %}
-        {% set step_num = APP_STATUSES.get(key, {}).get('step', 1) %}
-        <div class="tracker-step {% if cur_step > step_num %}done{% elif cur_step == step_num and not is_final %}active{% endif %}">
-          <div class="tracker-dot">
-            {% if cur_step > step_num %}<i class="fas fa-check"></i>{% else %}{{ step_num }}{% endif %}
-          </div>
-          <div class="tracker-label">{{ label }}</div>
+        <div class="tracker-step {% if cur_step >= 5 %}done{% elif cur_step == 4 %}next{% endif %}">
+          <div class="tracker-dot">5</div>
+          <div class="tracker-label">{{ t(label_key) }}</div>
         </div>
       {% endif %}
-      {% if not loop.last %}<div class="tracker-line"></div>{% endif %}
-    {% endfor %}
-  </div>
+    {% else %}
+      {% set step_num = APP_STATUSES.get(key, {}).get('step', 1) %}
+      <div class="tracker-step {% if cur_step > step_num %}done{% elif cur_step == step_num and not is_final %}active{% endif %}">
+        <div class="tracker-dot">
+          {% if cur_step > step_num %}<i class="fas fa-check"></i>{% else %}{{ step_num }}{% endif %}
+        </div>
+        <div class="tracker-label">{{ t(label_key) }}</div>
+      </div>
+    {% endif %}
+    {% if not loop.last %}<div class="tracker-line"></div>{% endif %}
+  {% endfor %}
+</div>
 
   <div class="detail-grid">
 
@@ -50,47 +50,47 @@
 
       <!-- Applicant info -->
       <div class="detail-card">
-        <div class="card-title"><i class="fas fa-user"></i> Данные абитуриента</div>
+        <div class="card-title"><i class="fas fa-user"></i> {{ t('Данные абитуриента') }}</div>
         <table class="info-table">
-          <tr><td>ФИО</td><td><strong>{{ application.last_name }} {{ application.first_name }}</strong></td></tr>
-          <tr><td>ИИН</td><td>{{ (applicant.iin if applicant and applicant.iin else '—') }}</td></tr>
-          <tr><td>Телефон</td><td>{{ application.phone or '—' }}</td></tr>
-          <tr><td>Email</td><td>{{ application.email or '—' }}</td></tr>
-          <tr><td>Школа</td><td>{{ application.education or '—' }}</td></tr>
+          <tr><td>{{ t('ФИО') }}</td><td><strong>{{ application.last_name }} {{ application.first_name }}</strong></td></tr>
+          <tr><td>{{ t('ИИН') }}</td><td>{{ (applicant.iin if applicant and applicant.iin else '—') }}</td></tr>
+          <tr><td>{{ t('Телефон') }}</td><td>{{ application.phone or '—' }}</td></tr>
+          <tr><td>{{ t('Email') }}</td><td>{{ application.email or '—' }}</td></tr>
+          <tr><td>{{ t('Школа') }}</td><td>{{ application.education or '—' }}</td></tr>
           {% if applicant and applicant.birth_date %}
-          <tr><td>Дата рождения</td><td>{{ applicant.birth_date.strftime('%d.%m.%Y') }}</td></tr>
+          <tr><td>{{ t('Дата рождения') }}</td><td>{{ applicant.birth_date.strftime('%d.%m.%Y') }}</td></tr>
           {% endif %}
           {% if applicant and applicant.address %}
-          <tr><td>Адрес</td><td>{{ applicant.address }}</td></tr>
+          <tr><td>{{ t('Адрес') }}</td><td>{{ applicant.address }}</td></tr>
           {% endif %}
-          <tr><td>Специальность</td><td><strong>{{ application.specialty }}</strong></td></tr>
-          <tr><td>Уровень</td><td>
-            {% if application.education_level == 'bachelor' %}Бакалавриат
-            {% elif application.education_level == 'master' %}Магистратура
-            {% elif application.education_level == 'doctor' %}Докторантура
+          <tr><td>{{ t('Специальность') }}</td><td><strong>{{ application.specialty }}</strong></td></tr>
+          <tr><td>{{ t('Уровень') }}</td><td>
+            {% if application.education_level == 'bachelor' %}{{ t('Бакалавриат') }}
+            {% elif application.education_level == 'master' %}{{ t('Магистратура') }}
+            {% elif application.education_level == 'doctor' %}{{ t('Докторантура') }}
             {% else %}—{% endif %}
           </td></tr>
-          <tr><td>Форма</td><td>
-            {% if application.grant_or_paid == 'grant' %}<span class="badge badge-green">Грант</span>
-            {% else %}<span class="badge badge-blue">Платно</span>{% endif %}
+          <tr><td>{{ t('Форма') }}</td><td>
+            {% if application.grant_or_paid == 'grant' %}<span class="badge badge-green">{{ t('Грант') }}</span>
+            {% else %}<span class="badge badge-blue">{{ t('Платно') }}</span>{% endif %}
           </td></tr>
-          <tr><td>Подана</td><td>{{ application.created_at.strftime('%d.%m.%Y %H:%M') }}</td></tr>
+          <tr><td>{{ t('Подана') }}</td><td>{{ application.created_at.strftime('%d.%m.%Y %H:%M') }}</td></tr>
           {% if application.comment %}
-          <tr><td>Комментарий</td><td><em>{{ application.comment }}</em></td></tr>
+          <tr><td>{{ t('Комментарий') }}</td><td><em>{{ application.comment }}</em></td></tr>
           {% endif %}
         </table>
       </div>
 
       <!-- Documents -->
       <div class="detail-card">
-        <div class="card-title"><i class="fas fa-folder-open"></i> Документы абитуриента</div>
+        <div class="card-title"><i class="fas fa-folder-open"></i> {{ t('Документы абитуриента') }}</div>
         {% if docs_by_type %}
           {% for doc_key, doc_label in DOC_TYPES.items() %}
             {% set doc = docs_by_type.get(doc_key) %}
             <div class="doc-row {{ 'ok' if doc else 'no' }}">
               <div class="doc-row-info">
                 <i class="fas {{ 'fa-check-circle' if doc else 'fa-circle' }}"></i>
-                <span>{{ doc_label }}</span>
+                <span>{{ t(doc_label) }}</span>
                 {% if doc %}
                   <span class="doc-meta">{{ '%.1f'|format(doc.file_size / 1024) }} KB</span>
                 {% endif %}
@@ -98,19 +98,19 @@
               {% if doc %}
                 <div class="doc-row-actions">
                   <a href="{{ url_for('staff_serve_document', doc_id=doc.id) }}"
-                     class="doc-action-btn download" title="Скачать">
-                    <i class="fas fa-download"></i> Скачать
+                     class="doc-action-btn download" title="{{ t('Скачать') }}">
+                    <i class="fas fa-download"></i> {{ t('Скачать') }}
                   </a>
                   <a href="{{ url_for('serve_document', doc_id=doc.id) }}"
-                     target="_blank" class="doc-action-btn view" title="Просмотреть">
-                    <i class="fas fa-eye"></i> Просмотр
+                     target="_blank" class="doc-action-btn view" title="{{ t('Просмотреть') }}">
+                    <i class="fas fa-eye"></i> {{ t('Просмотр') }}
                   </a>
                 </div>
               {% endif %}
             </div>
           {% endfor %}
         {% else %}
-          <p class="no-docs">Документы не загружены</p>
+          <p class="no-docs">{{ t('Документы не загружены') }}</p>
         {% endif %}
       </div>
 
@@ -121,32 +121,32 @@
 
       <!-- Status update -->
       <div class="detail-card">
-        <div class="card-title"><i class="fas fa-edit"></i> Изменить статус</div>
+        <div class="card-title"><i class="fas fa-edit"></i> {{ t('Изменить статус') }}</div>
         <form method="POST" action="{{ url_for('staff_update_status', app_id=application.id) }}">
           <div class="form-group">
-            <label>Новый статус</label>
+            <label>{{ t('Новый статус') }}</label>
             <select name="status" class="form-control" required>
-              {% for key, info in APP_STATUSES.items() %}
-                <option value="{{ key }}" {% if application.status == key %}selected{% endif %}>
-                  {{ info.label }}
-                </option>
-              {% endfor %}
+            {% for key, info in APP_STATUSES.items() %}
+    <option value="{{ key }}" {% if application.status == key %}selected{% endif %}>
+      {{ t(info.label_key) }}
+    </option>
+{% endfor %}
             </select>
           </div>
           <div class="form-group" style="margin-top:.75rem;">
-            <label>Примечание (необязательно)</label>
+            <label>{{ t('Примечание (необязательно)') }}</label>
             <textarea name="staff_note" class="form-control" rows="3"
-                      placeholder="Внутренняя заметка...">{{ application.staff_note or '' }}</textarea>
+                      placeholder="{{ t('Внутренняя заметка...') }}">{{ application.staff_note or '' }}</textarea>
           </div>
           <button type="submit" class="btn-primary" style="margin-top:.75rem;">
-            <i class="fas fa-save"></i> Сохранить статус
+            <i class="fas fa-save"></i> {{ t('Сохранить статус') }}
           </button>
         </form>
       </div>
 
       <!-- Comments -->
       <div class="detail-card">
-        <div class="card-title"><i class="fas fa-comments"></i> Комментарии для абитуриента</div>
+        <div class="card-title"><i class="fas fa-comments"></i> {{ t('Комментарии для абитуриента') }}</div>
 
         {% if comments %}
           <div class="comments-list">
@@ -161,18 +161,18 @@
             {% endfor %}
           </div>
         {% else %}
-          <p class="no-comments">Комментариев пока нет</p>
+          <p class="no-comments">{{ t('Комментариев пока нет') }}</p>
         {% endif %}
 
         <form method="POST" action="{{ url_for('staff_add_comment', app_id=application.id) }}"
               style="margin-top:1rem;">
           <div class="form-group">
-            <label>Новый комментарий абитуриенту</label>
+            <label>{{ t('Новый комментарий абитуриенту') }}</label>
             <textarea name="comment_text" class="form-control" rows="3"
-                      placeholder="Напишите комментарий..." required></textarea>
+                      placeholder="{{ t('Напишите комментарий...') }}" required></textarea>
           </div>
           <button type="submit" class="btn-secondary" style="margin-top:.5rem;">
-            <i class="fas fa-paper-plane"></i> Отправить комментарий
+            <i class="fas fa-paper-plane"></i> {{ t('Отправить комментарий') }}
           </button>
         </form>
       </div>

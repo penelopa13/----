@@ -198,21 +198,21 @@
         <!-- App summary -->
         <div class="app-summary-card">
           <div class="app-summary-row">
-            <span class="aps-key">Специальность</span>
+            <span class="aps-key">{{ t('Специальность') }}</span>
             <span class="aps-val"><strong>{{ existing_app.specialty }}</strong></span>
           </div>
           <div class="app-summary-row">
-            <span class="aps-key">Форма обучения</span>
+            <span class="aps-key">{{ t('Форма обучения') }}</span>
             <span class="aps-val">
-              {% if existing_app.grant_or_paid == 'grant' %}Грант{% else %}Платно{% endif %}
+              {% if existing_app.grant_or_paid == 'grant' %}{{ t('Грант') }}{% else %}{{ t('Платно') }}{% endif %}
             </span>
           </div>
           <div class="app-summary-row">
-            <span class="aps-key">Дата подачи</span>
+            <span class="aps-key">{{ t('Дата подачи') }}</span>
             <span class="aps-val">{{ existing_app.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
           </div>
           <div class="app-summary-row">
-            <span class="aps-key">Текущий статус</span>
+            <span class="aps-key">{{ t('Текущий статус') }}</span>
             <span class="aps-val">
               <span class="status-pill" style="background:{{ st.get('color','#999') }}20;
                     color:{{ st.get('color','#999') }}; border-color:{{ st.get('color','#999') }}40;">
@@ -222,7 +222,7 @@
           </div>
           {% if existing_app.staff_note %}
           <div class="app-summary-row">
-            <span class="aps-key">Примечание</span>
+            <span class="aps-key">{{ t('Примечание') }}</span>
             <span class="aps-val app-note">{{ existing_app.staff_note }}</span>
           </div>
           {% endif %}
@@ -231,12 +231,12 @@
         <!-- Staff comments -->
         {% if existing_app.comments %}
           <div class="comments-section">
-            <div class="comments-title"><i class="fas fa-comments"></i> Комментарии комиссии</div>
+            <div class="comments-title"><i class="fas fa-comments"></i> {{ t('Комментарии комиссии') }}</div>
             {% for c in existing_app.comments %}
               <div class="comment-card">
                 <div class="comment-meta">
                   <i class="fas fa-user-tie"></i>
-                  Сотрудник приёмной комиссии
+                  {{ t('Сотрудник приёмной комиссии') }}
                   <span class="comment-time">{{ c.created_at.strftime('%d.%m.%Y %H:%M') }}</span>
                 </div>
                 <div class="comment-text">{{ c.text }}</div>
@@ -259,10 +259,10 @@
       {% if notifications %}
         <div class="notif-section">
           <div class="notif-section-title">
-            <i class="fas fa-bell"></i> Уведомления
+            <i class="fas fa-bell"></i> {{ t('Уведомления') }}
             {% if unread_count > 0 %}
               <button class="mark-all-btn" onclick="markAllRead()">
-                Отметить все прочитанными
+                {{ t('Отметить все прочитанными') }}
               </button>
             {% endif %}
           </div>

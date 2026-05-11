@@ -372,7 +372,24 @@
             destroy: true,
             pageLength: 10,
             lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "{{ t('Все') }}"]],
-            language: { url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/ru.json" }
+            language: (function(){
+                const LANG = '{{ session.get("lang", "ru") }}';
+                const dtLangMap = {
+                    ru: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/ru.json' },
+                    kk: {
+                        search:            'Іздеу:',
+                        searchPlaceholder: 'Не іздейсіз?',
+                        lengthMenu:        '_MENU_ жазба көрсету',
+                        info:              '_START_–_END_ / _TOTAL_ көрсетілді',
+                        infoEmpty:         'Жазба жоқ',
+                        zeroRecords:       'Ештеңе табылмады',
+                        emptyTable:        'Деректер жоқ',
+                        paginate: { previous: 'Артқа', next: 'Алға' }
+                    },
+                    en: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json' }
+                };
+                return dtLangMap[LANG] || dtLangMap['ru'];
+            })()
         });
         window.scrollTo({ top: block.offsetTop - 100, behavior: 'smooth' });
     }

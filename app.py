@@ -23,7 +23,7 @@ def role_required(*roles):
         @login_required
         def decorated_function(*args, **kwargs):
             if current_user.role not in roles and current_user.role != 'admin':
-                flash('У вас нет доступа к этой странице.', 'error')
+                flash(t('У вас нет доступа к этой странице.'), 'error')
                 return redirect(url_for('profile'))
             return f(*args, **kwargs)
         return decorated_function
@@ -230,21 +230,20 @@ class ApplicationComment(db.Model):
 # === CONSTANTS ===
 
 APP_STATUSES = {
-    'received': {'label': 'Заявка получена',        'step': 1, 'color': '#27ae60'},
-    'checking': {'label': 'Документы проверяются',  'step': 2, 'color': '#3498db'},
-    'review':   {'label': 'Рассмотрение комиссией', 'step': 3, 'color': '#3498db'},
-    'decided':  {'label': 'Решение принято',         'step': 4, 'color': '#3498db'},
-    'approved': {'label': 'Заявка одобрена',         'step': 5, 'color': '#27ae60'},
-    'rejected': {'label': 'Заявка отклонена',        'step': 5, 'color': '#e74c3c'},
-    'revision': {'label': 'Требуется доработка',     'step': 5, 'color': '#e67e22'},
+    'received':  {'label_key': 'status_received',  'step': 1, 'color': '#27ae60'},
+    'checking':  {'label_key': 'status_checking',  'step': 2, 'color': '#3498db'},
+    'review':    {'label_key': 'status_review',    'step': 3, 'color': '#3498db'},
+    'decided':   {'label_key': 'status_decided',   'step': 4, 'color': '#3498db'},
+    'approved':  {'label_key': 'status_approved',  'step': 5, 'color': '#27ae60'},
+    'rejected':  {'label_key': 'status_rejected',  'step': 5, 'color': '#e74c3c'},
+    'revision':  {'label_key': 'status_revision',  'step': 5, 'color': '#e67e22'},
 }
-
 TRACKER_STEPS = [
-    ('received', 'Заявка получена'),
-    ('checking', 'Документы проверяются'),
-    ('review',   'Рассмотрение комиссией'),
-    ('decided',  'Решение принято'),
-    ('final',    'Итоговый статус'),
+    ('received', 'status_received'),
+    ('checking', 'status_checking'),
+    ('review',   'status_review'),
+    ('decided',  'status_decided'),
+    ('final',    'status_final'),
 ]
 
 DOC_TYPES = {
@@ -422,7 +421,7 @@ def profile_edit():
     if iin_val:
         conflict = User.query.filter(User.iin == iin_val, User.id != u.id).first()
         if conflict:
-            flash('Этот ИИН уже зарегистрирован в системе за другим пользователем.', 'error')
+            flash(t('Этот ИИН уже зарегистрирован в системе за другим пользователем.'), 'error')
             return redirect(url_for('profile'))
 
     u.first_name    = request.form.get('first_name', '').strip() or None
@@ -445,7 +444,7 @@ def profile_edit():
         u.graduation_year = int(grad_str)
 
     db.session.commit()
-    flash('Профиль успешно обновлён!', 'success')
+    flash(t('Профиль успешно обновлён!'), 'success')
     return redirect(url_for('profile'))
 
 
@@ -456,20 +455,20 @@ def upload_document():
     file = request.files.get('file')
 
     if not doc_type or doc_type not in DOC_TYPES:
-        flash('Неверный тип документа', 'error')
+        flash(t('Неверный тип документа'), 'error')
         return redirect(url_for('profile'))
 
     if not file or file.filename == '':
-        flash('Файл не выбран', 'error')
+        flash(t('Файл не выбран'), 'error')
         return redirect(url_for('profile'))
 
     if file.mimetype not in ALLOWED_MIMES:
-        flash('Разрешены только PDF, JPG и PNG файлы', 'error')
+        flash(t('Разрешены только PDF, JPG и PNG файлы'), 'error')
         return redirect(url_for('profile'))
 
     file_data = file.read()
     if len(file_data) > MAX_FILE_SIZE:
-        flash('Файл слишком большой (максимум 10 МБ)', 'error')
+        flash(t('Файл слишком большой (максимум 10 МБ)'), 'error')
         return redirect(url_for('profile'))
 
     existing = UserDocument.query.filter_by(user_id=current_user.id, doc_type=doc_type).first()
@@ -487,7 +486,7 @@ def upload_document():
     )
     db.session.add(doc)
     db.session.commit()
-    flash(f'Документы успешно загружены: «{DOC_TYPES[doc_type]}»', 'success')
+    flash(t('Документ успешно загружен') + f': «{DOC_TYPES[doc_type]}»', 'success')
     return redirect(url_for('profile') + '#documents')
 
 import urllib.parse
@@ -523,7 +522,7 @@ def delete_document(doc_id):
         return jsonify({'error': 'forbidden'}), 403
     db.session.delete(doc)
     db.session.commit()
-    flash('Документ удалён', 'info')
+    flash(t('Документ удалён'), 'info')
     return redirect(url_for('profile') + '#documents')
 
 
@@ -538,7 +537,7 @@ def submit_application():
     grant_or_paid = request.form.get('grant_or_paid') or 'paid'
 
     if not specialty:
-        flash('Выберите специальность', 'error')
+        flash(t('Выберите специальность'), 'error')
         return redirect(url_for('status'))
 
     # IIN duplicate check across same specialty
@@ -547,7 +546,7 @@ def submit_application():
         for iin_user in iin_users:
             existing = Application.query.filter_by(user_id=iin_user.id, specialty=specialty).first()
             if existing:
-                flash('Заявка на данную программу уже была подана с этим ИИН.', 'error')
+                flash(t('Заявка на данную программу уже была подана с этим ИИН.'), 'error')
                 return redirect(url_for('status'))
 
     app_entry = Application(
@@ -586,7 +585,7 @@ Email: {app_entry.email}
     except Exception as e:
         print("Ошибка при отправке письма:", e)
 
-    flash('Заявка успешно подана!', 'success')
+    flash(t('Заявка успешно подана!'), 'success')
     return redirect(url_for('status'))
 
 
@@ -650,7 +649,7 @@ def staff_update_status(app_id):
     new_status = request.form.get('status')
 
     if new_status not in APP_STATUSES:
-        flash('Неверный статус', 'error')
+        flash(t('Неверный статус'), 'error')
         return redirect(url_for('staff_application_detail', app_id=app_id))
 
     application.status = new_status
@@ -659,7 +658,7 @@ def staff_update_status(app_id):
         application.staff_note = staff_note
 
     if application.user_id:
-        status_label = APP_STATUSES[new_status]['label']
+        status_label = t(APP_STATUSES[new_status]['label_key'])
         notif_type = 'success' if new_status == 'approved' else ('error' if new_status == 'rejected' else 'info')
         notif = Notification(
             title='Статус вашей заявки изменён',
@@ -670,7 +669,7 @@ def staff_update_status(app_id):
         db.session.add(notif)
 
     db.session.commit()
-    flash(f'Статус заявки обновлён: {APP_STATUSES[new_status]["label"]}', 'success')
+    flash(t('Статус заявки обновлён') + f': {t(APP_STATUSES[new_status]["label_key"])}', 'success')
     return redirect(url_for('staff_application_detail', app_id=app_id))
 
 
@@ -681,7 +680,7 @@ def staff_add_comment(app_id):
     text = request.form.get('comment_text', '').strip()
 
     if not text:
-        flash('Комментарий не может быть пустым', 'error')
+        flash(t('Комментарий не может быть пустым'), 'error')
         return redirect(url_for('staff_application_detail', app_id=app_id))
 
     comment = ApplicationComment(
@@ -701,7 +700,7 @@ def staff_add_comment(app_id):
         db.session.add(notif)
 
     db.session.commit()
-    flash('Комментарий добавлен', 'success')
+    flash(t('Комментарий добавлен'), 'success')
     return redirect(url_for('staff_application_detail', app_id=app_id))
 
 
@@ -728,7 +727,7 @@ def staff_serve_document(doc_id):
 @login_required
 def admin_dashboard():
     if not current_user.is_admin:
-        flash('Доступ запрещён.', 'error')
+        flash(t('Доступ запрещён.'), 'error')
         return redirect(url_for('profile'))
 
     users = User.query.all()
@@ -782,7 +781,7 @@ def register():
         password = request.form.get('password')
 
         if User.query.filter_by(email=email).first():
-            flash('Пользователь с таким Email уже существует', 'error')
+            flash(t('Пользователь с таким Email уже существует'), 'error')
             return redirect(url_for('register'))
 
         u = User(name=name, email=email, role='applicant', language=session.get('lang', 'ru'))
@@ -791,7 +790,7 @@ def register():
         db.session.commit()
 
         login_user(u)
-        flash('Регистрация прошла успешно!', 'success')
+        flash(t('Регистрация прошла успешно!'), 'success')
         return redirect(url_for('profile'))
 
     return render_template('register.html')
@@ -806,7 +805,7 @@ def login():
 
         if u and u.check_password(pw):
             login_user(u)
-            flash(f'Добро пожаловать, {u.name or u.email}!', 'success')
+            flash(t('Добро пожаловать') + f', {u.name or u.email}!', 'success')
             if u.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             elif u.role == 'staff':
@@ -814,7 +813,7 @@ def login():
             else:
                 return redirect(url_for('profile'))
 
-        flash('Неверный логин или пароль', 'error')
+        flash(t('Неверный логин или пароль'), 'error')
     return render_template('login.html')
 
 
@@ -864,7 +863,7 @@ def login_eds():
 @login_required
 def logout():
     logout_user()
-    flash('Вы вышли из системы.', 'info')
+    flash(t('Вы вышли из системы.'), 'info')
     return redirect(url_for('home'))
 
 
@@ -908,7 +907,7 @@ def mark_all_read():
 @login_required
 def admin_notify():
     if not current_user.is_admin:
-        return jsonify({'status': 'error', 'message': 'Доступ запрещен'}), 403
+        return jsonify({'status': 'error', 'message': t('Доступ запрещен')}), 403
 
     data = request.get_json() or {}
     title = data.get('title')
@@ -917,7 +916,7 @@ def admin_notify():
     recipient = data.get('recipient')
 
     if not title or not message:
-        return jsonify({'status': 'error', 'message': 'Заполните все поля'}), 400
+        return jsonify({'status': 'error', 'message': t('Заполните все поля')}), 400
 
     if recipient == 'all':
         users = User.query.all()
@@ -932,7 +931,7 @@ def admin_notify():
     else:
         user = User.query.get(int(recipient))
         if not user:
-            return jsonify({'status': 'error', 'message': 'Пользователь не найден'}), 404
+            return jsonify({'status': 'error', 'message': t('Пользователь не найден')}), 404
         db.session.add(Notification(title=title, message=message,
                                     notif_type=notif_type, recipient_id=user.id))
         try:
@@ -942,7 +941,7 @@ def admin_notify():
             print("Email error:", e)
 
     db.session.commit()
-    return jsonify({'status': 'ok', 'message': 'Уведомление отправлено'})
+    return jsonify({'status': 'ok', 'message': t('Уведомление отправлено')})
 
 
 # === CONTACT ===
@@ -954,10 +953,10 @@ def api_contact():
     email = data.get('email')
     message = data.get('message')
     if not (name and email and message):
-        return jsonify({'status': 'error', 'message': 'Заполните все поля'}), 400
+        return jsonify({'status': 'error', 'message': t('Заполните все поля')}), 400
     db.session.add(ContactMessage(name=name, email=email, message=message))
     db.session.commit()
-    return jsonify({'status': 'ok', 'message': 'Спасибо, мы свяжемся с вами.'})
+    return jsonify({'status': 'ok', 'message': t('Спасибо, мы свяжемся с вами.')})
 
 
 # === PSY TEST ===
@@ -1105,7 +1104,7 @@ def api_chat():
     data = request.get_json() or {}
     user_message = data.get("message", "").strip()
     if not user_message:
-        return jsonify({"reply": "Пустое сообщение."})
+        return jsonify({"reply": t("Пустое сообщение.")})
 
     msg = user_message.lower()
     lang = session.get('lang') or detect_language(user_message)
