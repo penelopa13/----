@@ -8,15 +8,25 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-import google.generativeai as genai
 from flask_mail import Mail, Message
+# === GEMINI IMPORTS ===
+from google import genai
+from google.genai import types
+import os
+from dotenv import load_dotenv
+
+
+# Инициализация клиента
 
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 load_dotenv()
-
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+FILE_SEARCH_STORE_NAME = "fileSearchStores/zhubanov-university-knowled-qp4q7i4cfpv5"
 # === ROLE DECORATORS ===
+
+
 def role_required(*roles):
     def decorator(f):
         @wraps(f)
@@ -54,7 +64,6 @@ DIALOG_SCENARIOS = {}
 app.jinja_env.globals['t'] = t
 app.jinja_env.globals['lang'] = lambda: session.get('lang', current_user.language if current_user.is_authenticated else 'ru')
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 def load_faq_exact():
     global FAQ_DATA
@@ -1103,12 +1112,14 @@ def api_chat():
     init_chat_state()
     data = request.get_json() or {}
     user_message = data.get("message", "").strip()
+
     if not user_message:
         return jsonify({"reply": t("Пустое сообщение.")})
 
     msg = user_message.lower()
     lang = session.get('lang') or detect_language(user_message)
 
+    # === ТВОЯ СТАРАЯ ЛОГИКА (полностью сохранена) ===
     free_question_variants = ["задать свой вопрос", "өз сұрауыңызды жіберіңіз",
                                "өз сұрағыңызды қою", "ask your question"]
     if msg.strip() in free_question_variants:
@@ -1123,6 +1134,7 @@ def api_chat():
         return jsonify({"reply": t("Вы вернулись назад."), "options": options,
                         "update_options": True, "markdown": True})
 
+    # Level selection (бакалавриат, магистратура и т.д.)
     level_map = {
         "бакалавриат": "bachelor_menu", "магистратура": "master_menu",
         "докторантура": "doctorate_menu", "bachelor": "bachelor_menu",
@@ -1137,6 +1149,7 @@ def api_chat():
             return jsonify({"reply": t("Отлично! Вы выбрали раздел.") + "\n\n" + t("Выберите тему:"),
                             "options": options, "update_options": True, "markdown": True})
 
+    # Submenu selection
     submenu_map = {
         "после 11 класса": "bachelor_after_school", "после колледжа": "bachelor_after_college",
         "после армии": "bachelor_after_army", "after school": "bachelor_after_school",
@@ -1152,6 +1165,7 @@ def api_chat():
             return jsonify({"reply": t("Вы выбрали:") + f" {user_message}\n\n" + t("Выберите вопрос:"),
                             "options": options, "update_options": True, "markdown": True})
 
+    # === ТВОЙ СТАРЫЙ FAQ EXACT MATCH ===
     if FAQ_DATA:
         msg_lower = user_message.lower()
         for item in FAQ_DATA:
@@ -1162,33 +1176,53 @@ def api_chat():
                 db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
 
+    # === НОВЫЙ RAG (Google File Search) ===
     try:
-        context_text = ""
-        if FAQ_DATA:
-            for item in FAQ_DATA:
-                keywords = [k.lower() for k in item.get("keywords", [])]
-                if any(kw in user_message.lower() for kw in keywords):
-                    context_text = item.get(f"answer_{lang}") or item.get("answer_ru", "")
-                    break
+        file_search_tool = types.Tool(
+            file_search=types.FileSearch(
+                file_search_store_names=[FILE_SEARCH_STORE_NAME]
+            )
+        )
 
-        prompt = f"""Ты — ИИ-консультант Талапкер в университете Қ.Жұбанов атындағы АӨУ.
-Отвечай ТОЛЬКО на языке вопроса ({lang.upper()}).
-ДАННЫЕ: {context_text if context_text else "Конкретных данных нет, отвечай по общим правилам вуза."}
-ПРАВИЛА: Кратко, по существу, используй Markdown.
-Вопрос: {user_message}
-Ответ:"""
+        system_prompt = f"""
+        Ты — официальный ИИ-консультант приёмной комиссии университета им. К. Жубанова (Актобе).
+        Отвечай только на языке вопроса пользователя ({lang.upper()}).
+        Будь вежливым, точным и лаконичным.
+        Используй только информацию из загруженных документов.
+        Если точного ответа нет — честно скажи, что этой информации нет в базе или посоветуй обратиться в приёмную комиссию.
+        """
 
-        model = genai.GenerativeModel('gemini-flash-latest')
-        response = model.generate_content(prompt)
-        reply = response.text.strip() if response.text else "Извините, не смог сформировать ответ."
-        db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=reply))
+        response = client.models.generate_content(
+            model="gemini-flash-latest",
+            contents=[user_message],
+            config=types.GenerateContentConfig(
+                tools=[file_search_tool],
+                temperature=0.3,
+                system_instruction=system_prompt,
+            )
+        )
+
+        reply = response.text.strip() if hasattr(response, 'text') and response.text else "Извините, не удалось получить ответ."
+
+        # Сохраняем в историю
+        db.session.add(ChatHistory(
+            user_id=current_user.id,
+            message=user_message,
+            response=reply
+        ))
         db.session.commit()
+
         return jsonify({"reply": reply, "options": [], "markdown": True})
 
     except Exception as e:
-        print("Gemini error:", e)
-        fallback = {'ru': "Сервис временно недоступен.", 'kk': "Қызмет уақытша қолжетімсіз.", 'en': "Service temporarily unavailable."}
+        print("Gemini File Search Error:", str(e))
+        fallback = {
+            'ru': "Сервис временно недоступен. Попробуйте позже.",
+            'kk': "Қызмет уақытша қолжетімсіз. Кейінірек көріңіз.",
+            'en': "Service temporarily unavailable."
+        }
         return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
+    
 
 
 @app.route('/api/chat/history')
