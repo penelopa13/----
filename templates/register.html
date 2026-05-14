@@ -22,11 +22,6 @@
                 <input name="password" type="password" placeholder="{{ t('Придумайте пароль') }}" required>
             </div>
             <button class="btn orange" type="submit">{{ t('Зарегистрироваться') }}</button>
-            <div class="text-center mt-4">
-                <a href="{{ url_for('register_eds') }}" class="btn btn-outline-primary">
-                    🔑 {{ t('Зарегистрироваться через ЭЦП') }}
-                </a>
-            </div>
         </form>
         <p class="login-link">
             {{ t('Уже есть аккаунт?') }} <a href="{{ url_for('login') }}">{{ t('Войти') }}</a>

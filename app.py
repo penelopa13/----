@@ -349,6 +349,91 @@ def programs():
 def calculator():
     return render_template('calculator.html')
 
+@app.route('/api/calculator/recommend', methods=['POST'])
+@login_required
+def calculator_recommend():
+    if current_user.role in ['staff', 'admin']:
+        return jsonify({'error': 'Доступно только абитуриентам'}), 403
+
+    data = request.get_json() or {}
+    program  = data.get('program', '')
+    faculty  = data.get('faculty', '')
+    total    = int(data.get('total', 0))
+    grant    = int(data.get('grant', 0))
+    contract = int(data.get('contract', 0))
+    lang     = data.get('lang', session.get('lang', 'ru'))
+
+    if total >= grant and grant > 0:
+        status_ru = 'Проходит на грант!'
+        status_kk = 'Грантқа өтеді!'
+        status_en = 'Qualifies for grant!'
+    elif total >= contract and contract > 0:
+        status_ru = 'Проходит на контракт.'
+        status_kk = 'Ақылы оқуға өтеді.'
+        status_en = 'Qualifies for paid education.'
+    else:
+        status_ru = f'Не проходит (нужно ещё {contract - total} баллов для контракта).'
+        status_kk = f'Өтпейді (контрактқа {contract - total} балл жетіспейді).'
+        status_en = f'Does not qualify ({contract - total} more points needed for contract).'
+
+    prompts = {
+        'ru': f"""Ты — дружелюбный ИИ-консультант для абитуриентов АРГУ им. Жубанова.
+
+Данные абитуриента:
+- Специальность: {program}
+- Факультет: {faculty}
+- Набранный балл ЕНТ: {total}
+- Проходной балл на грант: {grant}
+- Проходной балл на контракт: {contract}
+- Статус: {status_ru}
+
+Дай персональный практический совет: что делать дальше, на что обратить внимание, как повысить шансы. 
+Будь позитивным, конкретным и кратким (4–6 предложений).""",
+
+        'kk': f"""Сен — Жұбанов университетіне түсушілерге арналған ЖИ кеңесші.
+
+Деректер:
+- Мамандық: {program}
+- Факультет: {faculty}
+- ҰБТ балы: {total}
+- Грантқа өтпелі балл: {grant}
+- Ақылыға өтпелі балл: {contract}
+- Мәртебе: {status_kk}
+
+Жеке кеңес бер: не істеу керек, құжаттарға нені назар аудару керек, балл жетпесе қалай мүмкіндікті арттыруға болады. 
+Нақты, оң және қысқа бол (4–6 сөйлем).""",
+
+        'en': f"""You are a friendly AI consultant for applicants to Zhubanov University.
+
+Applicant data:
+- Specialty: {program}
+- Faculty: {faculty}
+- ENT score: {total}
+- Grant threshold: {grant}
+- Contract threshold: {contract}
+- Status: {status_en}
+
+Give practical personalized advice on next steps. Be positive, specific and concise (4-6 sentences)."""
+    }
+
+    prompt = prompts.get(lang, prompts['ru'])
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-flash-latest",   # или gemini-flash-latest
+            contents=[prompt]
+        )
+        text = response.text.strip() if response.text else ''
+        return jsonify({'recommendation': text, 'ok': True})
+
+    except Exception as e:
+        print('Calculator recommend error:', e)
+        fallback = {
+            'ru': 'Сервис рекомендаций временно недоступен. Попробуйте позже.',
+            'kk': 'Ұсыным қызметі уақытша қолжетімсіз. Кейінірек қайталаңыз.',
+            'en': 'Recommendation service temporarily unavailable.'
+        }
+        return jsonify({'recommendation': fallback.get(lang, fallback['ru']), 'ok': False})
 @app.route('/contact')
 def contact():
     return render_template('contact.html')

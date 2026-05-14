@@ -27,7 +27,7 @@
             </div>
             <div class="alert alert-info border-0 rounded-4 py-3 mb-4 glass-alert" id="thresholdInfo" style="display:none;">
               <strong class="text-white">{{ t('Пороговый балл ЕНТ 2025:') }}</strong><br>
-              <span class="text-success fw-bold">{{ t('Грант:') }}</span> <span id="grantThreshold" class="fw-bold">—</span> {{ t('баллов') }} | 
+              <span class="text-success fw-bold">{{ t('Грант:') }}</span> <span id="grantThreshold" class="fw-bold">—</span> {{ t('баллов') }} |
               <span class="text-warning fw-bold">{{ t('Платное:') }}</span> <span id="contractThreshold" class="fw-bold">—</span> {{ t('баллов') }}
             </div>
             <div id="scoresSection" style="display:none;">
@@ -54,10 +54,41 @@
           <div id="chanceBadge" class="d-inline-block px-5 py-3 rounded-pill fs-3 fw-bold mb-4"></div>
           <p class="lead text-white opacity-90" id="chanceText"></p>
           <p class="text-white opacity-70 mb-4" id="adviceText"></p>
+
+          <div class="mt-4">
+            <button id="aiBtn" class="btn btn-ai btn-lg px-5" onclick="getAIRecommendation()">
+              ✨ {{ t('Получить рекомендацию от ИИ') }}
+            </button>
+          </div>
+
           <button class="btn btn-outline-light mt-4 px-5" onclick="location.reload()">{{ t('Новый расчёт') }}</button>
         </div>
       </div>
     </div>
+
+    <div class="row justify-content-center mt-4" id="aiSection" style="display:none;">
+      <div class="col-lg-9 col-xl-8">
+        <div class="glass-card p-5 shadow-lg">
+          <div class="ai-header mb-3">
+            <span class="ai-icon-big">🤖</span>
+            <div>
+              <h4 class="text-white mb-1 fw-bold">{{ t('ИИ-рекомендация') }}</h4>
+              <p class="text-white opacity-70 mb-0 small">{{ t('Персональный совет на основе ваших баллов') }}</p>
+            </div>
+          </div>
+          <div id="aiSpinner" class="ai-spinner" style="display:none;">
+            <div class="spinner-border text-warning" role="status"></div>
+            <p class="text-white mt-3 opacity-80">{{ t('ИИ анализирует ваши результаты...') }}</p>
+          </div>
+          <div id="aiResult" class="ai-result-text" style="display:none;"></div>
+          <div id="aiError" style="display:none;">
+            <p class="text-warning mb-2" id="aiErrorMsg"></p>
+            <button class="btn btn-outline-light btn-sm" onclick="getAIRecommendation()">{{ t('Попробовать снова') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 {% endblock %}
@@ -329,6 +360,8 @@
     document.getElementById('scoresSection').style.display = 'block';
   });
 
+  let lastCalcData = {};
+
   document.getElementById('calcForm').addEventListener('submit', function(e) {
     e.preventDefault();
     let total = 0, hasError = false, hasEmpty = false, hasHistoryError = false;
@@ -381,14 +414,83 @@
       advice.textContent = TRANSLATIONS.lowAdvice;
     }
 
+    lastCalcData = {
+      program:  document.getElementById('program').value,
+      faculty:  document.getElementById('faculty').value,
+      total:    total,
+      grant:    grant,
+      contract: contract
+    };
+
+    document.getElementById('aiSection').style.display = 'none';
+    document.getElementById('aiResult').style.display = 'none';
+    document.getElementById('aiResult').innerHTML = '';
+    document.getElementById('aiError').style.display = 'none';
+    document.getElementById('aiSpinner').style.display = 'none';
+    document.getElementById('aiBtn').disabled = false;
+
     document.getElementById('resultSection').style.display = 'flex';
     setTimeout(() => document.getElementById('resultSection').scrollIntoView({behavior: 'smooth', block: 'start'}), 50);
   });
+
+  function getAIRecommendation() {
+    if (!lastCalcData.program) return;
+    const btn     = document.getElementById('aiBtn');
+    btn.disabled  = true;
+    const aiSec   = document.getElementById('aiSection');
+    const spinner = document.getElementById('aiSpinner');
+    const result  = document.getElementById('aiResult');
+    const errDiv  = document.getElementById('aiError');
+
+    aiSec.style.display   = 'flex';
+    spinner.style.display = 'block';
+    result.style.display  = 'none';
+    errDiv.style.display  = 'none';
+
+    setTimeout(() => aiSec.scrollIntoView({behavior: 'smooth', block: 'start'}), 50);
+
+    fetch('/api/calculator/recommend', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(lastCalcData)
+    })
+    .then(r => r.json())
+    .then(data => {
+      spinner.style.display = 'none';
+      if (data.recommendation) {
+        result.innerHTML     = renderMarkdown(data.recommendation);
+        result.style.display = 'block';
+      } else {
+        showAIError('—');
+      }
+    })
+    .catch(() => {
+      spinner.style.display = 'none';
+      showAIError('Network error');
+    });
+  }
+
+  function showAIError(msg) {
+    document.getElementById('aiErrorMsg').textContent = msg;
+    document.getElementById('aiError').style.display  = 'block';
+    document.getElementById('aiBtn').disabled = false;
+  }
+
+  function renderMarkdown(text) {
+    return text
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/^/, '<p>').replace(/$/, '</p>');
+  }
 
   function hideAll() {
     document.getElementById('thresholdInfo').style.display = 'none';
     document.getElementById('scoresSection').style.display = 'none';
     document.getElementById('resultSection').style.display = 'none';
+    document.getElementById('aiSection').style.display     = 'none';
   }
 </script>
 
@@ -417,8 +519,8 @@
 }
 .glass-card:hover::before { animation: shine 1.2s ease-in-out; }
 @keyframes shine {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+  0%   { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%)  translateY(100%)  rotate(45deg); }
 }
 .glass-select, .form-control {
   background: rgba(255,255,255,0.15) !important;
@@ -445,12 +547,20 @@
   padding: 14px 32px; font-weight: 600; transition: all 0.3s ease;
 }
 .btn-orange:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,179,15,0.4); }
+.btn-ai {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white; border: none; border-radius: 12px;
+  padding: 12px 28px; font-weight: 600; font-size: 1rem;
+  transition: all 0.3s ease; cursor: pointer;
+}
+.btn-ai:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(124,58,237,0.45); color: #fff; }
+.btn-ai:disabled { opacity: 0.6; cursor: not-allowed; }
 .is-invalid { border-color: #dc3545 !important; background-image: none !important; animation: shake 0.5s; }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
+  25%       { transform: translateX(-5px); }
+  50%       { transform: translateX(5px); }
+  75%       { transform: translateX(-5px); }
 }
 .glass-select {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3e%3cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3e%3c/svg%3e");
@@ -460,5 +570,22 @@
 }
 option { background: #1f2d3d !important; color: white !important; }
 #scoreInputs .col-lg-6 { display: flex; flex-direction: column; }
+#aiSection { display: none; }
+.ai-header { display: flex; align-items: center; gap: 1rem; }
+.ai-icon-big { font-size: 2.2rem; line-height: 1; }
+.ai-spinner  { text-align: center; padding: 1.5rem 0; }
+.ai-result-text {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem;
+  color: rgba(255,255,255,0.92);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+.ai-result-text p            { margin: 0 0 .6rem; }
+.ai-result-text p:last-child { margin-bottom: 0; }
+.ai-result-text strong       { color: #ffd166; }
+.ai-result-text em           { color: #a5d8ff; }
 </style>
 {% endblock %}
