@@ -238,22 +238,49 @@ class ApplicationComment(db.Model):
 
 # === CONSTANTS ===
 
-APP_STATUSES = {
-    'received':  {'label_key': 'status_received',  'step': 1, 'color': '#27ae60'},
-    'checking':  {'label_key': 'status_checking',  'step': 2, 'color': '#3498db'},
-    'review':    {'label_key': 'status_review',    'step': 3, 'color': '#3498db'},
-    'decided':   {'label_key': 'status_decided',   'step': 4, 'color': '#3498db'},
-    'approved':  {'label_key': 'status_approved',  'step': 5, 'color': '#27ae60'},
-    'rejected':  {'label_key': 'status_rejected',  'step': 5, 'color': '#e74c3c'},
-    'revision':  {'label_key': 'status_revision',  'step': 5, 'color': '#e67e22'},
+APP_STATUSES_DATA = {
+    'received': {'step': 1, 'color': '#27ae60', 'labels': {
+        'ru': 'Получено',        'kk': 'Қабылданды',       'en': 'Received'}},
+    'checking': {'step': 2, 'color': '#3498db', 'labels': {
+        'ru': 'На проверке',     'kk': 'Тексерілуде',      'en': 'Under Review'}},
+    'review':   {'step': 3, 'color': '#3498db', 'labels': {
+        'ru': 'На рассмотрении', 'kk': 'Қаралуда',         'en': 'In Review'}},
+    'decided':  {'step': 4, 'color': '#3498db', 'labels': {
+        'ru': 'Решение принято', 'kk': 'Шешім қабылданды', 'en': 'Decision Made'}},
+    'approved': {'step': 5, 'color': '#27ae60', 'labels': {
+        'ru': 'Одобрено',        'kk': 'Мақұлданды',       'en': 'Approved'}},
+    'rejected': {'step': 5, 'color': '#e74c3c', 'labels': {
+        'ru': 'Отклонено',       'kk': 'Қабылданбады',     'en': 'Rejected'}},
+    'revision': {'step': 5, 'color': '#e67e22', 'labels': {
+        'ru': 'На доработке',    'kk': 'Түзетуде',          'en': 'Revision'}},
 }
-TRACKER_STEPS = [
-    ('received', 'status_received'),
-    ('checking', 'status_checking'),
-    ('review',   'status_review'),
-    ('decided',  'status_decided'),
-    ('final',    'status_final'),
-]
+
+FINAL_LABELS = {'ru': 'Итог', 'kk': 'Қорытынды', 'en': 'Final'}
+
+def get_app_statuses(lang='ru'):
+    """Возвращает APP_STATUSES с label на нужном языке. Не читает session."""
+    result = {}
+    for key, data in APP_STATUSES_DATA.items():
+        result[key] = {
+            'label': data['labels'].get(lang, data['labels']['ru']),
+            'step':  data['step'],
+            'color': data['color'],
+        }
+    return result
+
+def get_tracker_steps(lang='ru'):
+    s = get_app_statuses(lang)
+    return [
+        ('received', s['received']['label']),
+        ('checking', s['checking']['label']),
+        ('review',   s['review']['label']),
+        ('decided',  s['decided']['label']),
+        ('final',    FINAL_LABELS.get(lang, 'Итог')),
+    ]
+
+# Значения по умолчанию (ru) — используются до первого запроса
+APP_STATUSES  = get_app_statuses('ru')
+TRACKER_STEPS = get_tracker_steps('ru')
 
 DOC_TYPES = {
     'iin_scan':            'Удостоверение личности (ИИН)',
@@ -316,6 +343,9 @@ def calculate_ent_total(ent_data):
 def before_request():
     if current_user.is_authenticated and 'lang' not in session:
         session['lang'] = current_user.language or 'ru'
+    lang = session.get('lang', 'ru')
+    app.jinja_env.globals['APP_STATUSES']  = get_app_statuses(lang)
+    app.jinja_env.globals['TRACKER_STEPS'] = get_tracker_steps(lang)
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
@@ -877,7 +907,11 @@ def register():
         if User.query.filter_by(email=email).first():
             flash(t('Пользователь с таким Email уже существует'), 'error')
             return redirect(url_for('register'))
-
+        
+        if not password or len(password) < 8:
+            flash(t('Пароль должен содержать не менее 8 символов'), 'error')
+            return redirect(url_for('register'))
+        
         u = User(name=name, email=email, role='applicant', language=session.get('lang', 'ru'))
         u.set_password(password)
         db.session.add(u)
@@ -1178,8 +1212,9 @@ def pop_state():
 
 
 @app.route('/api/chat/options')
-@login_required
 def chat_options():
+    if not current_user.is_authenticated:
+        return jsonify({'options': []})
     init_chat_state()
     state = session.get("chat_state", "level_select")
     lang = session.get('lang', 'ru')
@@ -1192,9 +1227,9 @@ def chat_options():
 
 
 @app.route('/api/chat', methods=['POST'])
-@login_required
 def api_chat():
-    init_chat_state()
+    if current_user.is_authenticated:
+        init_chat_state()
     data = request.get_json() or {}
     user_message = data.get("message", "").strip()
 
@@ -1257,8 +1292,9 @@ def api_chat():
             keywords = [k.lower() for k in item.get("keywords", [])]
             if any(kw in msg_lower for kw in keywords):
                 answer = item.get(f"answer_{lang}") or item.get("answer_ru", "Ответ временно недоступен.")
-                db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=answer))
-                db.session.commit()
+                if current_user.is_authenticated:
+                    db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=answer))
+                    db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
 
     # === НОВЫЙ RAG (Google File Search) ===
