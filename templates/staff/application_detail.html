@@ -15,19 +15,19 @@
 {% set cur_step = APP_STATUSES.get(application.status, {}).get('step', 1) %}
 {% set is_final = application.status in ('approved', 'rejected', 'revision') %}
 <div class="tracker-bar">
-  {% for key, label_key in TRACKER_STEPS %}
+  {% for key, label in TRACKER_STEPS %}
     {% if key == 'final' %}
       {% set step_num = 5 %}
       {% if is_final %}
         {% set st = APP_STATUSES.get(application.status, {}) %}
         <div class="tracker-step done" style="--sc:{{ st.get('color','#27ae60') }}">
           <div class="tracker-dot"><i class="fas fa-flag"></i></div>
-          <div class="tracker-label">{{ t(st.get('label_key', label_key)) }}</div>
+          <div class="tracker-label">{{ st.get('label', label) }}</div>
         </div>
       {% else %}
         <div class="tracker-step {% if cur_step >= 5 %}done{% elif cur_step == 4 %}next{% endif %}">
           <div class="tracker-dot">5</div>
-          <div class="tracker-label">{{ t(label_key) }}</div>
+          <div class="tracker-label">{{ label }}</div>
         </div>
       {% endif %}
     {% else %}
@@ -36,7 +36,7 @@
         <div class="tracker-dot">
           {% if cur_step > step_num %}<i class="fas fa-check"></i>{% else %}{{ step_num }}{% endif %}
         </div>
-        <div class="tracker-label">{{ t(label_key) }}</div>
+        <div class="tracker-label">{{ label }}</div>
       </div>
     {% endif %}
     {% if not loop.last %}<div class="tracker-line"></div>{% endif %}
@@ -128,7 +128,7 @@
             <select name="status" class="form-control" required>
             {% for key, info in APP_STATUSES.items() %}
     <option value="{{ key }}" {% if application.status == key %}selected{% endif %}>
-      {{ t(info.label_key) }}
+      {{ info.label }}
     </option>
 {% endfor %}
             </select>

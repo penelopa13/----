@@ -1,23 +1,3 @@
- background: #ff3b30; 
-  color: white; 
-  animation: pulse 1.5s infinite;
-}
-
-.chat-form button[type="submit"] {
-  background: var(--accent-color);
-  color: white;
-}
-.chat-form button[type="submit"]:hover {
-  background: #e09e0c;
-  transform: scale(1.1);
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(255,59,48,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
-}
-
 /* ============================================================= */
 /* КНОПКА ОТКРЫТИЯ САЙДБАРА (SIDEBAR TOGGLE) */
 /* ============================================================= */
@@ -2108,5 +2088,23 @@ textarea {
   color: #666;
 }
 #voice-btn:hover { background: #e5e7eb; }
-#voice-btn.recording { 
- 
+#voice-btn.recording {
+  background: #ff3b30;
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.chat-form button[type="submit"] {
+  background: var(--accent-color);
+  color: white;
+}
+.chat-form button[type="submit"]:hover {
+  background: #e09e0c;
+  transform: scale(1.1);
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,59,48,0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255,59,48,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,59,48,0); }
+}

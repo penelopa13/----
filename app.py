@@ -282,14 +282,19 @@ def get_tracker_steps(lang='ru'):
 APP_STATUSES  = get_app_statuses('ru')
 TRACKER_STEPS = get_tracker_steps('ru')
 
-DOC_TYPES = {
-    'iin_scan':            'Удостоверение личности (ИИН)',
-    'photo_3x4':           'Фото 3×4',
-    'school_certificate':  'Аттестат / Диплом',
-    'transcript':          'Табель успеваемости',
-    'medical_certificate': 'Медицинская справка (форма 075)',
-    'other':               'Другой документ',
+DOC_TYPES_DATA = {
+    'iin_scan':            {'ru': 'Удостоверение личности (ИИН)', 'kk': 'Жеке куәлік (ЖСН)',          'en': 'ID Card (IIN)'},
+    'photo_3x4':           {'ru': 'Фото 3×4',                    'kk': 'Фото 3×4',                    'en': 'Photo 3×4'},
+    'school_certificate':  {'ru': 'Аттестат / Диплом',           'kk': 'Аттестат / Диплом',           'en': 'Certificate / Diploma'},
+    'transcript':          {'ru': 'Табель успеваемости',          'kk': 'Үлгерім табелі',              'en': 'Academic Transcript'},
+    'medical_certificate': {'ru': 'Медицинская справка (форма 075)', 'kk': 'Медициналық анықтама (075 нысаны)', 'en': 'Medical Certificate (form 075)'},
+    'other':               {'ru': 'Другой документ',             'kk': 'Басқа құжат',                 'en': 'Other Document'},
 }
+
+def get_doc_types(lang='ru'):
+    return {k: v.get(lang, v['ru']) for k, v in DOC_TYPES_DATA.items()}
+
+DOC_TYPES = get_doc_types('ru')
 
 ALLOWED_MIMES = {'application/pdf', 'image/jpeg', 'image/png', 'image/jpg'}
 MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -346,6 +351,7 @@ def before_request():
     lang = session.get('lang', 'ru')
     app.jinja_env.globals['APP_STATUSES']  = get_app_statuses(lang)
     app.jinja_env.globals['TRACKER_STEPS'] = get_tracker_steps(lang)
+    app.jinja_env.globals['DOC_TYPES']     = get_doc_types(lang)
 
 @app.route('/set_language/<lang>')
 def set_language(lang):

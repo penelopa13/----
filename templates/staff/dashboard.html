@@ -11,7 +11,7 @@
     </div>
     <div class="staff-user-info">
       <i class="fas fa-user-tie"></i> {{ current_user.name or current_user.email }}
-      <a href="{{ url_for('logout') }}" class="logout-link" title="Выйти">
+      <a href="{{ url_for('logout') }}" class="logout-link" title="{{ t('Выйти') }}">
         <i class="fas fa-sign-out-alt"></i>
       </a>
     </div>
@@ -79,7 +79,7 @@
         <tr>
           <th>#</th>
           <th>{{ t('Абитуриент') }}</th>
-          <th>ИИН</th>
+          <th>{{ t('ИИН') }}</th>
           <th>{{ t('Специальность') }}</th>
           <th>{{ t('Уровень') }}</th>
           <th>{{ t('Форма') }}</th>
@@ -119,7 +119,7 @@
           <td>
     {% set st = APP_STATUSES.get(a.status, {}) %}
     <span class="status-badge" style="background:{{ st.get('color','#999') }}20; color:{{ st.get('color','#999') }}; border-color:{{ st.get('color','#999') }}40;">
-      {{ t(st.get('label_key', a.status)) }}
+      {{ st.get('label', a.status) }}
     </span>
 </td>
           <td>
