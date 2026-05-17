@@ -31,18 +31,13 @@
     display: flex;
     flex-direction: column;
   }
-
-  #notifPanel.active {
-    right: 0;
-  }
-
+  #notifPanel.active { right: 0; }
   #notifPanel .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.25rem;
   }
-
   #notifPanel h4 {
     margin: 0;
     font-size: 1.4rem;
@@ -51,13 +46,7 @@
     flex-grow: 1;
     text-align: center;
   }
-
-  #notifPanel ul {
-    list-style: none;
-    padding: 0;
-    flex-grow: 1;
-  }
-
+  #notifPanel ul { list-style: none; padding: 0; flex-grow: 1; }
   #notifPanel li {
     padding: 1rem;
     margin-bottom: 0.75rem;
@@ -71,23 +60,12 @@
     flex-direction: column;
     gap: 0.25rem;
   }
-
   #notifPanel li:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-
-  #notifPanel li strong {
-    font-weight: 600;
-    color: #1a73e8;
-  }
-
-  #notifPanel li small {
-    font-size: 0.8rem;
-    color: #7f8c8d;
-  }
-
-  /* Пустое состояние */
+  #notifPanel li strong { font-weight: 600; color: #1a73e8; }
+  #notifPanel li small { font-size: 0.8rem; color: #7f8c8d; }
   #notifList:empty::before {
     content: attr(data-empty);
     display: block;
@@ -96,15 +74,12 @@
     font-style: italic;
     margin-top: 2rem;
   }
-
-  /* Значок уведомлений */
   #notifBtn {
     position: relative;
     color: #fff;
     font-size: 1.2rem;
     cursor: pointer;
   }
-
   .notif-badge {
     position: absolute;
     top: -6px;
@@ -119,25 +94,14 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     display: none;
   }
-
-  .notif-badge.show {
-    display: inline-block;
-  }
-
-  /* Кнопка закрытия панели */
+  .notif-badge.show { display: inline-block; }
   .notif-close {
     font-size: 2rem;
     color: #95a5a6;
     cursor: pointer;
     transition: color 0.2s ease, transform 0.2s ease;
   }
-
-  .notif-close:hover {
-    color: #34495e;
-    transform: rotate(90deg);
-  }
-
-  /* === Затемнение фона === */
+  .notif-close:hover { color: #34495e; transform: rotate(90deg); }
   #overlay {
     position: fixed;
     top: 0;
@@ -150,23 +114,40 @@
     transition: opacity 0.4s ease;
     z-index: 10000;
   }
+  #overlay.active { opacity: 1; pointer-events: all; }
 
-  #overlay.active {
-    opacity: 1;
-    pointer-events: all;
+  /* Бейдж роли в шапке */
+  .role-badge {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 20px;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-left: .35rem;
   }
-
+  .role-badge.admin { background: #ffe0e0; color: #c0392b; }
+  .role-badge.staff { background: #fff4e0; color: #d35400; }
   </style>
 </head>
 
 <body>
+  {% set is_staff_user = current_user.is_authenticated and current_user.role in ['staff', 'admin'] %}
+  {% set is_admin_user = current_user.is_authenticated and current_user.role == 'admin' %}
+
   <header class="site-header sticky-header">
     <div class="header-row">
 
       <!-- Логотип -->
-      <a href="{{ url_for('home') }}" class="logo">
+      <a href="{% if is_admin_user %}{{ url_for('admin_dashboard') }}{% elif is_staff_user %}{{ url_for('staff_dashboard') }}{% else %}{{ url_for('home') }}{% endif %}" class="logo">
         <img src="{{ url_for('static', filename='images/logo_zhubanov.png') }}" alt="Талапкер" />
         <span>{{ t('Талапкер') }}</span>
+        {% if is_admin_user %}
+          <span class="role-badge admin">{{ t('Админ') }}</span>
+        {% elif is_staff_user %}
+          <span class="role-badge staff">{{ t('Сотрудник') }}</span>
+        {% endif %}
       </a>
 
       <!-- Кнопка для мобильного меню -->
@@ -175,27 +156,68 @@
       <!-- Навигация -->
       <nav class="nav" id="nav">
         <div class="nav-center">
-          <a href="{{ url_for('home') }}">{{ t('Главная') }}</a>
-          <div class="dropdown nav-dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="universityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              {{ t('Университет') }}
+          {% if is_staff_user %}
+            {# === Меню для сотрудников и администратора === #}
+            <a href="{{ url_for('staff_dashboard') }}">
+              <i class="fas fa-list-alt"></i> {{ t('Список заявок') }}
             </a>
-            <ul class="dropdown-menu glass-menu" aria-labelledby="universityDropdown">
-              <li><a class="dropdown-item" href="{{ url_for('university') }}">{{ t('Университет') }}</a></li>
-              <li><a class="dropdown-item" href="{{ url_for('programs') }}">{{ t('Образовательные программы') }}</a></li>
-            </ul>
-          </div>
-          <a href="{{ url_for('status') }}">{{ t('Подать заявку') }}</a>
-          <a href="{{ url_for('test_psy') }}">{{ t('Тест') }}</a>
-          <a href="{{ url_for('calculator') }}">{{ t('Калькулятор') }}</a>
-          <a href="{{ url_for('contact') }}">{{ t('Контакты') }}</a>
+            <a href="{{ url_for('staff_dashboard', status='checking') }}">
+              <i class="fas fa-file-signature"></i> {{ t('Проверка документов') }}
+            </a>
+            <a href="{{ url_for('staff_dashboard', status='review') }}">
+              <i class="fas fa-tasks"></i> {{ t('Статусы заявок') }}
+            </a>
+            <a href="{{ url_for('staff_dashboard') }}#analytics">
+              <i class="fas fa-chart-line"></i> {{ t('Аналитика и отчёты') }}
+            </a>
+            {% if is_admin_user %}
+              <a href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-users-cog"></i> {{ t('Управление пользователями') }}
+              </a>
+            {% endif %}
+          {% else %}
+            {# === Меню для абитуриентов и гостей === #}
+            <a href="{{ url_for('home') }}">{{ t('Главная') }}</a>
+            <div class="dropdown nav-dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="universityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ t('Университет') }}
+              </a>
+              <ul class="dropdown-menu glass-menu" aria-labelledby="universityDropdown">
+                <li><a class="dropdown-item" href="{{ url_for('university') }}">{{ t('Университет') }}</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('programs') }}">{{ t('Образовательные программы') }}</a></li>
+              </ul>
+            </div>
+            <a href="{{ url_for('status') }}">{{ t('Подать заявку') }}</a>
+            <a href="{{ url_for('test_psy') }}">{{ t('Тест') }}</a>
+            <a href="{{ url_for('calculator') }}">{{ t('Калькулятор') }}</a>
+            <a href="{{ url_for('contact') }}">{{ t('Контакты') }}</a>
+          {% endif %}
         </div>
 
         <div class="nav-right d-flex align-items-center gap-3">
-          <a href="{{ url_for('profile') }}" class="btn small">
-            <i class="fa-solid fa-user"></i> {{ t('Личный кабинет') }}
-          </a>
-          <a href="{{ url_for('register') }}" class="btn small">{{ t('Регистрация') }}</a>
+          {% if is_staff_user %}
+            <span class="btn small" style="cursor:default;">
+              <i class="fa-solid fa-user-tie"></i>
+              {{ current_user.name or current_user.email }}
+            </span>
+            <a href="{{ url_for('logout') }}" class="btn small">
+              <i class="fa-solid fa-sign-out-alt"></i> {{ t('Выйти') }}
+            </a>
+          {% else %}
+            {% if current_user.is_authenticated %}
+              <a href="{{ url_for('profile') }}" class="btn small">
+                <i class="fa-solid fa-user"></i> {{ t('Личный кабинет') }}
+              </a>
+              <a href="{{ url_for('logout') }}" class="btn small">
+                <i class="fa-solid fa-sign-out-alt"></i> {{ t('Выйти') }}
+              </a>
+            {% else %}
+              <a href="{{ url_for('profile') }}" class="btn small">
+                <i class="fa-solid fa-user"></i> {{ t('Личный кабинет') }}
+              </a>
+              <a href="{{ url_for('register') }}" class="btn small">{{ t('Регистрация') }}</a>
+            {% endif %}
+          {% endif %}
 
           <div class="dropdown lang-switcher">
             <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -287,7 +309,6 @@
 
         data.forEach(n => {
           if (!n.is_read) unread++;
-
           const li = document.createElement("li");
           li.innerHTML = `
             <strong>${n.title}</strong><br>
@@ -298,17 +319,13 @@
         });
 
         notifBadge.textContent = unread;
-        if (unread > 0) {
-          notifBadge.classList.add("show");
-        } else {
-          notifBadge.classList.remove("show");
-        }
+        if (unread > 0) notifBadge.classList.add("show");
+        else notifBadge.classList.remove("show");
       } catch (error) {
         console.error('Error loading notifications:', error);
       }
     }
 
-    // Загружаем уведомления при загрузке страницы для обновления бейджа
     loadNotifications();
   </script>
 </body>

@@ -1997,7 +1997,87 @@ textarea {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
 }
+  /* ============ FLASH / TOAST ============ */
+  #flashContainer {
+    position: fixed;
+    top: 90px;
+    right: 24px;
+    z-index: 10050;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 360px;
+    pointer-events: none;
+  }
+  .toast-flash {
+    pointer-events: auto;
+    background: #fff;
+    color: #2c3e50;
+    border-radius: 12px;
+    padding: 14px 44px 14px 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    border-left: 4px solid #3498db;
+    font-size: .92rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    position: relative;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .25s ease;
+  }
+  .toast-flash.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .toast-flash.hide {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  .toast-flash .toast-icon {
+    font-size: 1.1rem;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .toast-flash .toast-body { line-height: 1.4; }
+  .toast-flash .toast-close {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #95a5a6;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .toast-flash .toast-close:hover { color: #2c3e50; }
 
+  .toast-flash.success { border-left-color: #27ae60; }
+  .toast-flash.success .toast-icon { color: #27ae60; }
+  .toast-flash.error,
+  .toast-flash.danger  { border-left-color: #e74c3c; }
+  .toast-flash.error .toast-icon,
+  .toast-flash.danger .toast-icon { color: #e74c3c; }
+  .toast-flash.warning { border-left-color: #e67e22; }
+  .toast-flash.warning .toast-icon { color: #e67e22; }
+  .toast-flash.info    { border-left-color: #3498db; }
+  .toast-flash.info .toast-icon { color: #3498db; }
+
+  @media (max-width: 480px) {
+    #flashContainer {
+      top: auto;
+      bottom: 16px;
+      right: 12px;
+      left: 12px;
+      max-width: none;
+    }
+    .toast-flash {
+      transform: translateY(120%);
+    }
+    .toast-flash.show { transform: translateY(0); }
+    .toast-flash.hide { transform: translateY(120%); }
+  }
 /* Индикатор "печатает" */
 .typing span {
   display: inline-block;

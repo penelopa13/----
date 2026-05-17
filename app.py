@@ -43,6 +43,14 @@ admin_required = role_required('admin')
 staff_required = role_required('staff', 'admin')
 applicant_required = role_required('applicant')
 
+def applicant_only_or_redirect():
+    """Для staff/admin возвращает redirect на их дашборд, иначе None."""
+    if current_user.is_authenticated and current_user.role in ['staff', 'admin']:
+        if current_user.role == 'admin':
+            return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('staff_dashboard'))
+    return None
+
 # === MULTILANG ===
 try:
     with open('translations/translations.json', 'r', encoding='utf-8') as f:
@@ -383,7 +391,11 @@ def programs():
 @app.route('/calculator')
 @login_required
 def calculator():
+    r = applicant_only_or_redirect()
+    if r:
+        return r
     return render_template('calculator.html')
+
 
 @app.route('/api/calculator/recommend', methods=['POST'])
 @login_required
@@ -476,10 +488,12 @@ def contact():
 
 
 # === APPLICANT STATUS PAGE ===
-
 @app.route('/status')
 @login_required
 def status():
+    r = applicant_only_or_redirect()
+    if r:
+        return r
     docs = UserDocument.query.filter_by(user_id=current_user.id).all()
     docs_by_type = {d.doc_type: d for d in docs}
     u = current_user
@@ -493,7 +507,6 @@ def status():
                            profile_complete=profile_complete,
                            existing_app=existing_app)
 
-
 # === PROFILE ===
 
 @app.route('/profile')
@@ -501,6 +514,8 @@ def status():
 def profile():
     if current_user.is_admin:
         return redirect(url_for('admin_dashboard'))
+    if current_user.role == 'staff':
+        return redirect(url_for('staff_dashboard'))
 
     lang = session.get('lang', current_user.language or 'ru')
 
@@ -540,7 +555,6 @@ def profile():
                            existing_app=existing_app,
                            notifications=notifications,
                            unread_count=unread_count)
-
 
 @app.route('/profile/edit', methods=['POST'])
 @login_required
@@ -661,10 +675,13 @@ def delete_document(doc_id):
 @app.route('/submit_application', methods=['POST'])
 @login_required
 def submit_application():
+    r = applicant_only_or_redirect()
+    if r:
+        return r
     u = current_user
     specialty = request.form.get('specialty', '').strip()
     education_level = request.form.get('education_level', '').strip()
-    grant_or_paid = request.form.get('grant_or_paid') or 'paid'
+    grant_or_paid = 'paid'  # форма обучения теперь всегда платная
 
     if not specialty:
         flash(t('Выберите специальность'), 'error')
@@ -717,7 +734,6 @@ Email: {app_entry.email}
 
     flash(t('Заявка успешно подана!'), 'success')
     return redirect(url_for('status'))
-
 
 # === STAFF INTERFACE ===
 
@@ -1098,6 +1114,9 @@ def api_contact():
 @app.route('/test_psy')
 @login_required
 def test_psy():
+    r = applicant_only_or_redirect()
+    if r:
+        return r
     lang = session.get('lang', current_user.language or 'ru')
     result = TestResult.query.filter_by(user_id=current_user.id)\
                             .order_by(TestResult.created_at.desc()).first()

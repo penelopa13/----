@@ -4,60 +4,58 @@
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Добавляем анимированный градиентный фон и частицы (как в оригинальном сайте) -->
-<div class="bg-gradient"></div>
-<div class="particles" id="particles"></div>
-
-<section class="hero" style="height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; position: relative; overflow: hidden;">
-  <div class="hero-inner" style="background-image: url('/static/images/zhubanov.png'); background-size: cover; background-position: center; color: #fff; height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); position: relative;">
-    <!-- Полупрозрачный градиентный оверлей (улучшенный, как в оригинале) -->
-    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15,23,36,0.7), rgba(43,140,255,0.4)); z-index: 1;"></div>
-    
-    <!-- Красивый текст над фото (как в оригинальном: с градиентом, анимацией float и shine) -->
-    <h1 class="hero-title" style="position: relative; z-index: 2; font-size: 4.5rem; font-weight: 900; margin-bottom: 2rem; background: linear-gradient(45deg, #fff, #e0e0e0, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; animation: titleFloat 3s ease-in-out infinite, textShine 3s linear infinite; background-size: 200% auto;">
-      {{ t('ИИ-консультант для абитуриентов') }}
-    </h1>
-    
-    <!-- Текст с пульсацией в овале (как hero-badge в оригинальном сайте) -->
-    <div class="hero-badge" style="position: relative; z-index: 2;">
-      {{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}
-    </div>
-    
-    <!-- Улучшенная кнопка "Узнать больше" -->
-    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;">
-      {{ t('Узнать больше') }}
+<!-- Компактный hero -->
+<section class="hero-compact">
+  <div class="hero-compact-inner">
+    <span class="hero-eyebrow">{{ t('Университет имени К. Жубанова') }}</span>
+    <h1 class="hero-compact-title">{{ t('Талапкер') }}</h1>
+    <p class="hero-compact-sub">
+      {{ t('ИИ-консультант для абитуриентов — всё о поступлении и подаче документов в одном окне.') }}
+    </p>
+    <a class="hero-cta" href="#chat-section">
+      <i class="fas fa-comments"></i> {{ t('Открыть чат') }}
     </a>
   </div>
 </section>
 
 <section id="chat-section" class="section container">
-  <h2>{{ t('Чат с консультантом') }}</h2>
+  <h2 class="chat-heading">{{ t('Чат с консультантом') }}</h2>
 
-  {% if current_user.is_authenticated %}
-    <!-- ==================== ЧАТ ДЛЯ АВТОРИЗОВАННЫХ ==================== -->
-    <div class="chat-layout">
-      <div class="chat-sidebar" id="chat-sidebar">
-        <div class="sidebar-header">
-          <i class="fas fa-bolt"></i> {{ t('Частые вопросы') }}
-        </div>
-        <div class="sidebar-content" id="quick-questions"></div>
+  <div class="chat-layout">
+    <div class="chat-sidebar {% if not current_user.is_authenticated %}is-locked{% endif %}" id="chat-sidebar">
+      <div class="sidebar-header">
+        <i class="fas fa-bolt"></i> {{ t('Частые вопросы') }}
       </div>
+      <div class="sidebar-content" id="quick-questions">
+        {% if not current_user.is_authenticated %}
+          <div class="sidebar-locked-hint">
+            <i class="fas fa-lock"></i>
+            {{ t('Доступно после входа') }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
 
-      <div class="chat-main">
-        <div id="chat-box" class="chat-box">
-          <div class="messages" id="messages">
-            <div class="message bot">
-              <div class="bubble" style="background:linear-gradient(135deg,var(--secondary-color),var(--primary-color)); color:#fff; border-radius:18px; padding:18px; box-shadow:0 6px 20px rgba(0,0,0,0.15);">
-                {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
+    <div class="chat-main">
+      <div id="chat-box" class="chat-box">
+        <div class="messages" id="messages">
+          <div class="message bot">
+            <div class="bubble bubble-greeting">
+              {{ t('Здравствуйте! Я — Талапкер, ИИ-помощник по приёму абитуриентов в Университет имени К. Жубанова') }}<br><br>
+              {% if current_user.is_authenticated %}
                 {{ t('Задайте любой вопрос или выберите один из частых') }}
-              </div>
+              {% else %}
+                {{ t('Войдите или зарегистрируйтесь, чтобы начать диалог.') }}
+              {% endif %}
             </div>
           </div>
+        </div>
 
-          <div id="typing-indicator" style="display:none;" class="message bot">
-            <div class="bubble typing"><span></span><span></span><span></span></div>
-          </div>
+        <div id="typing-indicator" style="display:none;" class="message bot">
+          <div class="bubble typing"><span></span><span></span><span></span></div>
+        </div>
 
+        {% if current_user.is_authenticated %}
           <form id="chat-form" class="chat-form">
             <textarea id="user-input" placeholder="{{ t('Введите ваш вопрос...') }}" rows="1" autocomplete="off"></textarea>
             <button type="button" id="voice-btn" class="voice-btn" aria-label="{{ t('Голосовой ввод') }}">
@@ -65,218 +63,218 @@
             </button>
             <button type="submit"><i class="fas fa-paper-plane"></i></button>
           </form>
-        </div>
+        {% else %}
+          <div class="chat-form chat-form-locked" aria-disabled="true">
+            <textarea
+              class="locked-input"
+              rows="1"
+              disabled
+              placeholder="{{ t('Войдите или зарегистрируйтесь, чтобы пользоваться ИИ-чатботом') }}"></textarea>
+            <button type="button" class="voice-btn" disabled aria-disabled="true">
+              <i class="fas fa-microphone"></i>
+            </button>
+            <button type="button" disabled aria-disabled="true">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+          <div class="chat-auth-row">
+            <a href="{{ url_for('login') }}" class="auth-btn auth-btn-primary">
+              <i class="fas fa-sign-in-alt"></i> {{ t('Войти') }}
+            </a>
+            <a href="{{ url_for('register') }}" class="auth-btn auth-btn-ghost">
+              <i class="fas fa-user-plus"></i> {{ t('Зарегистрироваться') }}
+            </a>
+          </div>
+        {% endif %}
       </div>
     </div>
-
-  {% else %}
-    <!-- ==================== БЛОК ДЛЯ НЕЗАРЕГИСТРИРОВАННЫХ ==================== -->
-    <div class="login-required-box">
-      <i class="fas fa-lock"></i>
-      <h3>{{ t('Для использования чата необходимо войти') }}</h3>
-      <p>{{ t('Зарегистрируйтесь или войдите в аккаунт, чтобы общаться с ИИ-консультантом Талапкер.') }}</p>
-      
-      <div class="auth-buttons">
-        <a href="{{ url_for('login') }}" class="btn btn-primary">{{ t('Войти') }}</a>
-        <a href="{{ url_for('register') }}" class="btn btn-outline">{{ t('Зарегистрироваться') }}</a>
-      </div>
-    </div>
-  {% endif %}
+  </div>
 </section>
 {% endblock %}
 
 {% block scripts %}
 <style>
-  /* Анимированный градиентный фон (как в оригинальном сайте) */
-  .bg-gradient {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: -2;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    animation: gradientShift 15s ease infinite;
-    background-size: 200% 200%;
+  /* ============ HERO (компактный) ============ */
+  .hero-compact {
+    position: relative;
+    min-height: 320px;
+    padding: 4rem 1.5rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      linear-gradient(135deg, rgba(15,23,36,0.78), rgba(43,140,255,0.55)),
+      url('/static/images/zhubanov.png') center/cover no-repeat;
+    color: #fff;
+    overflow: hidden;
   }
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  /* Частицы (particles) для эффекта */
-  .particles {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: -1;
-  }
-  .particle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: rgba(102, 126, 234, 0.6);
-    border-radius: 50%;
-    animation: particleFloat 20s infinite linear;
-  }
-  @keyframes particleFloat {
-    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-100vh) translateX(100px); opacity: 0; }
-  }
-
-  /* Пульсация для hero-badge */
-  .hero-badge {
-    display: inline-block;
-    padding: 1rem 2.5rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border-radius: 50px;
-    margin-bottom: 3rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-weight: 700;
-    font-size: 1.4rem;
-    opacity: 0.95;
-    line-height: 1.8;
-    max-width: 900px;
+  .hero-compact-inner {
+    max-width: 760px;
     text-align: center;
-    animation: pulse 2s infinite;
   }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+  .hero-eyebrow {
+    display: inline-block;
+    padding: .3rem .9rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+    font-size: .82rem;
+    letter-spacing: .04em;
+    margin-bottom: 1rem;
+    opacity: .9;
   }
-
-  /* Улучшенные стили для кнопки */
-  .btn-primary {
-    padding: 1.2rem 3rem;
-    border-radius: 50px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    text-decoration: none;
-    transition: all 0.4s ease;
+  .hero-compact-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin: 0 0 .75rem;
+    line-height: 1.15;
+    letter-spacing: -.01em;
+  }
+  .hero-compact-sub {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    opacity: .92;
+    max-width: 620px;
+    margin: 0 auto 1.75rem;
+  }
+  .hero-cta {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff7e5f);
-    background-size: 200% auto;
+    gap: .55rem;
+    padding: .85rem 1.75rem;
+    border-radius: 999px;
+    background: linear-gradient(45deg, #ff7e5f, #feb47b);
     color: #fff;
-    border: 2px solid transparent;
-    box-shadow: 0 10px 30px rgba(255, 126, 95, 0.4);
-    animation: textShine 3s linear infinite;
-  }
-  .btn-primary:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px rgba(255, 126, 95, 0.6);
-    animation: textShine 1.5s linear infinite;
-  }
-
-  @keyframes titleFloat {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  @keyframes textShine {
-    to { background-position: 200% center; }
-  }
-
-  /* Адаптив для мобильных */
-  @media (max-width: 768px) {
-    .hero-title {
-      font-size: 2.8rem !important;
-    }
-    .hero-badge {
-      font-size: 1.1rem;
-      padding: 0.8rem 1.5rem;
-    }
-    .btn-primary {
-      width: 100%;
-      max-width: 280px;
-      text-align: center;
-    }
-  }
-  @media (max-width: 480px) {
-    .hero-title {
-      font-size: 2.2rem !important;
-    }
-    .hero-badge {
-      font-size: 1rem;
-      padding: 0.8rem 1.5rem;
-    }
-  }
-
-  /* === СТИЛИ ДЛЯ БЛОКА "НЕОБХОДИМО ВОЙТИ" === */
-  .login-required-box {
-    text-align: center;
-    padding: 80px 40px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    border: 2px dashed #ff7e5f;
-    max-width: 700px;
-    margin: 40px auto;
-  }
-
-  .login-required-box i {
-    font-size: 5rem;
-    color: #ff7e5f;
-    margin-bottom: 25px;
-    opacity: 0.9;
-  }
-
-  .login-required-box h3 {
-    margin-bottom: 15px;
-    font-size: 1.8rem;
-  }
-
-  .login-required-box p {
-    max-width: 520px;
-    margin: 0 auto 35px;
-    opacity: 0.9;
-    line-height: 1.6;
-  }
-
-  .auth-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn-outline {
-    background: transparent;
-    border: 2px solid #fff;
-    color: #fff;
-    padding: 14px 32px;
-    border-radius: 50px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s ease;
+    box-shadow: 0 8px 22px rgba(255,126,95,0.35);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(255,126,95,0.45);
+    color: #fff;
   }
 
-  .btn-outline:hover {
+  @media (max-width: 600px) {
+    .hero-compact { padding: 3rem 1rem 2.25rem; min-height: 260px; }
+    .hero-compact-title { font-size: 1.9rem; }
+    .hero-compact-sub { font-size: .98rem; }
+  }
+
+  /* ============ ЧАТ ============ */
+  .chat-heading {
+    text-align: center;
+    margin: 2rem 0 1.25rem;
+    font-size: 1.6rem;
+  }
+
+  .bubble-greeting {
+    background: linear-gradient(135deg, var(--secondary-color, #2b8cff), var(--primary-color, #1f6feb));
+    color: #fff;
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  }
+
+  /* ====== Заблокированный чат для гостей ====== */
+  .chat-form-locked {
+    background: #f3f4f6;
+    border: 1px dashed #d0d4da;
+    border-radius: 14px;
+    padding: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    opacity: .95;
+  }
+  .chat-form-locked .locked-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #8a8f98;
+    font-size: .95rem;
+    resize: none;
+    outline: none;
+    padding: .65rem .75rem;
+    cursor: not-allowed;
+  }
+  .chat-form-locked .locked-input::placeholder {
+    color: #9aa0a8;
+    font-style: italic;
+  }
+  .chat-form-locked button {
+    background: #e6e8ec;
+    color: #b3b8c0;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: not-allowed;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-auth-row {
+    display: flex;
+    gap: .65rem;
+    justify-content: center;
+    margin-top: .9rem;
+    flex-wrap: wrap;
+  }
+  .auth-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .55rem 1.2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .92rem;
+    text-decoration: none;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .auth-btn-primary {
+    background: linear-gradient(45deg, #ff7e5f, #feb47b);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(255,126,95,0.3);
+  }
+  .auth-btn-primary:hover {
+    transform: translateY(-2px);
+    color: #fff;
+    box-shadow: 0 10px 22px rgba(255,126,95,0.4);
+  }
+  .auth-btn-ghost {
     background: #fff;
     color: #333;
+    border: 1px solid #e2e5ea;
+  }
+  .auth-btn-ghost:hover {
+    background: #f7f8fa;
+    transform: translateY(-2px);
+    color: #333;
+  }
+
+  /* Боковая панель в "выключенном" состоянии */
+  .chat-sidebar.is-locked .sidebar-content {
+    opacity: .55;
+    pointer-events: none;
+  }
+  .sidebar-locked-hint {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .75rem .9rem;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 10px;
+    font-size: .88rem;
+    font-style: italic;
   }
 </style>
 
 <script>
-// Создание частиц (как в оригинальном сайте)
-function createParticles() {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 50; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 20 + 's';
-    particle.style.animationDuration = (15 + Math.random() * 10) + 's';
-    container.appendChild(particle);
-  }
-}
-createParticles();
-
 {% if current_user.is_authenticated %}
 // ==================== СКРИПТ ЧАТА (только для авторизованных) ====================
 
@@ -284,7 +282,6 @@ const lang = "{{ session.get('lang', 'ru') }}";
 const userInput = document.getElementById('user-input');
 const messages = document.getElementById('messages');
 const sidebar = document.getElementById('chat-sidebar');
-// Sidebar всегда открыта — принудительно добавляем класс active
 if (sidebar) sidebar.classList.add('active');
 const typingIndicator = document.getElementById('typing-indicator');
 const quickBox = document.getElementById('quick-questions');
@@ -295,7 +292,6 @@ async function loadQuickQuestions() {
     const data = await res.json();
     quickBox.innerHTML = "";
 
-    // Варианты кнопки "Задать свой вопрос" на всех языках
     const ASK_OWN_VARIANTS = [
       'задать свой вопрос', 'өз сұрауыңызды жіберіңіз',
       'өз сұрағыңызды қою', 'ask your question'
@@ -305,20 +301,15 @@ async function loadQuickQuestions() {
       const btn = document.createElement('button');
       btn.className = 'quick-btn';
 
-      // Кнопка "Назад"
       if (q.includes('Назад') || q.includes('Артқа') || q.includes('Back') || q.includes('назад')) {
         btn.classList.add('back');
         btn.innerHTML = q;
         btn.onclick = () => sendMessage(q);
-      }
-      // Кнопка "Задать свой вопрос" — показать приглашение написать вопрос
-      else if (ASK_OWN_VARIANTS.includes(q.toLowerCase())) {
+      } else if (ASK_OWN_VARIANTS.includes(q.toLowerCase())) {
         btn.classList.add('special');
         btn.textContent = q;
         btn.onclick = () => sendMessage(q);
-      }
-      // Обычные кнопки
-      else {
+      } else {
         btn.textContent = q;
         btn.onclick = () => sendMessage(q);
       }
@@ -347,9 +338,9 @@ const predefined = [
   { keys: ["грант"], ru: "Да, есть государственные гранты. Результаты — на enbek.kz" },
   { keys: ["стоимость", "ақысы"], ru: "Бакалавриат: 850–1 500 тыс. ₸/год\nМагистратура: от 1 100 тыс. ₸" },
   { keys: ["общежитие", "жатақхана"], ru: "Да, есть. Стоимость: 15–25 тыс. ₸/мес." },
-  { 
+  {
     keys: ["әскер", "армия", "после армии", "отслужив", "срочн", "срочники", "военный билет"],
-    ru: "После армии (срочной службы):\n\n• На платное можно поступить без ЕНТ в течение 2 лет (по собеседованию).\n• Есть квота на грант по программе «Срочники 2.0».\n• Дополнительно нужен военный билет и справка о службе.\n\nПодробности уточняйте в приёмной комиссии." 
+    ru: "После армии (срочной службы):\n\n• На платное можно поступить без ЕНТ в течение 2 лет (по собеседованию).\n• Есть квота на грант по программе «Срочники 2.0».\n• Дополнительно нужен военный билет и справка о службе.\n\nПодробности уточняйте в приёмной комиссии."
   }
 ];
 
@@ -380,10 +371,10 @@ async function sendMessage(text) {
   addMessage(text, "user");
   userInput.value = "";
 
-  const predefined = getPredefinedAnswer(text);
-  if (predefined) {
+  const predefinedAns = getPredefinedAnswer(text);
+  if (predefinedAns) {
     setTimeout(() => {
-      addMessage(predefined, "bot");
+      addMessage(predefinedAns, "bot");
       loadQuickQuestions();
     }, 600);
     return;
@@ -401,7 +392,6 @@ async function sendMessage(text) {
 
     typingIndicator.style.display = "none";
     addMessage(data.reply, 'bot');
-
     loadQuickQuestions();
 
   } catch (err) {
@@ -478,12 +468,8 @@ async function loadChatHistory() {
 }
 document.addEventListener('DOMContentLoaded', loadChatHistory);
 
-
-
 {% else %}
-// Чат доступен только после входа в систему
 console.log("Чат доступен только после входа в аккаунт");
 {% endif %}
-
 </script>
 {% endblock %}
