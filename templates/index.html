@@ -4,16 +4,29 @@
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<!-- Компактный hero -->
-<section class="hero-compact">
-  <div class="hero-compact-inner">
-    <span class="hero-eyebrow">{{ t('Университет имени К. Жубанова') }}</span>
-    <h1 class="hero-compact-title">{{ t('Талапкер') }}</h1>
-    <p class="hero-compact-sub">
-      {{ t('ИИ-консультант для абитуриентов — всё о поступлении и подаче документов в одном окне.') }}
-    </p>
-    <a class="hero-cta" href="#chat-section">
-      <i class="fas fa-comments"></i> {{ t('Открыть чат') }}
+<!-- Анимированный градиентный фон -->
+<div class="bg-gradient"></div>
+<canvas id="particles-canvas"></canvas>
+
+<!-- ПОЛНОЭКРАННЫЙ HERO (оригинальный дизайн) -->
+<section class="hero" style="height: 100vh; width: 100vw; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; position: relative; overflow: hidden;">
+  <div class="hero-inner" style="background-image: url('/static/images/zhubanov.png'); background-size: cover; background-position: center; color: #fff; height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); position: relative;">
+    <!-- Полупрозрачный градиентный оверлей -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(15,23,36,0.7), rgba(43,140,255,0.4)); z-index: 1;"></div>
+
+    <!-- Заголовок с анимацией float + shine -->
+    <h1 class="hero-title" style="position: relative; z-index: 2; font-size: 4.5rem; font-weight: 900; margin-bottom: 2rem; background: linear-gradient(45deg, #fff, #e0e0e0, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; animation: titleFloat 3s ease-in-out infinite, textShine 3s linear infinite; background-size: 200% auto;">
+      {{ t('ИИ-консультант для абитуриентов') }}
+    </h1>
+
+    <!-- Пульсирующий badge -->
+    <div class="hero-badge" style="position: relative; z-index: 2;">
+      {{ t('С помощью "Талапкер" вы легко узнаете всё о поступлении и подаче документов') }}
+    </div>
+
+    <!-- Кнопка -->
+    <a class="btn orange btn-primary" href="#chat-section" style="position: relative; z-index: 2;">
+      {{ t('Узнать больше') }}
     </a>
   </div>
 </section>
@@ -94,73 +107,99 @@
 
 {% block scripts %}
 <style>
-  /* ============ HERO (компактный) ============ */
-  .hero-compact {
-    position: relative;
-    min-height: 320px;
-    padding: 4rem 1.5rem 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background:
-      linear-gradient(135deg, rgba(15,23,36,0.78), rgba(43,140,255,0.55)),
-      url('/static/images/zhubanov.png') center/cover no-repeat;
-    color: #fff;
-    overflow: hidden;
+  /* ============ АНИМИРОВАННЫЙ ГРАДИЕНТНЫЙ ФОН ============ */
+  .bg-gradient {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    animation: gradientShift 15s ease infinite;
+    background-size: 200% 200%;
   }
-  .hero-compact-inner {
-    max-width: 760px;
-    text-align: center;
-  }
-  .hero-eyebrow {
-    display: inline-block;
-    padding: .3rem .9rem;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(8px);
-    font-size: .82rem;
-    letter-spacing: .04em;
-    margin-bottom: 1rem;
-    opacity: .9;
-  }
-  .hero-compact-title {
-    font-size: 2.4rem;
-    font-weight: 800;
-    margin: 0 0 .75rem;
-    line-height: 1.15;
-    letter-spacing: -.01em;
-  }
-  .hero-compact-sub {
-    font-size: 1.05rem;
-    line-height: 1.55;
-    opacity: .92;
-    max-width: 620px;
-    margin: 0 auto 1.75rem;
-  }
-  .hero-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: .55rem;
-    padding: .85rem 1.75rem;
-    border-radius: 999px;
-    background: linear-gradient(45deg, #ff7e5f, #feb47b);
-    color: #fff;
-    font-weight: 600;
-    text-decoration: none;
-    box-shadow: 0 8px 22px rgba(255,126,95,0.35);
-    transition: transform .2s ease, box-shadow .2s ease;
-  }
-  .hero-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(255,126,95,0.45);
-    color: #fff;
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
-  @media (max-width: 600px) {
-    .hero-compact { padding: 3rem 1rem 2.25rem; min-height: 260px; }
-    .hero-compact-title { font-size: 1.9rem; }
-    .hero-compact-sub { font-size: .98rem; }
+  /* ============ CANVAS ЧАСТИЦЫ ============ */
+  #particles-canvas {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* ============ ПУЛЬСАЦИЯ BADGE ============ */
+  .hero-badge {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 700;
+    font-size: 1.4rem;
+    opacity: 0.95;
+    line-height: 1.8;
+    max-width: 900px;
+    text-align: center;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1);    box-shadow: 0 0 0 0   rgba(255,255,255,0.4); }
+    50%       { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255,255,255,0);   }
+  }
+
+  /* ============ КНОПКА CTA ============ */
+  .btn-primary {
+    padding: 1.2rem 3rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: all 0.4s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff7e5f);
+    background-size: 200% auto;
+    color: #fff;
+    border: 2px solid transparent;
+    box-shadow: 0 10px 30px rgba(255,126,95,0.4);
+    animation: textShine 3s linear infinite;
+  }
+  .btn-primary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(255,126,95,0.6);
+    animation: textShine 1.5s linear infinite;
+  }
+
+  /* ============ АНИМАЦИИ ============ */
+  @keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-10px); }
+  }
+  @keyframes textShine {
+    to { background-position: 200% center; }
+  }
+
+  /* ============ АДАПТИВ ============ */
+  @media (max-width: 768px) {
+    .hero-title { font-size: 2.8rem !important; }
+    .hero-badge  { font-size: 1.1rem; padding: 0.8rem 1.5rem; }
+    .btn-primary { width: 100%; max-width: 280px; text-align: center; }
+  }
+  @media (max-width: 480px) {
+    .hero-title { font-size: 2.2rem !important; }
+    .hero-badge  { font-size: 1rem; padding: 0.8rem 1.5rem; }
   }
 
   /* ============ ЧАТ ============ */
@@ -169,7 +208,6 @@
     margin: 2rem 0 1.25rem;
     font-size: 1.6rem;
   }
-
   .bubble-greeting {
     background: linear-gradient(135deg, var(--secondary-color, #2b8cff), var(--primary-color, #1f6feb));
     color: #fff;
@@ -178,7 +216,7 @@
     box-shadow: 0 6px 20px rgba(0,0,0,0.12);
   }
 
-  /* ====== Заблокированный чат для гостей ====== */
+  /* ============ ЗАБЛОКИРОВАННЫЙ ЧАТ ДЛЯ ГОСТЕЙ ============ */
   .chat-form-locked {
     background: #f3f4f6;
     border: 1px dashed #d0d4da;
@@ -256,7 +294,7 @@
     color: #333;
   }
 
-  /* Боковая панель в "выключенном" состоянии */
+  /* Боковая панель для гостей */
   .chat-sidebar.is-locked .sidebar-content {
     opacity: .55;
     pointer-events: none;
@@ -275,6 +313,109 @@
 </style>
 
 <script>
+// ============ CANVAS ЧАСТИЦЫ (светящиеся, не застревают) ============
+(function() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Цвета свечения
+  const COLORS = [
+    '100, 160, 255',  // синий
+    '80,  140, 255',  // чуть темнее
+    '130, 180, 255',  // светлее
+    '110, 150, 240',  // индиго-синий
+    '90,  170, 255',  // голубоватый
+  ];
+
+  const PARTICLE_COUNT = 55;
+  const particles = [];
+
+  function randomColor() {
+    return COLORS[Math.floor(Math.random() * COLORS.length)];
+  }
+
+  function createParticle(forceBottom) {
+    const r = 0.8 + Math.random() * 1.5; // радиус 0.8–2.3px (маленькие)
+    return {
+      x:        Math.random() * canvas.width,
+      y:        forceBottom ? canvas.height + r + Math.random() * 200 : Math.random() * canvas.height,
+      r:        r,
+      speedY:   0.3 + Math.random() * 0.7,   // медленный подъём
+      speedX:   (Math.random() - 0.5) * 0.4, // небольшой снос
+      opacity:  0,
+      maxOp:    0.5 + Math.random() * 0.5,
+      fadeIn:   true,
+      color:    randomColor(),
+      glowSize: 4 + Math.random() * 7,        // размер ореола
+    };
+  }
+
+  // Инициализация — частицы в случайных позициях
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    particles.push(createParticle(false));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach((p, i) => {
+      // Fade in / fade out
+      if (p.fadeIn) {
+        p.opacity += 0.008;
+        if (p.opacity >= p.maxOp) p.fadeIn = false;
+      } else {
+        // Начинаем fade-out только когда почти вышла за верх
+        if (p.y < canvas.height * 0.15) {
+          p.opacity -= 0.012;
+        }
+      }
+
+      // Движение
+      p.y -= p.speedY;
+      p.x += p.speedX;
+
+      // Сброс — когда полностью исчезла или вышла за верх
+      if (p.opacity <= 0 || p.y < -p.r * 4) {
+        particles[i] = createParticle(true);
+        return;
+      }
+
+      // Рисуем светящуюся частицу
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+
+      // Внешнее мягкое свечение
+      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.glowSize);
+      glow.addColorStop(0,   `rgba(${p.color}, 0.8)`);
+      glow.addColorStop(0.4, `rgba(${p.color}, 0.3)`);
+      glow.addColorStop(1,   `rgba(${p.color}, 0)`);
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.glowSize, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Яркое ядро
+      ctx.fillStyle = `rgba(${p.color}, 1)`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+})();
+
 {% if current_user.is_authenticated %}
 // ==================== СКРИПТ ЧАТА (только для авторизованных) ====================
 
@@ -334,7 +475,7 @@ async function loadQuickQuestions() {
 loadQuickQuestions();
 
 const predefined = [
- { keys: ["сроки", "қашан"], ru: "СРОКИ ПРИЁМА 2025–2026:\n• Бакалавриат: 1 июня – 25 июля\n• Магистратура: 1 июня – 15 июля\n• Докторантура: 1 июня – 10 июля" },
+  { keys: ["сроки", "қашан"], ru: "СРОКИ ПРИЁМА 2025–2026:\n• Бакалавриат: 1 июня – 25 июля\n• Магистратура: 1 июня – 15 июля\n• Докторантура: 1 июня – 10 июля" },
   { keys: ["грант"], ru: "Да, есть государственные гранты. Результаты — на enbek.kz" },
   { keys: ["стоимость", "ақысы"], ru: "Бакалавриат: 850–1 500 тыс. ₸/год\nМагистратура: от 1 100 тыс. ₸" },
   { keys: ["общежитие", "жатақхана"], ru: "Да, есть. Стоимость: 15–25 тыс. ₸/мес." },
@@ -358,8 +499,7 @@ function addMessage(text, type = "bot") {
   if (type === "bot") {
     div.innerHTML = marked.parse(text.replace(/\n/g, '  \n'));
   } else {
-    const formattedText = text.replace(/\n/g, '<br>');
-    div.innerHTML = formattedText;
+    div.innerHTML = text.replace(/\n/g, '<br>');
   }
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
