@@ -16,14 +16,13 @@ import os
 from dotenv import load_dotenv
 
 
-# Инициализация клиента
-
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 load_dotenv()
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 FILE_SEARCH_STORE_NAME = "fileSearchStores/zhubanov-university-knowled-qp4q7i4cfpv5"
+
 # === ROLE DECORATORS ===
 
 
@@ -43,6 +42,7 @@ admin_required = role_required('admin')
 staff_required = role_required('staff', 'admin')
 applicant_required = role_required('applicant')
 
+
 def applicant_only_or_redirect():
     """Для staff/admin возвращает redirect на их дашборд, иначе None."""
     if current_user.is_authenticated and current_user.role in ['staff', 'admin']:
@@ -50,6 +50,7 @@ def applicant_only_or_redirect():
             return redirect(url_for('admin_dashboard'))
         return redirect(url_for('staff_dashboard'))
     return None
+
 
 # === MULTILANG ===
 try:
@@ -396,7 +397,6 @@ def calculator():
         return r
     return render_template('calculator.html')
 
-
 @app.route('/api/calculator/recommend', methods=['POST'])
 @login_required
 def calculator_recommend():
@@ -468,7 +468,7 @@ Give practical personalized advice on next steps. Be positive, specific and conc
 
     try:
         response = client.models.generate_content(
-            model="gemini-flash-latest",   # или gemini-flash-latest
+            model="gemini-flash-latest",
             contents=[prompt]
         )
         text = response.text.strip() if response.text else ''
@@ -482,12 +482,14 @@ Give practical personalized advice on next steps. Be positive, specific and conc
             'en': 'Recommendation service temporarily unavailable.'
         }
         return jsonify({'recommendation': fallback.get(lang, fallback['ru']), 'ok': False})
+
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
 
 
 # === APPLICANT STATUS PAGE ===
+
 @app.route('/status')
 @login_required
 def status():
@@ -506,6 +508,7 @@ def status():
                            docs_by_type=docs_by_type,
                            profile_complete=profile_complete,
                            existing_app=existing_app)
+
 
 # === PROFILE ===
 
@@ -555,6 +558,7 @@ def profile():
                            existing_app=existing_app,
                            notifications=notifications,
                            unread_count=unread_count)
+
 
 @app.route('/profile/edit', methods=['POST'])
 @login_required
@@ -642,7 +646,6 @@ def serve_document(doc_id):
     if doc.user_id != current_user.id and not current_user.is_admin:
         return jsonify({'error': 'forbidden'}), 403
 
-    # Правильная обработка кириллицы в имени файла
     filename = doc.filename
     encoded_filename = urllib.parse.quote(filename)
 
@@ -651,8 +654,6 @@ def serve_document(doc_id):
         mimetype=doc.mime_type,
         headers={
             'Content-Disposition': f'inline; filename="{encoded_filename}"',
-            # Лучший вариант для современных браузеров:
-            # 'Content-Disposition': f'inline; filename*=UTF-8\'\'{encoded_filename}',
             'Content-Length': str(doc.file_size or len(doc.file_data))
         }
     )
@@ -732,8 +733,9 @@ Email: {app_entry.email}
     except Exception as e:
         print("Ошибка при отправке письма:", e)
 
-    flash(t('Заявка успешно подана!'), 'success')
+    flash(t('Заявка успешно подана! Мы свяжемся с вами в ближайшее время.'), 'success')
     return redirect(url_for('status'))
+
 
 # === STAFF INTERFACE ===
 
@@ -804,7 +806,7 @@ def staff_update_status(app_id):
         application.staff_note = staff_note
 
     if application.user_id:
-        status_label = t(APP_STATUSES[new_status]['label_key'])
+        status_label = APP_STATUSES[new_status]['label']
         notif_type = 'success' if new_status == 'approved' else ('error' if new_status == 'rejected' else 'info')
         notif = Notification(
             title='Статус вашей заявки изменён',
@@ -815,7 +817,7 @@ def staff_update_status(app_id):
         db.session.add(notif)
 
     db.session.commit()
-    flash(t('Статус заявки обновлён') + f': {t(APP_STATUSES[new_status]["label_key"])}', 'success')
+    flash(t('Статус заявки обновлён') + f': {APP_STATUSES[new_status]["label"]}', 'success')
     return redirect(url_for('staff_application_detail', app_id=app_id))
 
 
@@ -854,8 +856,7 @@ def staff_add_comment(app_id):
 @staff_required
 def staff_serve_document(doc_id):
     doc = UserDocument.query.get_or_404(doc_id)
-    
-    # Правильная обработка кириллицы в имени файла
+
     import urllib.parse
     encoded_filename = urllib.parse.quote(doc.filename)
 
@@ -867,6 +868,7 @@ def staff_serve_document(doc_id):
             'Content-Length': str(doc.file_size or len(doc.file_data))
         }
     )
+
 # === ADMIN ===
 
 @app.route('/admin')
@@ -929,18 +931,18 @@ def register():
         if User.query.filter_by(email=email).first():
             flash(t('Пользователь с таким Email уже существует'), 'error')
             return redirect(url_for('register'))
-        
+
         if not password or len(password) < 8:
             flash(t('Пароль должен содержать не менее 8 символов'), 'error')
             return redirect(url_for('register'))
-        
+
         u = User(name=name, email=email, role='applicant', language=session.get('lang', 'ru'))
         u.set_password(password)
         db.session.add(u)
         db.session.commit()
 
         login_user(u)
-        flash(t('Регистрация прошла успешно!'), 'success')
+        flash(t('Регистрация прошла успешно! Добро пожаловать в Талапкер.'), 'success')
         return redirect(url_for('profile'))
 
     return render_template('register.html')
@@ -955,7 +957,7 @@ def login():
 
         if u and u.check_password(pw):
             login_user(u)
-            flash(t('Добро пожаловать') + f', {u.name or u.email}!', 'success')
+            flash(t('Вы успешно вошли в систему') + f', {u.name or u.email}!', 'success')
             if u.role == 'admin':
                 return redirect(url_for('admin_dashboard'))
             elif u.role == 'staff':
@@ -963,7 +965,7 @@ def login():
             else:
                 return redirect(url_for('profile'))
 
-        flash(t('Неверный логин или пароль'), 'error')
+        flash(t('Неверный логин или пароль. Попробуйте снова.'), 'error')
     return render_template('login.html')
 
 
@@ -990,6 +992,7 @@ def register_eds():
     db.session.add(u)
     db.session.commit()
     login_user(u)
+    flash(t('Регистрация по ЭЦП прошла успешно! Добро пожаловать.'), 'success')
     return jsonify({'status': 'ok', 'redirect': url_for('profile')})
 
 
@@ -1005,6 +1008,7 @@ def login_eds():
     if not u:
         return jsonify({'status': 'error', 'message': 'Пользователь не найден. Пожалуйста, зарегистрируйтесь.'}), 404
     login_user(u)
+    flash(t('Вы успешно вошли по ЭЦП.'), 'success')
     redirect_url = url_for('admin_dashboard') if u.role == 'admin' else url_for('profile')
     return jsonify({'status': 'ok', 'redirect': redirect_url})
 
@@ -1264,7 +1268,6 @@ def api_chat():
     msg = user_message.lower()
     lang = session.get('lang') or detect_language(user_message)
 
-    # === ТВОЯ СТАРАЯ ЛОГИКА (полностью сохранена) ===
     free_question_variants = ["задать свой вопрос", "өз сұрауыңызды жіберіңіз",
                                "өз сұрағыңызды қою", "ask your question"]
     if msg.strip() in free_question_variants:
@@ -1279,7 +1282,6 @@ def api_chat():
         return jsonify({"reply": t("Вы вернулись назад."), "options": options,
                         "update_options": True, "markdown": True})
 
-    # Level selection (бакалавриат, магистратура и т.д.)
     level_map = {
         "бакалавриат": "bachelor_menu", "магистратура": "master_menu",
         "докторантура": "doctorate_menu", "bachelor": "bachelor_menu",
@@ -1294,7 +1296,6 @@ def api_chat():
             return jsonify({"reply": t("Отлично! Вы выбрали раздел.") + "\n\n" + t("Выберите тему:"),
                             "options": options, "update_options": True, "markdown": True})
 
-    # Submenu selection
     submenu_map = {
         "после 11 класса": "bachelor_after_school", "после колледжа": "bachelor_after_college",
         "после армии": "bachelor_after_army", "after school": "bachelor_after_school",
@@ -1310,7 +1311,6 @@ def api_chat():
             return jsonify({"reply": t("Вы выбрали:") + f" {user_message}\n\n" + t("Выберите вопрос:"),
                             "options": options, "update_options": True, "markdown": True})
 
-    # === ТВОЙ СТАРЫЙ FAQ EXACT MATCH ===
     if FAQ_DATA:
         msg_lower = user_message.lower()
         for item in FAQ_DATA:
@@ -1322,7 +1322,6 @@ def api_chat():
                     db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
 
-    # === НОВЫЙ RAG (Google File Search) ===
     try:
         file_search_tool = types.Tool(
             file_search=types.FileSearch(
@@ -1350,7 +1349,6 @@ def api_chat():
 
         reply = response.text.strip() if hasattr(response, 'text') and response.text else "Извините, не удалось получить ответ."
 
-        # Сохраняем в историю
         db.session.add(ChatHistory(
             user_id=current_user.id,
             message=user_message,
@@ -1368,7 +1366,6 @@ def api_chat():
             'en': "Service temporarily unavailable."
         }
         return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
-    
 
 
 @app.route('/api/chat/history')
@@ -1395,7 +1392,7 @@ def create_admin():
 
 def create_staff():
     staff = User.query.filter_by(email='staff@site.com').first()
-    
+
     if not staff:
         staff = User(
             name='Сотрудник Приёмной Комиссии',
@@ -1403,7 +1400,7 @@ def create_staff():
             role='staff',
             language='ru'
         )
-        staff.set_password('staff123')   # ← пароль можно легко поменять
+        staff.set_password('staff123')
         db.session.add(staff)
         db.session.commit()
         print("✅ Создан Staff аккаунт: staff@site.com / staff123")
@@ -1423,7 +1420,7 @@ with app.app_context():
     db.create_all()
     create_admin()
     load_faq_exact()
-    create_staff()          # ← добавь эту строку
+    create_staff()
     load_dialog_scenarios()
 
 if __name__ == '__main__':
@@ -1431,6 +1428,6 @@ if __name__ == '__main__':
         db.create_all()
         create_admin()
         load_faq_exact()
-        create_staff()          # ← добавь эту строку
+        create_staff()
         load_dialog_scenarios()
     app.run(debug=True)
