@@ -3,8 +3,8 @@ Flask-SQLAlchemy
 Flask-Login
 Flask-Migrate
 Flask-Mail
+google-generativeai
 python-dotenv
 psycopg2-binary
 gunicorn
-google-generativeai
 Werkzeug

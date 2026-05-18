@@ -10,8 +10,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 # === GEMINI IMPORTS ===
-from google import genai
-from google.genai import types
+# === GEMINI IMPORTS (CORRECT) ===
+import google.generativeai as genai
+from google.generativeai import types
 import os
 from dotenv import load_dotenv
 
