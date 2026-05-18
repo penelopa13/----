@@ -9,23 +9,18 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
-# === GEMINI IMPORTS ===
-# === GEMINI IMPORTS (CORRECT) ===
+# === GEMINI (старый SDK google
+# -generativeai) ===
 import google.generativeai as genai
-from google.generativeai import types
-import os
-from dotenv import load_dotenv
-
 
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-FILE_SEARCH_STORE_NAME = "fileSearchStores/zhubanov-university-knowled-qp4q7i4cfpv5"
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+GEMINI_MODEL_NAME = "gemini-1.5-flash"
 
 # === ROLE DECORATORS ===
-
 
 def role_required(*roles):
     def decorator(f):
@@ -268,7 +263,6 @@ APP_STATUSES_DATA = {
 FINAL_LABELS = {'ru': 'Итог', 'kk': 'Қорытынды', 'en': 'Final'}
 
 def get_app_statuses(lang='ru'):
-    """Возвращает APP_STATUSES с label на нужном языке. Не читает session."""
     result = {}
     for key, data in APP_STATUSES_DATA.items():
         result[key] = {
@@ -288,7 +282,6 @@ def get_tracker_steps(lang='ru'):
         ('final',    FINAL_LABELS.get(lang, 'Итог')),
     ]
 
-# Значения по умолчанию (ru) — используются до первого запроса
 APP_STATUSES  = get_app_statuses('ru')
 TRACKER_STEPS = get_tracker_steps('ru')
 
@@ -468,11 +461,9 @@ Give practical personalized advice on next steps. Be positive, specific and conc
     prompt = prompts.get(lang, prompts['ru'])
 
     try:
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=[prompt]
-        )
-        text = response.text.strip() if response.text else ''
+        model = genai.GenerativeModel(GEMINI_MODEL_NAME)
+        response = model.generate_content(prompt)
+        text = (response.text or '').strip() if hasattr(response, 'text') else ''
         return jsonify({'recommendation': text, 'ok': True})
 
     except Exception as e:
@@ -689,7 +680,6 @@ def submit_application():
         flash(t('Выберите специальность'), 'error')
         return redirect(url_for('status'))
 
-    # IIN duplicate check across same specialty
     if u.iin:
         iin_users = User.query.filter(User.iin == u.iin).all()
         for iin_user in iin_users:
@@ -1323,44 +1313,38 @@ def api_chat():
                     db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
 
+    # === Gemini (старый SDK, без File Search) ===
     try:
-        file_search_tool = types.Tool(
-            file_search=types.FileSearch(
-                file_search_store_names=[FILE_SEARCH_STORE_NAME]
-            )
+        system_prompt = (
+            f"Ты — официальный ИИ-консультант приёмной комиссии университета имени К. Жубанова (Актобе). "
+            f"Отвечай только на языке вопроса пользователя ({lang.upper()}). "
+            f"Будь вежливым, точным и лаконичным. "
+            f"Если точного ответа нет — честно скажи, что этой информации нет в базе, "
+            f"и посоветуй обратиться в приёмную комиссию."
         )
 
-        system_prompt = f"""
-        Ты — официальный ИИ-консультант приёмной комиссии университета им. К. Жубанова (Актобе).
-        Отвечай только на языке вопроса пользователя ({lang.upper()}).
-        Будь вежливым, точным и лаконичным.
-        Используй только информацию из загруженных документов.
-        Если точного ответа нет — честно скажи, что этой информации нет в базе или посоветуй обратиться в приёмную комиссию.
-        """
-
-        response = client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=[user_message],
-            config=types.GenerateContentConfig(
-                tools=[file_search_tool],
-                temperature=0.3,
-                system_instruction=system_prompt,
-            )
+        model = genai.GenerativeModel(
+            GEMINI_MODEL_NAME,
+            system_instruction=system_prompt,
+            generation_config={"temperature": 0.3}
         )
+        response = model.generate_content(user_message)
+        reply = (response.text or '').strip() if hasattr(response, 'text') else ''
+        if not reply:
+            reply = "Извините, не удалось получить ответ."
 
-        reply = response.text.strip() if hasattr(response, 'text') and response.text else "Извините, не удалось получить ответ."
-
-        db.session.add(ChatHistory(
-            user_id=current_user.id,
-            message=user_message,
-            response=reply
-        ))
-        db.session.commit()
+        if current_user.is_authenticated:
+            db.session.add(ChatHistory(
+                user_id=current_user.id,
+                message=user_message,
+                response=reply
+            ))
+            db.session.commit()
 
         return jsonify({"reply": reply, "options": [], "markdown": True})
 
     except Exception as e:
-        print("Gemini File Search Error:", str(e))
+        print("Gemini Error:", str(e))
         fallback = {
             'ru': "Сервис временно недоступен. Попробуйте позже.",
             'kk': "Қызмет уақытша қолжетімсіз. Кейінірек көріңіз.",
