@@ -19,10 +19,14 @@ print("=" * 80)
 
 # ===================== ФАЙЛЫ =====================
 files_to_upload = [
-    "data/faq_exact.json",
-    # Добавляй сюда остальные файлы:
-    # "knowledge_base/pravila_priema.pdf",
-    # "knowledge_base/specialty_list.pdf",
+    "knowledge_base/faq_exact.json",
+    "knowledge_base/applicant_calendar.docx",
+    "knowledge_base/doctor.pdf",
+    "knowledge_base/poriyadok.txt",
+    "knowledge_base/poslearmii.pdf",
+    "knowledge_base/priem.pdf",
+    "knowledge_base/specexam.txt",
+    "knowledge_base/stoimobuch.pdf",
 ]
 
 for file_path in files_to_upload:
