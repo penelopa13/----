@@ -55,7 +55,9 @@
 
         <div class="center mt-5 buttons-group">
           <a href="/profile" class="btn orange big">{{ t('Вернуться в профиль') }}</a>
-          <a href="/test_psy" class="btn small ml-3">{{ t('Пройти тест заново') }}</a>
+          <form method="POST" action="{{ url_for('test_psy_reset') }}" style="display:inline;">
+            <button type="submit" class="btn small ml-3">{{ t('Пройти тест заново') }}</button>
+          </form>
         </div>
 
       </div>
@@ -95,6 +97,71 @@
 <script src="{{ url_for('static', filename='js/test_psy.js') }}?v=12"></script>
 
 <style>
+  /* ── утилиты, которых нет в style.css ── */
+  .center       { text-align: center; }
+  .mt-4         { margin-top: 1.5rem; }
+  .mt-5         { margin-top: 3rem; }
+  .ml-3         { margin-left: 1rem; }
+  .fade-in      { animation: fadeInAnim 0.45s ease both; }
+  @keyframes fadeInAnim {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── вопрос теста ── */
+  .question-text {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  /* ── варианты ответов ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .options button {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 14px 22px;
+    color: #eee;
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.22s ease;
+  }
+  .options button:hover {
+    background: rgba(255,179,15,0.18);
+    border-color: var(--accent-color);
+    color: #fff;
+    transform: translateX(4px);
+  }
+  .options button.selected {
+    background: rgba(255,179,15,0.28);
+    border-color: var(--accent-color);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* ── прогресс ── */
+  .progress-text {
+    text-align: center;
+    color: rgba(255,255,255,0.55);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── кнопки навигации ── */
+  .buttons { display: flex; justify-content: center; gap: 12px; }
+  .btn.big { padding: 14px 36px; font-size: 1.05rem; }
+
+  /* ── результат: тип личности ── */
   .mbti-result-card {
     text-align: center;
     background: rgba(255,255,255,0.08);
@@ -103,7 +170,6 @@
     margin-bottom: 40px;
     border: 1px solid rgba(255,179,15,0.3);
   }
-
   .mbti-type-big {
     font-family: monospace;
     font-size: 3.5rem;
@@ -117,15 +183,24 @@
     margin: 20px 0 25px;
     letter-spacing: 6px;
   }
-
   .result-description {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     line-height: 1.75;
     color: #ddd;
     max-width: 740px;
     margin: 0 auto;
   }
 
+  /* ── секции результата ── */
+  .result-section  { margin-bottom: 50px; }
+  .section-title {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+
+  /* ── радар ── */
   .radar-container {
     max-width: 420px;
     margin: 30px auto;
@@ -134,17 +209,7 @@
     padding: 25px;
   }
 
-  .result-section {
-    margin-bottom: 50px;
-  }
-
-  .section-title {
-    color: var(--accent-color);
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-  }
-
+  /* ── сильные стороны ── */
   .strengths-list {
     background: rgba(255,255,255,0.08);
     padding: 28px;
@@ -154,26 +219,32 @@
     color: #eee;
   }
 
+  /* ── профессии ── */
   .professions-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 18px;
   }
-
   .profession-card {
     background: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.25);
     border-radius: 16px;
     padding: 22px;
-    transition: all 0.4s ease;
+    transition: all 0.35s ease;
   }
-
   .profession-card:hover {
-    background: rgba(255,179,15,0.25);
+    background: rgba(255,179,15,0.22);
     transform: translateY(-6px);
     border-color: var(--accent-color);
   }
+  .profession-card h5 {
+    margin: 0;
+    color: #fff;
+    font-size: 0.97rem;
+    line-height: 1.5;
+  }
 
+  /* ── кнопки внизу результата ── */
   .buttons-group {
     display: flex;
     justify-content: center;
@@ -182,8 +253,10 @@
   }
 
   @media (max-width: 768px) {
-    .mbti-type-big { font-size: 2.8rem; padding: 12px 30px; }
-    .radar-container { max-width: 340px; padding: 15px; }
+    .mbti-type-big    { font-size: 2.4rem; padding: 12px 24px; letter-spacing: 4px; }
+    .radar-container  { max-width: 100%; padding: 15px; }
+    .question-text    { font-size: 1.15rem; }
+    .options button   { font-size: 0.95rem; padding: 12px 16px; }
   }
 </style>
 {% endblock %}

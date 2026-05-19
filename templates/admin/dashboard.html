@@ -406,8 +406,10 @@
                 if (d.status === 'ok') {
                     alert('{{ t('Запись удалена') }}');
                     updateCardCount(table);
-                    const row = document.querySelector(`#${table}Table tr td:first-child:has(textContent='${id}')`).closest('tr');
-                    if (row) row.remove();
+                    const rows = document.querySelectorAll(`#${table}Table tbody tr`);
+                    rows.forEach(row => {
+                        if (row.querySelector('td')?.textContent.trim() == id) row.remove();
+                    });
                 } else {
                     alert('{{ t('Ошибка:') }} ' + (d.message || '{{ t('Не удалось удалить') }}'));
                 }

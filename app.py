@@ -494,9 +494,10 @@ def status():
     profile_complete = all([u.first_name, u.last_name, u.phone, u.iin, u.school_name])
     existing_app = Application.query.filter_by(user_id=current_user.id)\
                     .order_by(Application.created_at.desc()).first()
+    lang = session.get('lang', current_user.language or 'ru')
     return render_template('status.html',
                            user=u,
-                           doc_types=DOC_TYPES,
+                           doc_types=get_doc_types(lang),
                            docs_by_type=docs_by_type,
                            profile_complete=profile_complete,
                            existing_app=existing_app)
@@ -545,7 +546,7 @@ def profile():
     return render_template('profile.html',
                            user=current_user,
                            result=result_data,
-                           doc_types=DOC_TYPES,
+                           doc_types=get_doc_types(lang),
                            docs_by_type=docs_by_type,
                            existing_app=existing_app,
                            notifications=notifications,
@@ -635,7 +636,7 @@ import urllib.parse
 @login_required
 def serve_document(doc_id):
     doc = UserDocument.query.get_or_404(doc_id)
-    if doc.user_id != current_user.id and not current_user.is_admin:
+    if doc.user_id != current_user.id and not current_user.is_admin and current_user.role != 'staff':
         return jsonify({'error': 'forbidden'}), 403
 
     filename = doc.filename
@@ -797,18 +798,32 @@ def staff_update_status(app_id):
         application.staff_note = staff_note
 
     if application.user_id:
-        status_label = APP_STATUSES[new_status]['label']
+        recipient = User.query.get(application.user_id)
+        recipient_lang = (recipient.language or 'ru') if recipient else 'ru'
+        status_label = APP_STATUSES_DATA[new_status]['labels'].get(recipient_lang, APP_STATUSES_DATA[new_status]['labels']['ru'])
         notif_type = 'success' if new_status == 'approved' else ('error' if new_status == 'rejected' else 'info')
+        titles = {
+            'ru': 'Статус вашей заявки изменён',
+            'kk': 'Сіздің өтінішіңіздің мәртебесі өзгерді',
+            'en': 'Your application status has changed',
+        }
+        messages = {
+            'ru': f'Ваша заявка на специальность «{application.specialty}» перешла в статус: {status_label}.',
+            'kk': f'«{application.specialty}» мамандығына өтінішіңіздің мәртебесі өзгерді: {status_label}.',
+            'en': f'Your application for «{application.specialty}» has changed to: {status_label}.',
+        }
         notif = Notification(
-            title='Статус вашей заявки изменён',
-            message=f'Ваша заявка на специальность «{application.specialty}» перешла в статус: {status_label}.',
+            title=titles.get(recipient_lang, titles['ru']),
+            message=messages.get(recipient_lang, messages['ru']),
             notif_type=notif_type,
             recipient_id=application.user_id
         )
         db.session.add(notif)
 
     db.session.commit()
-    flash(t('Статус заявки обновлён') + f': {APP_STATUSES[new_status]["label"]}', 'success')
+    lang = session.get('lang', 'ru')
+    status_label_staff = APP_STATUSES_DATA[new_status]['labels'].get(lang, APP_STATUSES_DATA[new_status]['labels']['ru'])
+    flash(t('Статус заявки обновлён') + f': {status_label_staff}', 'success')
     return redirect(url_for('staff_application_detail', app_id=app_id))
 
 
@@ -830,9 +845,21 @@ def staff_add_comment(app_id):
     db.session.add(comment)
 
     if application.user_id:
+        recipient = User.query.get(application.user_id)
+        recipient_lang = (recipient.language or 'ru') if recipient else 'ru'
+        titles = {
+            'ru': 'Новый комментарий к вашей заявке',
+            'kk': 'Өтінішіңізге жаңа пікір',
+            'en': 'New comment on your application',
+        }
+        messages = {
+            'ru': f'Сотрудник приёмной комиссии оставил комментарий к вашей заявке на специальность «{application.specialty}».',
+            'kk': f'Қабылдау комиссиясының қызметкері «{application.specialty}» мамандығына өтінішіңізге пікір қалдырды.',
+            'en': f'The admissions office has left a comment on your application for «{application.specialty}».',
+        }
         notif = Notification(
-            title='Новый комментарий к вашей заявке',
-            message=f'Сотрудник приёмной комиссии оставил комментарий к вашей заявке на специальность «{application.specialty}».',
+            title=titles.get(recipient_lang, titles['ru']),
+            message=messages.get(recipient_lang, messages['ru']),
             notif_type='info',
             recipient_id=application.user_id
         )
@@ -908,6 +935,42 @@ def admin_delete(table, item_id):
     db.session.delete(obj)
     db.session.commit()
     return jsonify({'status': 'ok'})
+
+
+@app.route('/api/admin/delete/<string:table>/all', methods=['DELETE'])
+@login_required
+def admin_delete_all(table):
+    if not current_user.is_admin:
+        return jsonify({'status': 'error', 'message': 'forbidden'}), 403
+
+    models = {
+        'users': User, 'results': TestResult, 'messages': ContactMessage,
+        'notifications': Notification, 'applications': Application
+    }
+    model = models.get(table)
+    if not model:
+        return jsonify({'status': 'error', 'message': 'bad table'}), 400
+
+    model.query.delete()
+    db.session.commit()
+    return jsonify({'status': 'ok'})
+
+
+@app.route('/api/admin/count/<string:table>', methods=['GET'])
+@login_required
+def admin_count(table):
+    if not current_user.is_admin:
+        return jsonify({'status': 'error', 'message': 'forbidden'}), 403
+
+    models = {
+        'users': User, 'results': TestResult, 'messages': ContactMessage,
+        'notifications': Notification, 'applications': Application
+    }
+    model = models.get(table)
+    if not model:
+        return jsonify({'status': 'error', 'message': 'bad table'}), 400
+
+    return jsonify({'count': model.query.count()})
 
 
 # === AUTH ===
@@ -1132,6 +1195,14 @@ def test_psy():
         })
     questions = load_questions(lang)
     return render_template('test_psy.html', questions=questions, lang=lang)
+
+
+@app.route('/test_psy/reset', methods=['POST'])
+@login_required
+def test_psy_reset():
+    TestResult.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+    return redirect(url_for('test_psy'))
 
 
 @app.route('/api/test/questions', methods=['GET'])
