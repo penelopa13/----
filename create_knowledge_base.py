@@ -27,7 +27,9 @@ files_to_upload = [
     "knowledge_base/priem.pdf",
     "knowledge_base/specexam.txt",
     "knowledge_base/stoimobuch.pdf",
+    "knowledge_base/stoiim.docx",
 ]
+
 
 for file_path in files_to_upload:
     if not os.path.exists(file_path):

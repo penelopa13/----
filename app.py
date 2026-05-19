@@ -1386,17 +1386,6 @@ def api_chat():
             return jsonify({"reply": t("Вы выбрали:") + f" {user_message}\n\n" + t("Выберите вопрос:"),
                             "options": options, "update_options": True, "markdown": True})
 
-    if FAQ_DATA:
-        msg_lower = user_message.lower()
-        for item in FAQ_DATA:
-            keywords = [k.lower() for k in item.get("keywords", [])]
-            if any(kw in msg_lower for kw in keywords):
-                answer = item.get(f"answer_{lang}") or item.get("answer_ru", "Ответ временно недоступен.")
-                if current_user.is_authenticated:
-                    db.session.add(ChatHistory(user_id=current_user.id, message=user_message, response=answer))
-                    db.session.commit()
-                return jsonify({"reply": answer, "options": [], "markdown": True})
-
     # === Gemini с File Search (векторная база) ===
     try:
         system_prompt = (

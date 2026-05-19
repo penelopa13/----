@@ -492,48 +492,7 @@ async function loadQuickQuestions() {
 
 loadQuickQuestions();
 
-const predefined = [
-  {
-    keys: ["сроки", "қашан", "deadline", "when"],
-    ru: "СРОКИ ПРИЁМА 2026:\n• Бакалавриат: 20.06–25.08\n• Магистратура: 20.06–25.08\n• Докторантура: 20.06–25.08",
-    kk: "ҚАБЫЛДАУ МЕРЗІМІ 2026:\n• Бакалавриат: 20.06–25.08\n• Магистратура: 20.06–25.08\n• Докторантура: 20.06–25.08",
-    en: "ADMISSION DEADLINES 2026:\n• Bachelor's: 20.06–25.08\n• Master's: 20.06–25.08\n• Doctorate: 20.06–25.08"
-  },
-  {
-    keys: ["грант", "grant"],
-    ru: "Да, есть государственные гранты. Результаты — на enbek.kz",
-    kk: "Иә, мемлекеттік гранттар бар. Нәтижелер — enbek.kz сайтында",
-    en: "Yes, state grants are available. Results are published on enbek.kz"
-  },
-  {
-    keys: ["стоимость", "ақысы", "price", "cost"],
-    ru: "Бакалавриат: 850–1 500 тыс. ₸/год\nМагистратура: от 1 100 тыс. ₸",
-    kk: "Бакалавриат: 850–1 500 мың ₸/жыл\nМагистратура: 1 100 мың ₸-дан",
-    en: "Bachelor's: 850–1,500 thousand ₸/year\nMaster's: from 1,100 thousand ₸"
-  },
-  {
-    keys: ["общежитие", "жатақхана", "dormitory"],
-    ru: "Да, есть. Стоимость: 15–25 тыс. ₸/мес.",
-    kk: "Иә, бар. Бағасы: 15–25 мың ₸/ай",
-    en: "Yes, available. Cost: 15–25 thousand ₸/month"
-  },
-  {
-    keys: ["әскер", "армия", "после армии", "отслужив", "срочн", "срочники", "военный билет", "army"],
-    ru: "После армии (срочной службы):\n• На платное можно поступить без ЕНТ в течение 2 лет.\n• Есть квота на грант по программе «Срочники 2.0».\n• Нужен военный билет и справка о службе.",
-    kk: "Армиядан кейін:\n• ҰБТ-сыз 2 жыл ішінде ақылы оқуға түсуге болады.\n• «Мерзімді қызмет 2.0» бойынша грант квотасы бар.\n• Әскери билет пен қызмет анықтамасы қажет.",
-    en: "After military service:\n• Can apply for paid admission without UNT within 2 years.\n• Grant quota under 'Military Service 2.0' program.\n• Military ID and service certificate required."
-  }
-];
 
-function getPredefinedAnswer(text) {
-  const lower = text.toLowerCase();
-  for (const item of predefined) {
-    if (item.keys.some(k => lower.includes(k))) {
-      return item[CURRENT_LANG] || item['ru'];
-    }
-  }
-  return null;
-}
 
 function addMessage(text, type = "bot") {
   const div = document.createElement('div');
@@ -552,15 +511,6 @@ async function sendMessage(text) {
 
   addMessage(text, "user");
   userInput.value = "";
-
-  const predefinedAns = getPredefinedAnswer(text);
-  if (predefinedAns) {
-    setTimeout(() => {
-      addMessage(predefinedAns, "bot");
-      loadQuickQuestions();
-    }, 600);
-    return;
-  }
 
   typingIndicator.style.display = "flex";
 
