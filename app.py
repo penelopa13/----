@@ -9,16 +9,21 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
-# === GEMINI (старый SDK google
-# -generativeai) ===
-import google.generativeai as genai
+# === GEMINI (новый SDK google-genai) ===
+from google import genai as genai_sdk
+from google.genai import types as genai_types
 
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-GEMINI_MODEL_NAME = "gemini-1.5-flash"
+
+GEMINI_MODEL_NAME = "gemini-flash-latest"
+
+# Единый клиент для всего приложения
+_genai_client = genai_sdk.Client(api_key=os.getenv("GEMINI_API_KEY"))
+# STORE NAME из create_knowledge_base.py — задай в переменной окружения GEMINI_STORE_NAME
+GEMINI_STORE_NAME = os.getenv("GEMINI_STORE_NAME", "")
 
 # === ROLE DECORATORS ===
 
@@ -461,9 +466,17 @@ Give practical personalized advice on next steps. Be positive, specific and conc
     prompt = prompts.get(lang, prompts['ru'])
 
     try:
-        model = genai.GenerativeModel(GEMINI_MODEL_NAME)
-        response = model.generate_content(prompt)
-        text = (response.text or '').strip() if hasattr(response, 'text') else ''
+        response = _genai_client.models.generate_content(
+            model=GEMINI_MODEL_NAME,
+            contents=prompt,
+            config={"temperature": 0.5}
+        )
+        text = ""
+        if response and response.candidates:
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, "text") and part.text:
+                    text += part.text
+        text = text.strip()
         return jsonify({'recommendation': text, 'ok': True})
 
     except Exception as e:
@@ -1384,25 +1397,57 @@ def api_chat():
                     db.session.commit()
                 return jsonify({"reply": answer, "options": [], "markdown": True})
 
-    # === Gemini (старый SDK, без File Search) ===
+    # === Gemini с File Search (векторная база) ===
     try:
         system_prompt = (
-            f"Ты — официальный ИИ-консультант приёмной комиссии университета имени К. Жубанова (Актобе). "
-            f"Отвечай только на языке вопроса пользователя ({lang.upper()}). "
-            f"Будь вежливым, точным и лаконичным. "
-            f"Если точного ответа нет — честно скажи, что этой информации нет в базе, "
-            f"и посоветуй обратиться в приёмную комиссию."
+            f"Ты — официальный ИИ-консультант приёмной комиссии университета имени К. Жубанова (Актобе, Казахстан). "
+            f"Отвечай ТОЛЬКО на языке вопроса пользователя: {lang.upper()}. "
+            f"Используй информацию из базы знаний университета. "
+            f"Давай подробные, дружелюбные и полезные ответы — не менее 3–5 предложений. "
+            f"Структурируй ответ: сначала прямой ответ на вопрос, потом дополнительные детали. "
+            f"Если информации нет в базе — честно скажи и посоветуй обратиться в приёмную комиссию: "
+            f"+7 (7132) 54-49-74 или info@zhubanov.edu.kz"
         )
 
-        model = genai.GenerativeModel(
-            GEMINI_MODEL_NAME,
-            system_instruction=system_prompt,
-            generation_config={"temperature": 0.3}
-        )
-        response = model.generate_content(user_message)
-        reply = (response.text or '').strip() if hasattr(response, 'text') else ''
+        # Если есть Store — используем File Search (RAG)
+        if GEMINI_STORE_NAME:
+            response = _genai_client.models.generate_content(
+                model=GEMINI_MODEL_NAME,
+                contents=user_message,
+                config=genai_types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.4,
+                    tools=[genai_types.Tool(
+                        file_search=genai_types.FileSearch(
+                            fileSearchStoreNames=[GEMINI_STORE_NAME]
+                        )
+                    )]
+                )
+            )
+        else:
+            # Fallback: без File Search, просто Gemini
+            response = _genai_client.models.generate_content(
+                model=GEMINI_MODEL_NAME,
+                contents=user_message,
+                config=genai_types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.4,
+                )
+            )
+
+        reply = ""
+        if response and response.candidates:
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, "text") and part.text:
+                    reply += part.text
+        reply = reply.strip()
+
         if not reply:
-            reply = "Извините, не удалось получить ответ."
+            reply = {
+                'ru': "Извините, не удалось получить ответ. Попробуйте переформулировать вопрос.",
+                'kk': "Кешіріңіз, жауап алу мүмкін болмады. Сұрақты басқаша тұжырымдап көріңіз.",
+                'en': "Sorry, couldn't get an answer. Please try rephrasing your question."
+            }.get(lang, "Извините, не удалось получить ответ.")
 
         if current_user.is_authenticated:
             db.session.add(ChatHistory(
@@ -1417,9 +1462,9 @@ def api_chat():
     except Exception as e:
         print("Gemini Error:", str(e))
         fallback = {
-            'ru': "Сервис временно недоступен. Попробуйте позже.",
-            'kk': "Қызмет уақытша қолжетімсіз. Кейінірек көріңіз.",
-            'en': "Service temporarily unavailable."
+            'ru': "Сервис временно недоступен. Попробуйте позже или обратитесь в приёмную комиссию.",
+            'kk': "Қызмет уақытша қолжетімсіз. Кейінірек көріңіз немесе қабылдау комиссиясына хабарласыңыз.",
+            'en': "Service temporarily unavailable. Please try again or contact the admissions office."
         }
         return jsonify({"reply": fallback.get(lang, fallback['ru']), "markdown": True})
 
