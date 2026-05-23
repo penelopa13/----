@@ -13,7 +13,7 @@ print(f"📦 Store: {STORE_NAME}")
 print("=" * 80)
 
 files_to_upload = [
-    "knowledge_base/zhub.txt",
+    "knowledge_base/scores.docx",
 
 ]
 
